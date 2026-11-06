@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Envío Regular Lima Metropolitana",
+    "label": "Lima Metropolitana Regular",
+    "description": "Entrega en 24 a 48 horas hábiles en Lima y Callao.",
+    "code": "standard_lima",
+    "amount": 10,
+    "is_active": true,
+    "coverage": {
+      "origin_city": "Lima",
+      "departments": ["Lima", "Callao"],
+      "estimated_delivery": "24-48 horas"
+    }
+  },
+  {
+    "name": "Envío Express Mismo Día",
+    "label": "Lima Express Mismo Día",
+    "description": "Entrega el mismo día para pedidos confirmados antes de las 2:00 PM.",
+    "code": "express_lima",
+    "amount": 15,
+    "is_active": true,
+    "coverage": {
+      "origin_city": "Lima",
+      "departments": ["Lima"],
+      "estimated_delivery": "Mismo día (4-6 horas)"
+    }
+  },
+  {
+    "name": "Envío a Provincias (Agencia)",
+    "label": "Provincias Courier / Agencia",
+    "description": "Envío certificado a nivel nacional vía Olva Courier o Shalom.",
+    "code": "provincias_agencia",
+    "amount": 25,
+    "is_active": true,
+    "coverage": {
+      "origin_city": "Lima",
+      "estimated_delivery": "48-72 horas"
+    }
+  },
+  {
+    "name": "Recojo en Tienda",
+    "label": "Recojo en Tienda FancyPets",
+    "description": "Recojo gratuito en nuestro local comercial previa confirmación.",
+    "code": "recojo_tienda",
+    "amount": 0,
+    "is_active": true,
+    "coverage": {
+      "origin_city": "Lima",
+      "estimated_delivery": "Inmediato tras confirmación"
+    }
+  }
+]

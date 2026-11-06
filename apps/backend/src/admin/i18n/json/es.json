@@ -1,0 +1,19 @@
+{
+  "fields": {
+    "email": "Correo electrónico",
+    "password": "Contraseña"
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "hint": "Panel de administración",
+    "forgotPassword": "¿Olvidaste tu contraseña? - <0>Restablecer</0>"
+  },
+  "actions": {
+    "continueWithEmail": "Iniciar sesión →"
+  },
+  "app": {
+    "titles": {
+      "core": "Fancy Pets"
+    }
+  }
+}

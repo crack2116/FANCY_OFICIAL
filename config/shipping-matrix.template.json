@@ -1,0 +1,39 @@
+[
+  {
+    "code": "store-pickup",
+    "name": "Recojo en Tienda",
+    "label": "Recojo en Tienda (Gratis)",
+    "description": "Retiro sin costo en tienda física del comercio",
+    "amount": 0,
+    "is_active": false,
+    "coverage": {
+      "origin_city": "A ser definida por el cliente",
+      "estimated_delivery": "Horario comercial"
+    }
+  },
+  {
+    "code": "local-delivery",
+    "name": "Envío Local Estándar",
+    "label": "Envío Local Estándar",
+    "description": "Entrega en zona de cobertura local",
+    "amount": 0,
+    "is_active": false,
+    "coverage": {
+      "origin_city": "A ser definida por el cliente",
+      "districts": [],
+      "estimated_delivery": "A ser definido por el cliente"
+    }
+  },
+  {
+    "code": "national-delivery",
+    "name": "Envío Nacional / Provincias",
+    "label": "Envío a Provincias",
+    "description": "Despacho a través de courier nacional o agencia",
+    "amount": 0,
+    "is_active": false,
+    "coverage": {
+      "departments": [],
+      "estimated_delivery": "A ser definido por el cliente"
+    }
+  }
+]

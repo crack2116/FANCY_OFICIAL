@@ -1,0 +1,144 @@
+# ==============================================================================
+# FANCYPERU — Ephemeral Financial Staging Docker Compose (Real HTTP Tests)
+# Isolated capsule for E2E HTTP verification of Culqi and Medusa
+# ==============================================================================
+
+version: "3.8"
+
+networks:
+  fancyperu_staging_net:
+    driver: bridge
+    name: fancyperu_staging_net
+
+volumes:
+  fancyperu_staging_db_data:
+    name: fancyperu_staging_db_data
+
+services:
+  staging-postgres:
+    image: postgres:16-alpine
+    container_name: fancyperu-staging-db
+    restart: "no"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: staging_user
+      POSTGRES_PASSWORD: staging_pass_2026
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - fancyperu_staging_db_data:/var/lib/postgresql/data
+    networks:
+      fancyperu_staging_net:
+        aliases:
+          - staging-postgres
+          - staging-postgres.localhost
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U staging_user -d postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 3s
+    command: ["postgres", "-c", "max_connections=200", "-c", "shared_buffers=128MB"]
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 768M
+        reservations:
+          memory: 128M
+
+  staging-redis:
+    image: redis:7-alpine
+    container_name: fancyperu-staging-redis
+    restart: "no"
+    networks:
+      - fancyperu_staging_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 2s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 128M
+        reservations:
+          memory: 64M
+
+  staging-culqi-mock:
+    image: node:22-bookworm-slim
+    container_name: fancyperu-staging-culqi-mock
+    restart: "no"
+    working_dir: /app
+    command: ["node", "/app/scratch/staging-culqi-mock.js"]
+    volumes:
+      - ./scratch/staging-culqi-mock.js:/app/scratch/staging-culqi-mock.js:ro
+    environment:
+      PORT: 8080
+    networks:
+      - fancyperu_staging_net
+    healthcheck:
+      test: ["CMD-SHELL", "node -e 'const http=require(\"http\"); const r=http.request({host:\"127.0.0.1\",port:8080,path:\"/mock/stats\",method:\"GET\"},res=>process.exit(res.statusCode===200?0:1)); r.on(\"error\",()=>process.exit(1)); r.end();'"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 2s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 128M
+        reservations:
+          memory: 64M
+
+  staging-backend:
+    image: fancyperu-backend:production-2.21.2-20261016
+    container_name: fancyperu-staging-backend
+    restart: "no"
+    working_dir: /app/apps/backend
+    volumes:
+      - ./apps/backend/.medusa/server:/app/apps/backend/.medusa/server
+      - ./apps/backend/src:/app/apps/backend/src
+      - ./apps/backend/integration-tests:/app/apps/backend/integration-tests
+      - ./apps/backend/medusa-config.ts:/app/apps/backend/medusa-config.ts:ro
+      - ./apps/backend/jest.config.js:/app/apps/backend/jest.config.js:ro
+    environment:
+      PORT: 9005
+      NODE_ENV: development
+      TEST_TYPE: "integration:http"
+      NODE_OPTIONS: "--experimental-vm-modules"
+      DATABASE_URL: postgres://staging_user:staging_pass_2026@staging-postgres.localhost:5432/postgres
+      MEDUSA_DATABASE_URL: postgres://staging_user:staging_pass_2026@staging-postgres.localhost:5432/postgres
+      DB_HOST: staging-postgres.localhost
+      DB_PORT: "5432"
+      DB_USERNAME: staging_user
+      DB_PASSWORD: staging_pass_2026
+      DB_NAME: postgres
+      DB_WAITINGROOM_DATABASE: postgres
+      REDIS_URL: redis://staging-redis:6379
+      JWT_SECRET: staging_jwt_secret_temporal_12345
+      COOKIE_SECRET: staging_cookie_secret_temporal_12345
+      MEDUSA_FF_RBAC: "false"
+      CULQI_ENABLED: "true"
+      CULQI_ENVIRONMENT: test
+      CULQI_PUBLIC_KEY: pk_test_staging_public_key_mock
+      CULQI_SECRET_KEY: sk_test_staging_secret_key_mock
+      CULQI_API_URL: http://staging-culqi-mock:8080
+      CULQI_WEBHOOK_SECRET: wh_test_staging_secret
+    networks:
+      - fancyperu_staging_net
+    depends_on:
+      staging-postgres:
+        condition: service_healthy
+      staging-redis:
+        condition: service_healthy
+      staging-culqi-mock:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1536M
+        reservations:
+          memory: 256M

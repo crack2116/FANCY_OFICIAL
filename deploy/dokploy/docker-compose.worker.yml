@@ -1,0 +1,62 @@
+# ==============================================================================
+# FANCYPERU — optional dedicated Medusa worker (manual use only).
+#
+# The default deployment runs Medusa in `shared` mode (server + worker in one
+# process), which is sufficient for this store. Dokploy's Docker Compose mode
+# does not pass `--profile`, so this file is intentionally not referenced by
+# the main deployment.
+#
+# Manual use from the repository root:
+#   docker compose -f docker-compose.dokploy.yml \
+#                  -f deploy/dokploy/docker-compose.worker.yml up -d
+#
+# This switches the backend to `server` mode and starts one worker process.
+# Never run the backend in `shared` mode together with this worker.
+# ==============================================================================
+
+services:
+  fancyperu-backend:
+    environment:
+      MEDUSA_WORKER_MODE: server
+
+  fancyperu-worker:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    image: fancyperu-backend:dokploy
+    restart: unless-stopped
+    depends_on:
+      fancyperu-db:
+        condition: service_healthy
+      fancyperu-redis:
+        condition: service_healthy
+      fancyperu-migration:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      MEDUSA_WORKER_MODE: worker
+      DATABASE_URL: postgres://${POSTGRES_USER:-fancyperu_prod_admin}:${POSTGRES_PASSWORD}@fancyperu-db:5432/${POSTGRES_DB:-fancyperu_production}?sslmode=disable
+      REDIS_URL: redis://:${REDIS_PASSWORD}@fancyperu-redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      COOKIE_SECRET: ${COOKIE_SECRET}
+      MEDUSA_FF_RBAC: "true"
+      STORE_CORS: ${STORE_CORS}
+      ADMIN_CORS: ${ADMIN_CORS}
+      AUTH_CORS: ${AUTH_CORS}
+      MEDUSA_BACKEND_URL: https://${API_DOMAIN}
+      S3_ENDPOINT: http://fancyperu-minio:9000
+      S3_BUCKET: ${S3_BUCKET:-fancyperu-media}
+      S3_PRIVATE_BUCKET: ${S3_PRIVATE_BUCKET:-fancyperu-private}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      S3_FILE_URL: https://${S3_DOMAIN}/${S3_BUCKET:-fancyperu-media}
+    networks:
+      - fancyperu-internal
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 512M }
+        reservations: { memory: 192M }

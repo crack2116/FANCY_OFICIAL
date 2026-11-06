@@ -1,0 +1,54 @@
+const checkEnvVariables = require("./check-env-variables")
+const path = require("path")
+
+checkEnvVariables()
+
+/**
+ * Medusa Cloud-related environment variables
+ */
+const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
+const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
+
+/**
+ * @type {import('next').NextConfig}
+ */
+const nextConfig = {
+  output: "standalone",
+  reactStrictMode: true,
+  // The monorepo root holds pnpm-lock.yaml. Without this, Next can infer a
+  // workspace root from an unrelated lockfile that lives outside the project.
+  outputFileTracingRoot: path.join(__dirname, "../../"),
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
+  images: {
+    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
+      {
+        protocol: "https",
+        hostname: "*.s3.*.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.s3.amazonaws.com",
+      },
+      ...(S3_HOSTNAME && S3_PATHNAME
+        ? [
+            {
+              protocol: "https",
+              hostname: S3_HOSTNAME,
+              pathname: S3_PATHNAME,
+            },
+          ]
+        : []),
+    ],
+  },
+}
+
+module.exports = nextConfig
