@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fancy Pets Perú — Centro de Administración</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      background-color: #F8FAFC;
+      color: #0F172A;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen text-slate-800 bg-[#F8FAFC] selection:bg-slate-200 selection:text-slate-900">
+
+  <div class="flex min-h-screen w-full">
+
+    <!-- ===================================================================== -->
+    <!-- SIDEBAR (Corporativo, sobrio, 220px)                                  -->
+    <!-- ===================================================================== -->
+    <aside class="w-56 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 fixed inset-y-0 left-0 z-30 select-none">
+      
+      <!-- Top Section -->
+      <div class="p-4">
+        
+        <!-- Brand Header -->
+        <a href="#dashboard" onclick="showView('dashboard')" class="flex items-center gap-2.5 mb-6 cursor-pointer">
+          <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white shrink-0 shadow-xs">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <ellipse cx="12" cy="15" rx="5" ry="4"/>
+              <ellipse cx="6.5" cy="10.5" rx="2" ry="2.5" transform="rotate(-18 6.5 10.5)"/>
+              <ellipse cx="10.2" cy="7.5" rx="2" ry="2.7" transform="rotate(-5 10.2 7.5)"/>
+              <ellipse cx="13.8" cy="7.5" rx="2" ry="2.7" transform="rotate(5 13.8 7.5)"/>
+              <ellipse cx="17.5" cy="10.5" rx="2" ry="2.5" transform="rotate(18 17.5 10.5)"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="font-bold text-xs text-slate-900 tracking-tight leading-none">Fancy Pets Perú</h1>
+            <p class="text-[9.5px] text-slate-400 font-medium tracking-wide mt-1">Panel de Control</p>
+          </div>
+        </a>
+
+        <!-- Section Label -->
+        <p class="text-[9.5px] font-semibold text-slate-400 tracking-wider uppercase mb-2 px-2.5">Operaciones</p>
+
+        <!-- Navigation Links -->
+        <nav class="space-y-1">
+          
+          <!-- Item: Dashboard -->
+          <button onclick="showView('dashboard')" id="nav-btn-dashboard"
+                  class="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold relative transition text-white bg-slate-900 shadow-xs">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+            <span>Dashboard</span>
+          </button>
+
+          <!-- Item: Pedidos -->
+          <button onclick="showView('pedidos')" id="nav-btn-pedidos"
+                  class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium relative transition text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <div class="flex items-center gap-2.5">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              </svg>
+              <span>Pedidos</span>
+            </div>
+            <span id="badgeOrdersPending" class="hidden text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-amber-50 text-amber-700">0</span>
+          </button>
+
+          <!-- Item: Catálogo -->
+          <div>
+            <button onclick="toggleCatalogSubmenu()" id="nav-btn-catalogo"
+                    class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium relative transition text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+                <span>Catálogo</span>
+              </div>
+              <svg id="catalogChevron" class="w-3 h-3 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            
+            <!-- Submenu Catálogo -->
+            <div id="catalogSubmenu" class="hidden pl-8 pr-1 py-1 space-y-0.5">
+              <button onclick="showView('catalogo', 'all')" class="w-full text-left py-1 px-2 rounded text-[11px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+                Todos los productos
+              </button>
+              <button onclick="showView('catalogo', 'categories')" class="w-full text-left py-1 px-2 rounded text-[11px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
+                Categorías
+              </button>
+              <button onclick="showView('catalogo', 'low-stock')" class="w-full text-left py-1 px-2 rounded text-[11px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center justify-between">
+                <span>Stock bajo</span>
+                <span id="submenuLowStockCount" class="text-[9px] bg-red-50 text-red-700 font-bold px-1.5 rounded-full">0</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Item: Clientes -->
+          <button onclick="showView('clientes')" id="nav-btn-clientes"
+                  class="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium relative transition text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <span>Clientes</span>
+          </button>
+
+          <!-- Section Label -->
+          <p class="text-[9.5px] font-semibold text-slate-400 tracking-wider uppercase pt-4 pb-1 px-2.5">Sistema</p>
+
+          <!-- Item: Reportes -->
+          <button onclick="showView('reportes')" id="nav-btn-reportes"
+                  class="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium relative transition text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            <span>Reportes</span>
+          </button>
+
+          <!-- Item: Configuración -->
+          <button onclick="showView('configuracion')" id="nav-btn-configuracion"
+                  class="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium relative transition text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span>Configuración</span>
+          </button>
+
+        </nav>
+      </div>
+
+      <!-- Bottom: System Status & User Info -->
+      <div class="p-3 border-t border-slate-200 bg-slate-50/50">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-[10px] font-medium text-slate-500">Servidor en línea</span>
+          </div>
+          <span class="text-[9px] font-mono text-slate-400">v1.2.0</span>
+        </div>
+        <a href="https://wa.me/51987654321" target="_blank"
+           class="w-full py-1.5 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-medium flex items-center justify-center gap-1.5 transition shadow-2xs">
+          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <span>Soporte Técnico</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ===================================================================== -->
+    <!-- MAIN WORKSPACE (Aparece exactamente al costado, ml-56)                -->
+    <!-- ===================================================================== -->
+    <div class="flex-1 ml-56 min-h-screen flex flex-col bg-[#F8FAFC]">
+
+      <!-- Top Header / Search & User -->
+      <header class="h-14 px-6 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-md z-20 border-b border-slate-200">
+        
+        <!-- Search bar -->
+        <div class="relative w-80">
+          <input type="text" id="globalSearchInput" oninput="handleGlobalSearch(this.value)"
+                 placeholder="Buscar por ID de pedido, cliente o email..."
+                 class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-12 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition">
+          <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <span class="absolute right-2.5 top-2 text-[10px] text-slate-400 font-mono border border-slate-200 px-1 rounded bg-white">Ctrl+K</span>
+        </div>
+
+        <!-- Right: Environment Badge & User Profile -->
+        <div class="flex items-center gap-3">
+          <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-[10.5px] font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span>Región: Perú (PEN)</span>
+          </div>
+
+          <button class="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center relative hover:bg-slate-50 text-slate-600 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+          </button>
+
+          <!-- User Pill -->
+          <button onclick="logout()" class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-semibold text-slate-600 hover:bg-slate-50 transition">Salir</button>
+          <div onclick="showView('configuracion')" class="flex items-center gap-2 pl-2 border-l border-slate-200 cursor-pointer hover:opacity-80 transition">
+            <div class="w-7 h-7 rounded-lg bg-slate-900 text-white font-bold text-xs flex items-center justify-center">
+              IC
+            </div>
+            <div class="hidden md:block text-left">
+              <div class="text-xs font-semibold text-slate-900 leading-none">Ivan Crisanto</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Administrador</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- =================================================================== -->
+      <!-- VIEW 1: DASHBOARD PRINCIPAL                                         -->
+      <!-- =================================================================== -->
+      <main id="view-dashboard" class="flex-1 p-6 relative w-full">
+
+        <!-- Page Header -->
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 tracking-tight">Panel de Control</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Resumen consolidado de operaciones y estado comercial de la tienda.</p>
+          </div>
+
+          <!-- Date Filter Button & Refresh -->
+          <div class="flex items-center gap-2">
+            <div class="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 flex items-center gap-1.5 shadow-2xs">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <span>Últimos 30 días</span>
+            </div>
+            <button onclick="loadMetrics()" class="p-1.5 bg-white border border-slate-200 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition shadow-2xs" title="Actualizar datos">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- UNIFIED METRICS STRIP (NO CHUNKY CARDS) -->
+        <div class="bg-white border border-slate-200 rounded-xl grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 mb-6 shadow-2xs">
+          
+          <!-- Metric 1: Ventas Totales -->
+          <div onclick="showView('reportes')" class="p-4 cursor-pointer hover:bg-slate-50/50 transition">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] font-semibold uppercase tracking-wider">Ventas Totales</span>
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div id="statTotalSales" class="text-2xl font-bold text-slate-900 tracking-tight">S/ 0.00</div>
+            <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+              <span class="text-emerald-600 font-semibold">+0.0%</span>
+              <span>vs mes anterior</span>
+            </div>
+          </div>
+
+          <!-- Metric 2: Pedidos -->
+          <div onclick="showView('pedidos')" class="p-4 cursor-pointer hover:bg-slate-50/50 transition">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] font-semibold uppercase tracking-wider">Pedidos</span>
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              </svg>
+            </div>
+            <div id="statTotalOrders" class="text-2xl font-bold text-slate-900 tracking-tight">0</div>
+            <div class="text-[11px] text-slate-500 mt-1">
+              <span>0 completados en el período</span>
+            </div>
+          </div>
+
+          <!-- Metric 3: Clientes Registrados -->
+          <div onclick="showView('clientes')" class="p-4 cursor-pointer hover:bg-slate-50/50 transition">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] font-semibold uppercase tracking-wider">Clientes</span>
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+            </div>
+            <div id="statTotalCustomers" class="text-2xl font-bold text-slate-900 tracking-tight">0</div>
+            <div class="text-[11px] text-slate-500 mt-1">
+              <span>Directorio verificado</span>
+            </div>
+          </div>
+
+          <!-- Metric 4: Stock Bajo -->
+          <div onclick="showView('catalogo', 'low-stock')" class="p-4 cursor-pointer hover:bg-slate-50/50 transition">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] font-semibold uppercase tracking-wider">Alertas de Stock</span>
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <div id="statLowStock" class="text-2xl font-bold text-slate-900 tracking-tight">0</div>
+            <div class="text-[11px] text-amber-600 font-medium mt-1 flex items-center justify-between">
+              <span>Artículos por reponer</span>
+              <span class="text-[10px] underline">Ver lista</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- MAIN OPERATIONAL SECTION: Pedidos Recientes -->
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+          
+          <!-- Table Action Header -->
+          <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-sm text-slate-900 tracking-tight">Pedidos Recientes</h3>
+              <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600" id="headerOrderCount">0 registros</span>
+            </div>
+
+            <button onclick="showView('pedidos')" class="text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center gap-1 transition">
+              <span>Ver todos los pedidos</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Table Header -->
+          <div class="grid grid-cols-12 bg-slate-50/80 py-2.5 px-5 text-[11px] font-semibold text-slate-500 border-b border-slate-100">
+            <div class="col-span-2">Nº Pedido</div>
+            <div class="col-span-3">Cliente</div>
+            <div class="col-span-2">Fecha</div>
+            <div class="col-span-2">Total</div>
+            <div class="col-span-2">Estado de Pago</div>
+            <div class="col-span-1 text-right">Acciones</div>
+          </div>
+
+          <!-- Professional Empty State -->
+          <div id="emptyOrdersIllustration" class="py-16 flex flex-col items-center justify-center text-center">
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-slate-800 text-sm">Sin pedidos registrados</h4>
+            <p class="text-xs text-slate-400 font-normal mt-1 max-w-sm">Los pedidos realizados en la tienda o autorizados vía COD se sincronizarán aquí automáticamente.</p>
+          </div>
+
+          <!-- Dynamic Orders List -->
+          <div id="dynamicOrdersList" class="divide-y divide-slate-100 hidden">
+            <!-- Populated via JS -->
+          </div>
+
+        </div>
+
+      </main>
+
+      <!-- =================================================================== -->
+      <!-- VIEW 2: GESTIÓN DE PEDIDOS (Aparece al costado)                     -->
+      <!-- =================================================================== -->
+      <section id="view-pedidos" class="flex-1 p-6 hidden w-full">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <button onclick="showView('dashboard')" class="text-xs font-semibold text-slate-500 hover:text-slate-900 mb-1 flex items-center gap-1">
+              <span>←</span> <span>Volver al Dashboard</span>
+            </button>
+            <h2 class="text-lg font-bold text-slate-900 tracking-tight">Gestión de Pedidos</h2>
+            <p class="text-xs text-slate-500">Supervisión de compras, verificación de depósitos Yape/Plin y emisión de firmas COD.</p>
+          </div>
+          <button onclick="loadMetrics()" class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs">
+            Actualizar lista
+          </button>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-xl shadow-2xs overflow-hidden">
+          <!-- Filters Toolbar -->
+          <div class="p-3 border-b border-slate-100 flex items-center gap-2">
+            <button onclick="filterOrdersByStatus('all')" id="filter-ord-all" class="px-3 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white">Todos (<span id="count-all-orders">0</span>)</button>
+            <button onclick="filterOrdersByStatus('captured')" id="filter-ord-captured" class="px-3 py-1 rounded-md text-xs font-medium text-slate-600 hover:bg-slate-100">Pagados</button>
+            <button onclick="filterOrdersByStatus('awaiting')" id="filter-ord-awaiting" class="px-3 py-1 rounded-md text-xs font-medium text-slate-600 hover:bg-slate-100">Por Verificar (Manual)</button>
+            <button onclick="filterOrdersByStatus('cod')" id="filter-ord-cod" class="px-3 py-1 rounded-md text-xs font-medium text-slate-600 hover:bg-slate-100">Contra Entrega (COD)</button>
+          </div>
+
+          <div class="grid grid-cols-12 bg-slate-50 py-2.5 px-5 text-[11px] font-semibold text-slate-500 border-b border-slate-100">
+            <div class="col-span-2">Nº Pedido</div>
+            <div class="col-span-3">Cliente</div>
+            <div class="col-span-2">Fecha</div>
+            <div class="col-span-2">Total</div>
+            <div class="col-span-2">Estado</div>
+            <div class="col-span-1 text-right">Acciones</div>
+          </div>
+
+          <div id="fullOrdersTable" class="divide-y divide-slate-100">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- VIEW 3: CATÁLOGO DE PRODUCTOS (Aparece al costado)                  -->
+      <!-- =================================================================== -->
+      <section id="view-catalogo" class="flex-1 p-6 hidden w-full">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <button onclick="showView('dashboard')" class="text-xs font-semibold text-slate-500 hover:text-slate-900 mb-1 flex items-center gap-1">
+              <span>←</span> <span>Volver al Dashboard</span>
+            </button>
+            <h2 class="text-lg font-bold text-slate-900 tracking-tight">Catálogo de Productos</h2>
+            <p class="text-xs text-slate-500">Precios y stock en Soles Peruanos (PEN).</p>
+          </div>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">18 Productos Activos</span>
+        </div>
+
+        <div class="flex items-center gap-2 mb-4 overflow-x-auto pb-1" id="categoryFilterContainer">
+          <button onclick="filterCatalogCategory('all')" id="cat-filter-all" class="px-3 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white">Todos</button>
+          <button onclick="filterCatalogCategory('cat_alimentos')" id="cat-filter-cat_alimentos" class="px-3 py-1 rounded-md text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50">Alimentos</button>
+          <button onclick="filterCatalogCategory('cat_farmacia')" id="cat-filter-cat_farmacia" class="px-3 py-1 rounded-md text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50">Farmacia</button>
+          <button onclick="filterCatalogCategory('cat_higiene')" id="cat-filter-cat_higiene" class="px-3 py-1 rounded-md text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50">Higiene</button>
+          <button onclick="filterCatalogCategory('cat_accesorios')" id="cat-filter-cat_accesorios" class="px-3 py-1 rounded-md text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50">Accesorios</button>
+        </div>
+
+        <div id="catalogGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- VIEW 4: CLIENTES (Aparece al costado)                               -->
+      <!-- =================================================================== -->
+      <section id="view-clientes" class="flex-1 p-6 hidden w-full">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <button onclick="showView('dashboard')" class="text-xs font-semibold text-slate-500 hover:text-slate-900 mb-1 flex items-center gap-1">
+              <span>←</span> <span>Volver al Dashboard</span>
+            </button>
+            <h2 class="text-lg font-bold text-slate-900 tracking-tight">Directorio de Clientes</h2>
+            <p class="text-xs text-slate-500">Historial de compradores y frecuencia de consumo.</p>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-xl shadow-2xs overflow-hidden">
+          <div id="customersTable" class="divide-y divide-slate-100">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- VIEW 5: REPORTES (Aparece al costado)                               -->
+      <!-- =================================================================== -->
+      <section id="view-reportes" class="flex-1 p-6 hidden w-full">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <button onclick="showView('dashboard')" class="text-xs font-semibold text-slate-500 hover:text-slate-900 mb-1 flex items-center gap-1">
+              <span>←</span> <span>Volver al Dashboard</span>
+            </button>
+            <h2 class="text-lg font-bold text-slate-900 tracking-tight">Reportes Financieros y Métricas</h2>
+            <p class="text-xs text-slate-500">Distribución de cobranzas por canal de pago e inventario.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs">
+            <h3 class="font-bold text-slate-900 text-xs mb-3 uppercase tracking-wider text-slate-500">Desglose de Ingresos</h3>
+            <div id="paymentBreakdown" class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-slate-100 text-xs">
+                <span class="text-slate-600">Culqi (Tarjetas Online)</span>
+                <span class="font-bold text-slate-900">S/ 0.00</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-slate-100 text-xs">
+                <span class="text-slate-600">Yape / Plin / Transferencias</span>
+                <span class="font-bold text-slate-900">S/ 0.00</span>
+              </div>
+              <div class="flex justify-between py-2 text-xs">
+                <span class="text-slate-600">Contra Entrega (COD Autorizado)</span>
+                <span class="font-bold text-slate-900">S/ 0.00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs">
+            <h3 class="font-bold text-slate-900 text-xs mb-3 uppercase tracking-wider text-slate-500">Balance de Catálogo</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-slate-100 text-xs">
+                <span class="text-slate-600">Total Productos Publicados</span>
+                <span class="font-bold text-slate-900" id="repTotalProd">18</span>
+              </div>
+              <div class="flex justify-between py-2 text-xs">
+                <span class="text-slate-600">Alertas de Stock Reposición</span>
+                <span class="font-bold text-amber-600" id="repLowStock">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- VIEW 6: CONFIGURACIÓN (Aparece al costado)                          -->
+      <!-- =================================================================== -->
+      <section id="view-configuracion" class="flex-1 p-6 hidden w-full">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <button onclick="showView('dashboard')" class="text-xs font-semibold text-slate-500 hover:text-slate-900 mb-1 flex items-center gap-1">
+              <span>←</span> <span>Volver al Dashboard</span>
+            </button>
+            <h2 class="text-lg font-bold text-slate-900 tracking-tight">Configuración del Comercio</h2>
+            <p class="text-xs text-slate-500">Parámetros de facturación, pasarelas y contactos de atención.</p>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs max-w-xl">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">Razón Social / Nombre Comercial</label>
+              <input type="text" value="Fancy Pets Perú" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">Moneda Operativa</label>
+              <input type="text" value="Soles Peruanos (PEN - S/)" readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-xs text-slate-600 cursor-not-allowed">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">Teléfono WhatsApp de Soporte</label>
+              <input type="text" value="+51 987 654 321" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">Cuentas Bancarias Registradas</label>
+              <input type="text" value="BCP Soles: 191-12345678-0-12" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900">
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <!-- LOGIN OVERLAY -->
+  <div id="loginOverlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+      <div class="mb-6 flex items-center gap-2.5">
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-white">
+          <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24">
+            <ellipse cx="12" cy="15" rx="5" ry="4"/>
+            <ellipse cx="6.5" cy="10.5" rx="2" ry="2.5" transform="rotate(-18 6.5 10.5)"/>
+            <ellipse cx="10.2" cy="7.5" rx="2" ry="2.7" transform="rotate(-5 10.2 7.5)"/>
+            <ellipse cx="13.8" cy="7.5" rx="2" ry="2.7" transform="rotate(5 13.8 7.5)"/>
+            <ellipse cx="17.5" cy="10.5" rx="2" ry="2.5" transform="rotate(18 17.5 10.5)"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-sm font-bold text-slate-900">Fancy Pets Perú</h2>
+          <p class="text-[10px] font-medium text-slate-400">Acceso administrativo</p>
+        </div>
+      </div>
+      <form id="loginForm" class="space-y-3">
+        <div>
+          <label class="mb-1 block text-xs font-medium text-slate-700">Correo</label>
+          <input id="loginEmail" type="email" required autocomplete="username" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none focus:border-slate-400" placeholder="admin@fancyperu.com">
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-slate-700">Contraseña</label>
+          <input id="loginPassword" type="password" required autocomplete="current-password" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none focus:border-slate-400" placeholder="••••••••">
+        </div>
+        <p id="loginError" class="hidden text-[11px] font-medium text-red-600"></p>
+        <button type="submit" class="w-full rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white transition hover:bg-slate-800">Ingresar</button>
+      </form>
+      <p class="mt-4 text-center text-[10px] text-slate-400">Acceso restringido al personal autorizado</p>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    const TOKEN_KEY = 'fancy_admin_token';
+    const FALLBACK_IMG = "data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22160%22%20height=%22160%22%3E%3Crect%20width=%22160%22%20height=%22160%22%20rx=%2216%22%20fill=%22%23f1f5f9%22/%3E%3Ctext%20x=%2280%22%20y=%2286%22%20font-family=%22Arial%22%20font-size=%2213%22%20text-anchor=%22middle%22%20fill=%22%2394a3b8%22%3EFancy%20Pets%3C/text%3E%3C/svg%3E";
+    let token = localStorage.getItem(TOKEN_KEY) || '';
+    let allOrders = [];
+    let allProducts = [];
+
+    function setToken(value) {
+      token = value || '';
+      if (token) localStorage.setItem(TOKEN_KEY, token);
+      else localStorage.removeItem(TOKEN_KEY);
+    }
+
+    function showLogin(message) {
+      const overlay = document.getElementById('loginOverlay');
+      if (!overlay) return;
+      overlay.classList.remove('hidden');
+      overlay.classList.add('flex');
+      const error = document.getElementById('loginError');
+      if (error && message) {
+        error.textContent = message;
+        error.classList.remove('hidden');
+      }
+    }
+
+    function hideLogin() {
+      const overlay = document.getElementById('loginOverlay');
+      if (!overlay) return;
+      overlay.classList.add('hidden');
+      overlay.classList.remove('flex');
+    }
+
+    function logout() {
+      setToken('');
+      showLogin();
+    }
+
+    async function apiFetch(path, options = {}) {
+      const headers = new Headers(options.headers || {});
+      if (token) headers.set('Authorization', `Bearer ${token}`);
+      const response = await fetch(path, { ...options, headers });
+      if (response.status === 401) {
+        setToken('');
+        showLogin('Tu sesión expiró. Ingresá de nuevo.');
+      }
+      return response;
+    }
+
+    async function bootstrap() {
+      if (!token) {
+        showLogin();
+        return;
+      }
+      const me = await apiFetch('/admin/users/me');
+      if (!me.ok) {
+        showLogin('Tu sesión expiró. Ingresá de nuevo.');
+        return;
+      }
+      hideLogin();
+      await loadMetrics();
+      const hash = window.location.hash.replace('#', '') || 'dashboard';
+      showView(hash);
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const form = document.getElementById('loginForm');
+      if (form) {
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const email = document.getElementById('loginEmail').value.trim();
+          const password = document.getElementById('loginPassword').value;
+          const error = document.getElementById('loginError');
+          if (error) error.classList.add('hidden');
+          try {
+            const response = await fetch('/auth/user/emailpass', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, password }),
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || !data.token) {
+              if (error) {
+                error.textContent = data.message || 'Credenciales inválidas.';
+                error.classList.remove('hidden');
+              }
+              return;
+            }
+            setToken(data.token);
+            document.getElementById('loginPassword').value = '';
+            hideLogin();
+            await loadMetrics();
+            const hash = window.location.hash.replace('#', '') || 'dashboard';
+            showView(hash);
+          } catch (err) {
+            if (error) {
+              error.textContent = 'No se pudo conectar con el servidor.';
+              error.classList.remove('hidden');
+            }
+          }
+        });
+      }
+      await bootstrap();
+    });
+
+    async function loadMetrics() {
+      try {
+        const ordersRes = await apiFetch('/admin/orders?limit=100&order=-created_at&fields=id,display_id,email,total,payment_status,created_at,metadata,*shipping_address');
+        if (ordersRes.ok) {
+          const data = await ordersRes.json();
+          allOrders = data.orders || [];
+          renderDashboardOrders(allOrders);
+          renderFullOrdersTable(allOrders);
+          renderCustomersView(allOrders);
+          renderReportsView(allOrders);
+        }
+
+        const prodRes = await apiFetch('/admin/products?limit=100&fields=id,title,description,thumbnail,*variants.prices,*categories');
+        if (prodRes.ok) {
+          const data = await prodRes.json();
+          allProducts = (data.products || []).map(normalizeProduct);
+          renderDashboardProducts(allProducts);
+          renderCatalogView(allProducts);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function normalizeProduct(product) {
+      const variants = (product.variants || []).map((variant) => {
+        const penPrice = (variant.prices || []).find((price) => price.currency_code === 'pen');
+        const amount = penPrice?.amount ?? variant.prices?.[0]?.amount ?? null;
+        return {
+          ...variant,
+          calculated_price: { calculated_amount: amount },
+          inventory_quantity: variant.inventory_quantity ?? 25,
+        };
+      });
+      return { ...product, variants };
+    }
+
+    function renderDashboardOrders(orders) {
+      document.getElementById('statTotalOrders').textContent = orders.length;
+      document.getElementById('headerOrderCount').textContent = `${orders.length} registros`;
+
+      const totalSales = orders
+        .filter(o => o.payment_status === 'captured')
+        .reduce((sum, o) => sum + Number(o.total || 0), 0);
+      document.getElementById('statTotalSales').textContent = `S/ ${totalSales.toFixed(2)}`;
+
+      const uniqueEmails = new Set(orders.map(o => o.email).filter(Boolean));
+      document.getElementById('statTotalCustomers').textContent = uniqueEmails.size;
+
+      const emptyIllustration = document.getElementById('emptyOrdersIllustration');
+      const dynamicList = document.getElementById('dynamicOrdersList');
+
+      if (orders.length === 0) {
+        emptyIllustration.classList.remove('hidden');
+        dynamicList.classList.add('hidden');
+      } else {
+        emptyIllustration.classList.add('hidden');
+        dynamicList.classList.remove('hidden');
+
+        dynamicList.innerHTML = orders.slice(0, 8).map(o => {
+          const isCaptured = o.payment_status === 'captured';
+          const isAwaiting = o.payment_status === 'awaiting';
+          const isCod = o.metadata?.fancyperu_cod?.status === 'authorized';
+
+          let badge = isCaptured
+            ? '<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold px-2 py-0.5 rounded">Pagado</span>'
+            : isAwaiting
+            ? '<span class="bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-semibold px-2 py-0.5 rounded">Por Verificar</span>'
+            : '<span class="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded">Pendiente</span>';
+
+          if (isCod) badge += ' <span class="bg-blue-50 text-blue-700 border border-blue-200 text-[9px] font-semibold px-1.5 py-0.5 rounded ml-1">COD</span>';
+
+          const dateStr = new Date(o.created_at).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' });
+
+          return `
+            <div class="grid grid-cols-12 py-3 px-5 text-xs items-center hover:bg-slate-50 transition">
+              <div class="col-span-2 font-mono font-semibold text-slate-900">#${o.display_id || o.id.slice(0, 8)}</div>
+              <div class="col-span-3">
+                <div class="font-semibold text-slate-900">${o.shipping_address?.first_name || ''} ${o.shipping_address?.last_name || ''}</div>
+                <div class="text-[11px] text-slate-400 font-normal">${o.email}</div>
+              </div>
+              <div class="col-span-2 text-slate-500 font-normal">${dateStr}</div>
+              <div class="col-span-2 font-bold text-slate-900">S/ ${Number(o.total).toFixed(2)}</div>
+              <div class="col-span-2">${badge}</div>
+              <div class="col-span-1 text-right">
+                <button onclick="showView('pedidos')" class="text-xs text-slate-700 hover:text-slate-900 font-semibold underline">Detalle</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function renderDashboardProducts(products) {
+      let lowStockCount = 0;
+      products.forEach(p => {
+        p.variants?.forEach(v => {
+          if (v.inventory_quantity < 20) lowStockCount++;
+        });
+      });
+      document.getElementById('statLowStock').textContent = lowStockCount;
+      document.getElementById('submenuLowStockCount').textContent = lowStockCount;
+    }
+
+    function showView(viewId, subFilter) {
+      const views = ['dashboard', 'pedidos', 'catalogo', 'clientes', 'reportes', 'configuracion'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (el) el.classList.add('hidden');
+
+        const btn = document.getElementById(`nav-btn-${v}`);
+        if (btn) {
+          btn.classList.remove('bg-slate-900', 'text-white', 'shadow-xs', 'font-semibold');
+          btn.classList.add('text-slate-600', 'font-medium', 'hover:text-slate-900', 'hover:bg-slate-50');
+        }
+      });
+
+      const activeEl = document.getElementById(`view-${viewId}`);
+      if (activeEl) {
+        activeEl.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      const activeBtn = document.getElementById(`nav-btn-${viewId}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-slate-600', 'font-medium', 'hover:text-slate-900', 'hover:bg-slate-50');
+        activeBtn.classList.add('bg-slate-900', 'text-white', 'shadow-xs', 'font-semibold');
+      }
+
+      if (viewId === 'catalogo') {
+        if (subFilter === 'low-stock') filterCatalogByLowStock();
+        else renderCatalogView(allProducts);
+      }
+
+      window.location.hash = viewId;
+    }
+
+    function toggleCatalogSubmenu() {
+      const submenu = document.getElementById('catalogSubmenu');
+      const chevron = document.getElementById('catalogChevron');
+      const isHidden = submenu.classList.contains('hidden');
+      if (isHidden) {
+        submenu.classList.remove('hidden');
+        chevron.classList.add('rotate-180');
+      } else {
+        submenu.classList.add('hidden');
+        chevron.classList.remove('rotate-180');
+      }
+      showView('catalogo');
+    }
+
+    function renderFullOrdersTable(orders) {
+      document.getElementById('count-all-orders').textContent = orders.length;
+      const container = document.getElementById('fullOrdersTable');
+
+      if (orders.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center text-slate-400">
+            <p class="text-xs font-semibold text-slate-700">No hay pedidos registrados.</p>
+            <p class="text-[11px] mt-0.5">Los pedidos aparecerán aquí una vez generados por los clientes.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = orders.map(o => {
+        const isCaptured = o.payment_status === 'captured';
+        const isAwaiting = o.payment_status === 'awaiting';
+        const isCod = o.metadata?.fancyperu_cod?.status === 'authorized';
+
+        let badge = isCaptured
+          ? '<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold px-2 py-0.5 rounded">Pagado</span>'
+          : isAwaiting
+          ? '<span class="bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-semibold px-2 py-0.5 rounded">Por Verificar</span>'
+          : '<span class="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-0.5 rounded">Pendiente</span>';
+
+        if (isCod) badge += ' <span class="bg-blue-50 text-blue-700 border border-blue-200 text-[9px] font-semibold px-1.5 py-0.5 rounded ml-1">COD</span>';
+
+        const dateStr = new Date(o.created_at).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' });
+
+        return `
+          <div class="grid grid-cols-12 py-3 px-5 text-xs items-center hover:bg-slate-50 transition">
+            <div class="col-span-2 font-mono font-semibold text-slate-900">#${o.display_id || o.id.slice(0, 8)}</div>
+            <div class="col-span-3">
+              <div class="font-semibold text-slate-900">${o.shipping_address?.first_name || ''} ${o.shipping_address?.last_name || ''}</div>
+              <div class="text-[11px] text-slate-400 font-normal">${o.email}</div>
+            </div>
+            <div class="col-span-2 text-slate-500 font-normal">${dateStr}</div>
+            <div class="col-span-2 font-bold text-slate-900">S/ ${Number(o.total).toFixed(2)}</div>
+            <div class="col-span-2">${badge}</div>
+            <div class="col-span-1 text-right flex items-center justify-end gap-1.5">
+              ${isAwaiting ? `
+                <button onclick="approvePayment('${o.id}')" class="px-2 py-1 rounded bg-emerald-700 text-white text-[10px] font-semibold hover:bg-emerald-800 transition">
+                  Aprobar
+                </button>
+              ` : ''}
+              ${!isCod && !isCaptured ? `
+                <button onclick="authorizeCod('${o.id}')" class="px-2 py-1 rounded bg-slate-900 text-white text-[10px] font-semibold hover:bg-slate-800 transition">
+                  Firma COD
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function approvePayment(orderId) {
+      if (!confirm(`Confirmar recepción de pago para el pedido #${orderId.slice(0, 8)}`)) return;
+      try {
+        const res = await apiFetch(`/admin/orders/${orderId}/verify-manual-payment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'confirm',
+            notes: 'Pago verificado desde el panel administrativo'
+          })
+        });
+        if (res.ok) {
+          alert('Pago verificado exitosamente');
+          await loadMetrics();
+        } else {
+          alert('Error al verificar el pago');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function authorizeCod(orderId) {
+      if (!confirm(`Emitir autorización segura COD con firma HMAC para el pedido #${orderId.slice(0, 8)}`)) return;
+      try {
+        const res = await apiFetch(`/admin/orders/${orderId}/authorize-cod`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            notes: 'Aprobado vía panel administrativo Fancy Pets'
+          })
+        });
+        if (res.ok) {
+          alert('Firma COD autorizada correctamente');
+          await loadMetrics();
+        } else {
+          alert('Error al autorizar COD');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderCatalogView(products) {
+      const grid = document.getElementById('catalogGrid');
+      if (!grid) return;
+
+      if (products.length === 0) {
+        grid.innerHTML = '<div class="col-span-3 py-12 text-center text-slate-400">Cargando catálogo...</div>';
+        return;
+      }
+
+      grid.innerHTML = products.map(p => {
+        const variant = p.variants?.[0] || {};
+        const price = variant.calculated_price?.calculated_amount != null
+          ? Number(variant.calculated_price.calculated_amount).toFixed(2)
+          : 'Consultar';
+        const stock = variant.inventory_quantity ?? 25;
+        const thumbnail = p.thumbnail || FALLBACK_IMG;
+
+        return `
+          <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs hover:border-slate-300 transition flex flex-col justify-between">
+            <div>
+              <div class="w-full h-32 bg-slate-50 rounded-lg mb-3 overflow-hidden flex items-center justify-center p-2 border border-slate-100">
+                <img src="${thumbnail}" class="max-h-full max-w-full object-contain" alt="${p.title}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">
+              </div>
+              <div class="flex items-start justify-between gap-2 mb-1">
+                <h4 class="font-semibold text-xs text-slate-900 leading-snug line-clamp-2">${p.title}</h4>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${stock < 20 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-slate-100 text-slate-600'} shrink-0">
+                  Stock: ${stock}
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-500 line-clamp-2">${p.description || 'Producto veterinario oficial'}</p>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-3">
+              <span class="text-sm font-bold text-slate-900">S/ ${price}</span>
+              <button class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                Editar
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterCatalogByLowStock() {
+      const lowStockProds = allProducts.filter(p => {
+        return p.variants?.some(v => v.inventory_quantity < 20);
+      });
+      renderCatalogView(lowStockProds);
+    }
+
+    function filterCatalogCategory(catKey) {
+      ['all', 'cat_alimentos', 'cat_farmacia', 'cat_higiene', 'cat_accesorios'].forEach(k => {
+        const btn = document.getElementById(`cat-filter-${k}`);
+        if (btn) {
+          if (k === catKey) {
+            btn.className = "px-3 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white";
+          } else {
+            btn.className = "px-3 py-1 rounded-md text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50";
+          }
+        }
+      });
+
+      if (catKey === 'all') {
+        renderCatalogView(allProducts);
+      } else {
+        const filtered = allProducts.filter(p => {
+          return p.categories?.some(c => c.handle?.includes(catKey.replace('cat_', '')) || c.name?.toLowerCase().includes(catKey.replace('cat_', '')));
+        });
+        renderCatalogView(filtered.length ? filtered : allProducts);
+      }
+    }
+
+    function filterOrdersByStatus(status) {
+      ['all', 'captured', 'awaiting', 'cod'].forEach(s => {
+        const btn = document.getElementById(`filter-ord-${s}`);
+        if (btn) {
+          if (s === status) {
+            btn.className = "px-3 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white";
+          } else {
+            btn.className = "px-3 py-1 rounded-md text-xs font-medium text-slate-600 hover:bg-slate-100";
+          }
+        }
+      });
+
+      if (status === 'all') {
+        renderFullOrdersTable(allOrders);
+      } else if (status === 'captured') {
+        renderFullOrdersTable(allOrders.filter(o => o.payment_status === 'captured'));
+      } else if (status === 'awaiting') {
+        renderFullOrdersTable(allOrders.filter(o => o.payment_status === 'awaiting'));
+      } else if (status === 'cod') {
+        renderFullOrdersTable(allOrders.filter(o => o.metadata?.fancyperu_cod?.status === 'authorized'));
+      }
+    }
+
+    function renderCustomersView(orders) {
+      const container = document.getElementById('customersTable');
+      if (!container) return;
+
+      const customerMap = new Map();
+      orders.forEach(o => {
+        if (!o.email) return;
+        if (!customerMap.has(o.email)) {
+          customerMap.set(o.email, {
+            name: `${o.shipping_address?.first_name || ''} ${o.shipping_address?.last_name || ''}`.trim() || 'Cliente Registrado',
+            email: o.email,
+            phone: o.shipping_address?.phone || '-',
+            ordersCount: 1,
+            totalSpent: Number(o.total || 0)
+          });
+        } else {
+          const c = customerMap.get(o.email);
+          c.ordersCount++;
+          c.totalSpent += Number(o.total || 0);
+        }
+      });
+
+      const customers = Array.from(customerMap.values());
+      if (customers.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center text-slate-400">
+            <p class="text-xs font-semibold text-slate-700">Aún no hay clientes registrados.</p>
+            <p class="text-[11px] mt-0.5">Los clientes se registrarán al completar su primera compra.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = customers.map(c => `
+        <div class="py-3 px-5 text-xs flex items-center justify-between hover:bg-slate-50 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs">
+              ${c.name.slice(0, 2).toUpperCase()}
+            </div>
+            <div>
+              <div class="font-semibold text-slate-900">${c.name}</div>
+              <div class="text-[11px] text-slate-400 font-normal">${c.email} • Tel: ${c.phone}</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="font-bold text-slate-900">S/ ${c.totalSpent.toFixed(2)}</div>
+            <div class="text-[11px] text-slate-400 font-normal">${c.ordersCount} pedido(s)</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderReportsView(orders) {
+      let culqiTotal = 0;
+      let manualTotal = 0;
+      let codTotal = 0;
+
+      orders.forEach(o => {
+        const total = Number(o.total || 0);
+        if (o.metadata?.fancyperu_cod?.status === 'authorized') {
+          codTotal += total;
+        } else if (o.payment_provider_id?.includes('manual') || o.payment_status === 'awaiting') {
+          manualTotal += total;
+        } else if (o.payment_status === 'captured') {
+          culqiTotal += total;
+        }
+      });
+
+      const container = document.getElementById('paymentBreakdown');
+      if (container) {
+        container.innerHTML = `
+          <div class="flex justify-between py-2 border-b border-slate-100 text-xs">
+            <span class="text-slate-600">Culqi (Tarjetas Online)</span>
+            <span class="font-bold text-slate-900">S/ ${culqiTotal.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-slate-100 text-xs">
+            <span class="text-slate-600">Yape / Plin / BCP</span>
+            <span class="font-bold text-slate-900">S/ ${manualTotal.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between py-2 text-xs">
+            <span class="text-slate-600">Contra Entrega (COD Seguro)</span>
+            <span class="font-bold text-slate-900">S/ ${codTotal.toFixed(2)}</span>
+          </div>
+        `;
+      }
+    }
+
+    function handleGlobalSearch(query) {
+      if (!query.trim()) {
+        renderFullOrdersTable(allOrders);
+        return;
+      }
+      const q = query.toLowerCase();
+      const filtered = allOrders.filter(o => {
+        return (o.id && o.id.toLowerCase().includes(q)) ||
+               (o.display_id && String(o.display_id).includes(q)) ||
+               (o.email && o.email.toLowerCase().includes(q)) ||
+               (o.shipping_address?.first_name && o.shipping_address.first_name.toLowerCase().includes(q));
+      });
+      showView('pedidos');
+      renderFullOrdersTable(filtered);
+    }
+  </script>
+</body>
+</html>
