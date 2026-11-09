@@ -150,6 +150,17 @@
             </div>
           </div>
 
+          <!-- Item: Productos -->
+          <button onclick="showView('productos')" id="nav-btn-productos"
+                  class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-[11px] font-medium relative transition text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <span id="nav-indicator-productos" class="absolute left-0 inset-y-1 w-1 bg-[#F99C32] rounded-r-full hidden"></span>
+            <svg class="w-3.5 h-3.5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+            <span>Productos</span>
+            <span id="navProductCount" class="ml-auto text-[8.5px] bg-[#FFF5EE] text-[#F99C32] font-bold px-1.5 rounded-full">0</span>
+          </button>
+
           <!-- Item: Clientes -->
           <button onclick="showView('clientes')" id="nav-btn-clientes"
                   class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-[11px] font-medium relative transition text-slate-600 hover:text-slate-900 hover:bg-slate-50">
@@ -849,7 +860,62 @@
       </section>
 
       <!-- =================================================================== -->
-      <!-- VIEW 4: CLIENTES (Aparece al costado)                               -->
+      <!-- VIEW 4: PRODUCTOS (CRUD conectado a Medusa)                        -->
+      <!-- =================================================================== -->
+      <section id="view-productos" class="flex-1 px-3 sm:px-5 pb-6 pt-3 hidden w-full">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+          <div>
+            <button onclick="showView('dashboard')" class="text-[11px] font-bold text-slate-400 hover:text-slate-700 mb-0.5 flex items-center gap-1">
+              <span>←</span> <span>Volver al Dashboard</span>
+            </button>
+            <h2 class="text-[18px] font-extrabold text-slate-900 tracking-tight">Productos</h2>
+            <p class="text-[10px] text-slate-500 font-medium">Creá, editá y eliminá productos directamente en Medusa.</p>
+          </div>
+          <button onclick="openCreateProduct()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#F99C32] text-white text-[11px] font-bold hover:bg-[#e0851e] transition shadow-sm">
+            <span class="text-sm leading-none">+</span> Agregar producto
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-4">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+            <div class="relative flex-1">
+              <svg class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z"/></svg>
+              <input id="productSearch" oninput="renderProductsView()" type="search" placeholder="Buscar por nombre o SKU..." class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+            </div>
+            <select id="productCategoryFilter" onchange="renderProductsView()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+              <option value="all">Todas las categorías</option>
+            </select>
+            <button onclick="loadMetrics()" class="px-3 py-2 rounded-xl bg-white border border-slate-200/80 text-[11px] font-bold text-slate-700 hover:bg-slate-50 shadow-2xs whitespace-nowrap">↻ Actualizar</button>
+          </div>
+
+          <div id="productsScrollHint" class="sm:hidden text-[9px] text-slate-400 font-medium mb-1">Desliza para ver todas las columnas →</div>
+          <div class="overflow-x-auto -mx-1 px-1">
+            <div class="min-w-[780px]">
+              <div class="grid grid-cols-12 bg-[#F8FAFC] py-1.5 px-3 rounded-lg text-[9.5px] font-bold text-slate-600 mb-1.5 border border-slate-100">
+                <div class="col-span-4">Producto</div>
+                <div class="col-span-2">Categoría</div>
+                <div class="col-span-2">Precio</div>
+                <div class="col-span-1">Stock</div>
+                <div class="col-span-1">Estado</div>
+                <div class="col-span-2 text-right">Acciones</div>
+              </div>
+              <div id="productsTable" class="divide-y divide-slate-100"></div>
+            </div>
+          </div>
+
+          <div id="productsEmpty" class="py-10 text-center hidden">
+            <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF5EE] text-[#F99C32]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            </div>
+            <p class="text-xs font-bold text-slate-700">No hay productos para mostrar.</p>
+            <p class="text-[10px] text-slate-400 mt-1">Probá con otra búsqueda o creá tu primer producto.</p>
+            <button onclick="openCreateProduct()" class="mt-3 px-3 py-1.5 rounded-xl bg-[#F99C32] text-white text-[10px] font-bold hover:bg-[#e0851e] transition">+ Agregar producto</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- VIEW 5: CLIENTES (Aparece al costado)                               -->
       <!-- =================================================================== -->
       <section id="view-clientes" class="flex-1 px-3 sm:px-5 pb-6 pt-3 hidden w-full">
         <div class="flex items-center justify-between mb-3">
@@ -1029,6 +1095,10 @@
     let allProducts = [];
     let allCustomers = [];
     let allStore = null;
+    let allCategories = [];
+    let allStockLocations = [];
+    let allShippingProfiles = [];
+    let allSalesChannels = [];
     let dateRangeDays = 30;
     let activeOrderFilter = 'all';
 
@@ -1153,10 +1223,15 @@
 
     async function loadMetrics() {
       try {
-        const [ordersRes, prodRes, customersRes] = await Promise.all([
+        const [ordersRes, prodRes, customersRes, categoriesRes, locationsRes, shippingRes, salesRes, storeRes] = await Promise.all([
           apiFetch('/admin/orders?limit=100&order=-created_at&fields=id,display_id,email,total,payment_status,created_at,metadata,payment_provider_id,*shipping_address,*items'),
           apiFetch('/admin/products?limit=100&fields=id,title,description,thumbnail,status,*variants,*variants.prices,*variants.inventory_items.inventory.location_levels,*categories'),
-          apiFetch('/admin/customers?limit=500&fields=id,email,first_name,last_name,phone,created_at')
+          apiFetch('/admin/customers?limit=500&fields=id,email,first_name,last_name,phone,created_at'),
+          apiFetch('/admin/product-categories?limit=100&fields=id,name,handle'),
+          apiFetch('/admin/stock-locations?limit=5'),
+          apiFetch('/admin/shipping-profiles?limit=5'),
+          apiFetch('/admin/sales-channels?limit=5'),
+          apiFetch('/admin/stores?limit=1')
         ]);
 
         if (ordersRes.ok) {
@@ -1172,6 +1247,31 @@
         if (customersRes.ok) {
           const data = await customersRes.json();
           allCustomers = data.customers || [];
+        }
+
+        if (categoriesRes.ok) {
+          const data = await categoriesRes.json();
+          allCategories = data.product_categories || [];
+        }
+
+        if (locationsRes.ok) {
+          const data = await locationsRes.json();
+          allStockLocations = data.stock_locations || [];
+        }
+
+        if (shippingRes.ok) {
+          const data = await shippingRes.json();
+          allShippingProfiles = data.shipping_profiles || [];
+        }
+
+        if (salesRes.ok) {
+          const data = await salesRes.json();
+          allSalesChannels = data.sales_channels || [];
+        }
+
+        if (storeRes.ok) {
+          const data = await storeRes.json();
+          allStore = data.stores?.[0] || allStore;
         }
 
         refreshViewsWithRange();
@@ -1378,7 +1478,7 @@
     }
 
     function showView(viewId, subFilter) {
-      const views = ['dashboard', 'pedidos', 'catalogo', 'clientes', 'reportes', 'configuracion'];
+      const views = ['dashboard', 'pedidos', 'catalogo', 'productos', 'clientes', 'reportes', 'configuracion'];
       views.forEach(v => {
         const el = document.getElementById(`view-${v}`);
         if (el) el.classList.add('hidden');
@@ -1403,6 +1503,10 @@
         activeBtn.className = "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold relative transition text-[#F99C32] bg-[#FFF5EE]";
       }
       if (activeInd) activeInd.classList.remove('hidden');
+
+      if (viewId === 'productos') {
+        renderProductsView();
+      }
 
       if (viewId === 'catalogo') {
         if (subFilter === 'low-stock') {
@@ -1582,6 +1686,337 @@
           </div>
         `;
       }).join('');
+    }
+
+    function renderProductsView() {
+      const table = document.getElementById('productsTable');
+      const empty = document.getElementById('productsEmpty');
+      const count = document.getElementById('navProductCount');
+      if (!table || !empty) return;
+
+      if (count) count.textContent = String(allProducts.length);
+
+      const categorySelect = document.getElementById('productCategoryFilter');
+      if (categorySelect) {
+        const expectedOptions = allCategories.length + 1;
+        if (categorySelect.options.length !== expectedOptions) {
+          const currentValue = categorySelect.value || 'all';
+          categorySelect.innerHTML = '<option value="all">Todas las categorías</option>';
+          allCategories
+            .slice()
+            .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'es'))
+            .forEach((category) => {
+              const option = document.createElement('option');
+              option.value = category.id;
+              option.textContent = category.name;
+              categorySelect.appendChild(option);
+            });
+          categorySelect.value = currentValue;
+          if (!categorySelect.value) categorySelect.value = 'all';
+        }
+      }
+
+      const query = (document.getElementById('productSearch')?.value || '').trim().toLowerCase();
+      const categoryId = categorySelect?.value || 'all';
+      const products = allProducts.filter((product) => {
+        const matchesQuery = !query
+          || String(product.title || '').toLowerCase().includes(query)
+          || (product.variants || []).some((variant) => String(variant.sku || '').toLowerCase().includes(query));
+        const matchesCategory = categoryId === 'all'
+          || (product.categories || []).some((category) => category.id === categoryId);
+        return matchesQuery && matchesCategory;
+      });
+
+      if (!products.length) {
+        table.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      table.innerHTML = products.map((product) => {
+        const variant = product.variants?.[0] || {};
+        const price = variant.calculated_price?.calculated_amount;
+        const stock = variant.inventory_quantity;
+        const categories = (product.categories || []).map((category) => category.name).filter(Boolean).join(', ') || 'Sin categoría';
+        const status = product.status || 'draft';
+        const statusBadge = status === 'published'
+          ? '<span class="bg-emerald-50 text-emerald-700 text-[9.5px] font-bold px-2 py-0.5 rounded-full">Publicado</span>'
+          : '<span class="bg-slate-100 text-slate-600 text-[9.5px] font-bold px-2 py-0.5 rounded-full">Borrador</span>';
+        const thumbnail = product.thumbnail || FALLBACK_IMG;
+        return `
+          <div class="grid grid-cols-12 py-2.5 px-3 text-xs items-center hover:bg-slate-50 transition rounded-xl">
+            <div class="col-span-4 flex items-center gap-2.5 min-w-0">
+              <div class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
+                <img src="${thumbnail}" class="max-h-full max-w-full object-contain" alt="${escapeHtml(product.title || 'Producto')}" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-slate-900 truncate">${escapeHtml(product.title || 'Producto')}</div>
+                <div class="text-[9.5px] text-slate-400 font-medium truncate">${escapeHtml(variant.sku || 'Sin SKU')} · ${(product.variants || []).length} variante(s)</div>
+              </div>
+            </div>
+            <div class="col-span-2 text-[10.5px] text-slate-500 font-medium truncate pr-2">${escapeHtml(categories)}</div>
+            <div class="col-span-2 font-extrabold text-slate-900">${price != null ? 'S/ ' + Number(price).toFixed(2) : '—'}</div>
+            <div class="col-span-1">
+              <span class="text-[9.5px] font-bold px-1.5 py-0.5 rounded-full ${stock != null && Number(stock) < 20 ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'}">${formatStock(stock)}</span>
+            </div>
+            <div class="col-span-1">${statusBadge}</div>
+            <div class="col-span-2 flex items-center justify-end gap-1.5">
+              <button onclick="openProductEditor('${product.id}')" class="px-2 py-1 rounded-lg bg-[#FFF5EE] text-[#F99C32] text-[10px] font-bold hover:bg-[#ffe3cf] transition">Editar</button>
+              <button onclick="confirmDeleteProduct('${product.id}')" class="px-2 py-1 rounded-lg bg-rose-50 text-rose-600 text-[10px] font-bold hover:bg-rose-100 transition">Eliminar</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function generateProductSku(title) {
+      const base = String(title || 'producto')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase()
+        .replace(/[^A-Z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 24) || 'PRODUCTO';
+      return `FP-${base}-${Date.now().toString(36).toUpperCase().slice(-4)}`;
+    }
+
+    async function openCreateProduct() {
+      if (!allStockLocations.length || !allShippingProfiles.length || !allSalesChannels.length) {
+        await loadMetrics();
+      }
+      if (!allStockLocations.length) {
+        showToast('No hay un almacén configurado en Medusa.', 'error');
+        return;
+      }
+      if (!allShippingProfiles.length) {
+        showToast('No hay un perfil de envío configurado en Medusa.', 'error');
+        return;
+      }
+      if (!allSalesChannels.length) {
+        showToast('No hay un canal de venta configurado en Medusa.', 'error');
+        return;
+      }
+
+      const categoryOptions = allCategories.length
+        ? allCategories
+            .slice()
+            .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'es'))
+            .map((category) => `<option value="${category.id}">${escapeHtml(category.name)}</option>`)
+            .join('')
+        : '';
+
+      openModal('Agregar producto', `
+        <div class="space-y-3">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-700 mb-1">Título *</label>
+            <input id="createProductTitle" type="text" placeholder="Ej. Alimento Premium para Perros" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-700 mb-1">Descripción</label>
+            <textarea id="createProductDescription" rows="3" placeholder="Descripción del producto..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]"></textarea>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Categoría</label>
+              <select id="createProductCategory" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+                <option value="">Sin categoría</option>
+                ${categoryOptions}
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Estado</label>
+              <select id="createProductStatus" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+                <option value="published">Publicado</option>
+                <option value="draft">Borrador</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Precio (PEN) *</label>
+              <input id="createProductPrice" type="number" min="0" step="0.01" placeholder="0.00" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Stock *</label>
+              <input id="createProductStock" type="number" min="0" step="1" placeholder="0" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">SKU</label>
+              <input id="createProductSku" type="text" placeholder="Automático" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Imagen (URL)</label>
+              <input id="createProductImage" type="url" placeholder="https://..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+            </div>
+          </div>
+          <div class="rounded-xl bg-[#FFF5EE] px-3 py-2 text-[10px] text-slate-500 font-medium">
+            Se creará una variante <b>"Único"</b> con precio en PEN y stock en el almacén principal de Medusa.
+          </div>
+          <div class="flex items-center justify-end gap-2 pt-1">
+            <button onclick="closeModal()" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition">Cancelar</button>
+            <button onclick="createProduct()" class="px-3 py-2 rounded-xl bg-[#F99C32] text-white text-[11px] font-bold hover:bg-[#e0851e] transition">Crear producto</button>
+          </div>
+        </div>
+      `);
+    }
+
+    async function createProduct() {
+      const title = document.getElementById('createProductTitle')?.value.trim();
+      const description = document.getElementById('createProductDescription')?.value.trim();
+      const categoryId = document.getElementById('createProductCategory')?.value;
+      const status = document.getElementById('createProductStatus')?.value || 'draft';
+      const priceRaw = document.getElementById('createProductPrice')?.value.trim();
+      const stockRaw = document.getElementById('createProductStock')?.value.trim();
+      const sku = document.getElementById('createProductSku')?.value.trim();
+      const imageUrl = document.getElementById('createProductImage')?.value.trim();
+
+      if (!title) {
+        showToast('El título es obligatorio.', 'error');
+        return;
+      }
+      if (priceRaw === '') {
+        showToast('El precio es obligatorio.', 'error');
+        return;
+      }
+      const price = Number(priceRaw);
+      if (!Number.isFinite(price) || price < 0) {
+        showToast('El precio debe ser un número mayor o igual a 0.', 'error');
+        return;
+      }
+      if (stockRaw === '') {
+        showToast('El stock es obligatorio.', 'error');
+        return;
+      }
+      const stock = Number(stockRaw);
+      if (!Number.isInteger(stock) || stock < 0) {
+        showToast('El stock debe ser un número entero mayor o igual a 0.', 'error');
+        return;
+      }
+      if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
+        showToast('La URL de imagen debe empezar con http:// o https://', 'error');
+        return;
+      }
+
+      const salesChannelId = allStore?.default_sales_channel_id || allSalesChannels[0]?.id;
+      const shippingProfileId = allShippingProfiles[0]?.id;
+      const locationId = allStockLocations[0]?.id;
+      if (!salesChannelId || !shippingProfileId || !locationId) {
+        showToast('No se pudieron cargar los datos de Medusa para crear el producto.', 'error');
+        return;
+      }
+
+      const payload = {
+        title,
+        description: description || null,
+        status,
+        thumbnail: imageUrl || null,
+        images: imageUrl ? [{ url: imageUrl }] : [],
+        categories: categoryId ? [{ id: categoryId }] : [],
+        options: [{ title: 'Presentación', values: ['Único'] }],
+        variants: [{
+          title: 'Único',
+          sku: sku || generateProductSku(title),
+          manage_inventory: true,
+          allow_backorder: false,
+          options: { 'Presentación': 'Único' },
+          prices: [{ amount: price, currency_code: 'pen' }]
+        }],
+        sales_channels: [{ id: salesChannelId }],
+        shipping_profile_id: shippingProfileId
+      };
+
+      try {
+        const res = await apiFetch('/admin/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          showToast(data.message || 'No se pudo crear el producto en Medusa.', 'error');
+          return;
+        }
+
+        const data = await res.json();
+        const created = data.product;
+        if (!created?.id) {
+          showToast('Medusa creó el producto, pero no devolvió su ID.', 'error');
+          return;
+        }
+
+        let stockWarning = false;
+        const refreshRes = await apiFetch(`/admin/products/${created.id}?fields=id,*variants.inventory_items.inventory.location_levels`);
+        if (refreshRes.ok) {
+          const refreshed = await refreshRes.json();
+          const inventoryItemId = refreshed.product?.variants?.[0]?.inventory_items?.[0]?.inventory_item_id;
+          if (inventoryItemId) {
+            const levelRes = await apiFetch(`/admin/inventory-items/${inventoryItemId}/location-levels`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ location_id: locationId, stocked_quantity: stock })
+            });
+            if (!levelRes.ok) stockWarning = true;
+          } else {
+            stockWarning = true;
+          }
+        } else {
+          stockWarning = true;
+        }
+
+        closeModal();
+        showToast(
+          stockWarning
+            ? 'Producto creado en Medusa, pero no se pudo cargar el stock. Editalo para reintentar.'
+            : 'Producto creado en Medusa con precio y stock.',
+          stockWarning ? 'error' : 'success'
+        );
+        await loadMetrics();
+        showView('productos');
+      } catch (err) {
+        console.error(err);
+        showToast('Error de conexión al crear el producto.', 'error');
+      }
+    }
+
+    function confirmDeleteProduct(productId) {
+      const product = findProduct(productId);
+      if (!product) {
+        showToast('Producto no encontrado.', 'error');
+        return;
+      }
+      openModal('Eliminar producto', `
+        <div class="space-y-3">
+          <div class="rounded-xl bg-rose-50 border border-rose-100 px-3 py-2 text-[11px] text-rose-700 font-medium">
+            ¿Seguro que querés eliminar <b>${escapeHtml(product.title || 'este producto')}</b>? Se quitará de Medusa.
+          </div>
+          <p class="text-[10px] text-slate-500">Si el producto tiene pedidos asociados, Medusa puede rechazar la eliminación.</p>
+          <div class="flex items-center justify-end gap-2 pt-1">
+            <button onclick="closeModal()" class="px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition">Cancelar</button>
+            <button onclick="deleteProduct('${product.id}')" class="px-3 py-2 rounded-xl bg-rose-600 text-white text-[11px] font-bold hover:bg-rose-700 transition">Eliminar producto</button>
+          </div>
+        </div>
+      `);
+    }
+
+    async function deleteProduct(productId) {
+      try {
+        const res = await apiFetch(`/admin/products/${productId}`, { method: 'DELETE' });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          showToast(data.message || 'No se pudo eliminar el producto.', 'error');
+          return;
+        }
+        closeModal();
+        showToast('Producto eliminado de Medusa.');
+        await loadMetrics();
+        showView('productos');
+      } catch (err) {
+        console.error(err);
+        showToast('Error de conexión al eliminar el producto.', 'error');
+      }
     }
 
     function filterCatalogByLowStock() {
@@ -1871,6 +2306,7 @@
       renderCustomersView();
       renderReportsView(orders);
       renderDashboardProducts(allProducts);
+      renderProductsView();
       renderNotifications();
     }
 
