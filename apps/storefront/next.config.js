@@ -18,6 +18,23 @@ const nextConfig = {
   // The monorepo root holds pnpm-lock.yaml. Without this, Next can infer a
   // workspace root from an unrelated lockfile that lives outside the project.
   outputFileTracingRoot: path.join(__dirname, "../../"),
+  // The browser must never be pinned to a loopback address: the storefront is
+  // opened from other machines (LAN / Tailscale). All SDK calls go through this
+  // same-origin proxy and Next forwards them to the backend server-side.
+  async rewrites() {
+    const backend = process.env.MEDUSA_BACKEND_URL || "http://127.0.0.1:9000"
+    return [
+      // Storefront-only surface. Do not expose /admin through this proxy.
+      {
+        source: "/api/medusa/store/:path*",
+        destination: `${backend}/store/:path*`,
+      },
+      {
+        source: "/api/medusa/auth/:path*",
+        destination: `${backend}/auth/:path*`,
+      },
+    ]
+  },
   logging: {
     fetches: {
       fullUrl: true,
