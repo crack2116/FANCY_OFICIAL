@@ -25,26 +25,33 @@
       border-radius: 9999px;
     }
     
-    /* KPI Cards — soft premium gradients */
-    .card-kpi-1 {
-      background: linear-gradient(145deg, #FFFFFF 0%, #FFF5EC 100%);
-      border: 1px solid #FFE3D0;
-      box-shadow: 0 14px 30px -26px rgba(249, 156, 50, 0.85);
+    /* Premium KPI cards */
+    .kpi-card {
+      isolation: isolate;
     }
-    .card-kpi-2 {
-      background: linear-gradient(145deg, #FFFFFF 0%, #EFF6FF 100%);
-      border: 1px solid #D6E8FF;
-      box-shadow: 0 14px 30px -26px rgba(59, 130, 246, 0.85);
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      pointer-events: none;
     }
-    .card-kpi-3 {
-      background: linear-gradient(145deg, #FFFFFF 0%, #ECFDF5 100%);
-      border: 1px solid #D1FAE5;
-      box-shadow: 0 14px 30px -26px rgba(16, 185, 129, 0.85);
+    .kpi-orange {
+      background: linear-gradient(135deg, #F59E0B 0%, #EA580C 100%);
+      box-shadow: 0 18px 40px -24px rgba(234, 88, 12, 0.9);
     }
-    .card-kpi-4 {
-      background: linear-gradient(145deg, #FFFFFF 0%, #FAF5FF 100%);
-      border: 1px solid #EDE9FE;
-      box-shadow: 0 14px 30px -26px rgba(139, 92, 246, 0.85);
+    .kpi-blue {
+      background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+      box-shadow: 0 18px 40px -24px rgba(29, 78, 216, 0.9);
+    }
+    .kpi-green {
+      background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+      box-shadow: 0 18px 40px -24px rgba(4, 120, 87, 0.9);
+    }
+    .kpi-purple {
+      background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+      box-shadow: 0 18px 40px -24px rgba(109, 40, 217, 0.9);
     }
     @keyframes float-soft {
       0%, 100% { transform: translateY(0); }
@@ -63,7 +70,7 @@
     <!-- ===================================================================== -->
     <!-- SIDEBAR (Ancho exacto 172px correspondiente al mockup de 1024px)     -->
     <!-- ===================================================================== -->
-    <aside class="w-[172px] bg-white border-r border-slate-200/70 flex flex-col justify-between shrink-0 fixed inset-y-0 left-0 z-30 select-none">
+    <aside id="sidebar" class="w-[220px] lg:w-[172px] bg-white border-r border-slate-200/70 flex flex-col justify-between shrink-0 fixed inset-y-0 left-0 z-40 select-none -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-out overflow-y-auto custom-scrollbar">
       
       <!-- Top Section -->
       <div class="p-3 pt-3.5">
@@ -200,26 +207,36 @@
       </div>
     </aside>
 
+    <!-- Mobile sidebar overlay -->
+    <div id="sidebarOverlay" onclick="closeSidebar()" class="fixed inset-0 z-30 hidden bg-slate-900/40 backdrop-blur-sm lg:hidden"></div>
+
     <!-- ===================================================================== -->
     <!-- MAIN WORKSPACE (Aparece exactamente al costado, ml-[172px])           -->
     <!-- ===================================================================== -->
-    <div class="flex-1 ml-[172px] min-h-screen flex flex-col bg-[#F8FAFC]">
+    <div class="flex-1 ml-0 lg:ml-[172px] min-h-screen flex flex-col bg-[#F8FAFC] min-w-0">
 
       <!-- Top Header / Search & User -->
-      <header class="h-11 px-5 flex items-center justify-between sticky top-0 bg-[#F8FAFC]/95 backdrop-blur-md z-20 border-b border-slate-100">
-        
-        <!-- Search bar -->
-        <div class="relative w-64">
-          <input type="text" id="globalSearchInput" oninput="handleGlobalSearch(this.value)"
-                 placeholder="Buscar pedidos, clientes..."
-                 class="w-full bg-white border border-slate-200/80 rounded-full pl-8 pr-3 py-1 text-[11px] text-slate-800 placeholder-slate-400 shadow-2xs focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32] transition">
-          <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
+      <header class="h-11 px-3 sm:px-5 flex items-center justify-between gap-2 sticky top-0 bg-[#F8FAFC]/95 backdrop-blur-md z-20 border-b border-slate-100">
+        <div class="flex items-center gap-2 flex-1 min-w-0">
+          <button onclick="toggleSidebar()" class="lg:hidden w-8 h-8 rounded-full bg-white border border-slate-200/80 flex items-center justify-center text-slate-600 shadow-2xs shrink-0" aria-label="Abrir menú">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+
+          <!-- Search bar -->
+          <div class="relative w-full max-w-xs">
+            <input type="text" id="globalSearchInput" oninput="handleGlobalSearch(this.value)"
+                   placeholder="Buscar pedidos, clientes..."
+                   class="w-full bg-white border border-slate-200/80 rounded-full pl-8 pr-3 py-1 text-[11px] text-slate-800 placeholder-slate-400 shadow-2xs focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32] transition">
+            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
         </div>
 
         <!-- Right: Bell Notification & User Profile -->
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           <div class="relative">
             <button id="notificationBell" onclick="toggleNotifications(event)" class="w-7 h-7 rounded-full bg-white border border-slate-200/80 flex items-center justify-center relative shadow-2xs hover:bg-slate-50 text-slate-600 transition">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -227,7 +244,7 @@
               </svg>
               <span id="notificationBadge" class="absolute -top-0.5 -right-0.5 min-w-3 h-3 px-0.5 rounded-full bg-rose-500 text-white text-[8px] font-bold flex items-center justify-center border border-white">0</span>
             </button>
-            <div id="notificationMenu" class="hidden absolute right-0 top-9 w-72 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl z-30">
+            <div id="notificationMenu" class="hidden absolute right-0 top-9 w-72 max-w-[calc(100vw-1.5rem)] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl z-30">
               <div class="flex items-center justify-between px-2 py-1.5">
                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Notificaciones</span>
                 <button onclick="markNotificationsRead()" class="text-[9px] font-bold text-[#F99C32] hover:text-[#e0851e]">Marcar leídas</button>
@@ -238,7 +255,7 @@
 
           <!-- User Pill -->
           <button onclick="logout()" class="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition">Salir</button>
-          <div onclick="showView('configuracion')" class="bg-white border border-slate-200/80 rounded-full py-0.5 pl-0.5 pr-2.5 flex items-center gap-1.5 shadow-2xs cursor-pointer hover:bg-slate-50 transition">
+          <div onclick="showView('configuracion')" class="hidden sm:flex bg-white border border-slate-200/80 rounded-full py-0.5 pl-0.5 pr-2.5 items-center gap-1.5 shadow-2xs cursor-pointer hover:bg-slate-50 transition">
             <div class="w-6 h-6 rounded-full bg-[#1E293B] text-white font-bold text-[10px] flex items-center justify-center">
               IC
             </div>
@@ -253,7 +270,7 @@
       <!-- =================================================================== -->
       <!-- VIEW 1: DASHBOARD PRINCIPAL                                         -->
       <!-- =================================================================== -->
-      <main id="view-dashboard" class="flex-1 px-5 pb-3 pt-2 relative w-full">
+      <main id="view-dashboard" class="flex-1 px-3 sm:px-5 pb-3 pt-2 relative w-full">
         
         <!-- Subtle Decorative Pure Vector SVG Paw Watermark Top-Right -->
         <svg class="absolute right-0 top-0 w-44 pointer-events-none opacity-40 select-none" viewBox="0 0 180 120" fill="none">
@@ -274,7 +291,7 @@
         </svg>
 
         <!-- Greeting Row -->
-        <div class="flex items-start justify-between relative z-10 mb-2.5">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 relative z-10 mb-2.5">
           <div>
             <h2 class="text-[16px] font-extrabold text-slate-900 tracking-tight flex items-center gap-1.5">
               <span>¡Hola, Ivan!</span>
@@ -304,141 +321,133 @@
         </div>
 
         <!-- 4 KPI METRIC CARDS -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 relative z-10 mb-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 relative z-10 mb-3">
 
           <!-- Card 1: Pedidos totales -->
-          <div onclick="showView('pedidos')" class="card-kpi-1 group rounded-3xl p-3.5 relative overflow-hidden cursor-pointer transition duration-200 hover:-translate-y-0.5 hover:shadow-lg h-[104px] flex flex-col justify-between">
-            <div class="absolute -right-7 -top-9 h-24 w-24 rounded-full bg-[#F99C32]/10 blur-2xl pointer-events-none"></div>
-            <div class="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#F99C32] via-[#FBBF24] to-[#FDBA74]"></div>
-            <div class="flex items-start justify-between relative">
-              <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-2xl bg-white/85 border border-white shadow-sm flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-[#F99C32]" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <div onclick="showView('pedidos')" class="kpi-card kpi-orange group rounded-3xl p-4 relative overflow-hidden cursor-pointer transition duration-200 hover:-translate-y-1 hover:shadow-xl min-h-[118px] flex flex-col justify-between">
+            <div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-white/10 pointer-events-none"></div>
+            <div class="absolute -left-8 -bottom-12 h-28 w-28 rounded-full bg-white/5 pointer-events-none"></div>
+            <div class="flex items-start justify-between gap-2 relative">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-2xl bg-white/20 border border-white/25 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                     <path d="M6 3h12a1 1 0 0 1 1 1v17l-3-2-2 2-2-2-2 2-2-2-3 2V4a1 1 0 0 1 1-1Z"/>
                     <path d="M9 8h6M9 12h6M9 16h4"/>
                   </svg>
                 </div>
-                <div>
-                  <div class="text-[8px] font-extrabold uppercase tracking-[0.07em] text-slate-400 leading-tight">Pedidos totales</div>
-                  <div id="statTotalOrders" class="text-[21px] font-extrabold text-slate-900 leading-none mt-0.5 whitespace-nowrap">0</div>
+                <div class="min-w-0">
+                  <div class="text-[8px] font-extrabold uppercase tracking-[0.12em] text-white/75 leading-tight">Pedidos totales</div>
+                  <div id="statTotalOrders" class="text-[26px] font-extrabold text-white leading-none mt-1 whitespace-nowrap">0</div>
                 </div>
               </div>
+              <span id="statOrdersTrend" class="rounded-full bg-white/20 border border-white/20 px-2 py-0.5 text-[8.5px] font-bold text-white whitespace-nowrap shrink-0">—</span>
             </div>
-            <div class="flex items-end justify-between relative">
-              <div>
-                <div id="statOrdersTrend" class="text-[9.5px] font-bold text-slate-400">—</div>
-                <div class="text-[8.5px] text-slate-400 font-medium mt-0.5">vs. periodo anterior</div>
-              </div>
-              <svg class="h-6 w-20 overflow-visible" viewBox="0 0 68 22" fill="none">
+            <div class="flex items-end justify-between relative mt-2">
+              <div class="text-[9px] text-white/70 font-medium">vs. periodo anterior</div>
+              <svg class="h-6 w-16 sm:w-20 overflow-visible opacity-90" viewBox="0 0 68 22" fill="none">
                 <defs>
                   <linearGradient id="c1-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#F99C32" stop-opacity="0.35"/>
-                    <stop offset="100%" stop-color="#F99C32" stop-opacity="0.0"/>
+                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+                    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
                   </linearGradient>
                 </defs>
                 <path d="M 0 20 C 14 20, 22 15, 30 14 C 36 13, 44 17, 52 9 C 58 5, 62 7, 68 18 L 68 22 L 0 22 Z" fill="url(#c1-grad)"/>
-                <path d="M 0 20 C 14 20, 22 15, 30 14 C 36 13, 44 17, 52 9 C 58 5, 62 7, 68 18" stroke="#F99C32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 0 20 C 14 20, 22 15, 30 14 C 36 13, 44 17, 52 9 C 58 5, 62 7, 68 18" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
           </div>
 
           <!-- Card 2: Clientes registrados -->
-          <div onclick="showView('clientes')" class="card-kpi-2 group rounded-3xl p-3.5 relative overflow-hidden cursor-pointer transition duration-200 hover:-translate-y-0.5 hover:shadow-lg h-[104px] flex flex-col justify-between">
-            <div class="absolute -right-7 -top-9 h-24 w-24 rounded-full bg-[#3B82F6]/10 blur-2xl pointer-events-none"></div>
-            <div class="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#93C5FD]"></div>
-            <div class="flex items-start justify-between relative">
-              <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-2xl bg-white/85 border border-white shadow-sm flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-[#3B82F6]" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <div onclick="showView('clientes')" class="kpi-card kpi-blue group rounded-3xl p-4 relative overflow-hidden cursor-pointer transition duration-200 hover:-translate-y-1 hover:shadow-xl min-h-[118px] flex flex-col justify-between">
+            <div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-white/10 pointer-events-none"></div>
+            <div class="absolute -left-8 -bottom-12 h-28 w-28 rounded-full bg-white/5 pointer-events-none"></div>
+            <div class="flex items-start justify-between gap-2 relative">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-2xl bg-white/20 border border-white/25 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                     <circle cx="9" cy="7" r="4"/>
                     <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
                   </svg>
                 </div>
-                <div>
-                  <div class="text-[8px] font-extrabold uppercase tracking-[0.07em] text-slate-400 leading-tight">Clientes registrados</div>
-                  <div id="statTotalCustomers" class="text-[21px] font-extrabold text-slate-900 leading-none mt-0.5 whitespace-nowrap">0</div>
+                <div class="min-w-0">
+                  <div class="text-[8px] font-extrabold uppercase tracking-[0.12em] text-white/75 leading-tight">Clientes registrados</div>
+                  <div id="statTotalCustomers" class="text-[26px] font-extrabold text-white leading-none mt-1 whitespace-nowrap">0</div>
                 </div>
               </div>
+              <span id="statCustomersTrend" class="rounded-full bg-white/20 border border-white/20 px-2 py-0.5 text-[8.5px] font-bold text-white whitespace-nowrap shrink-0">—</span>
             </div>
-            <div class="flex items-end justify-between relative">
-              <div>
-                <div id="statCustomersTrend" class="text-[9.5px] font-bold text-slate-400">—</div>
-                <div class="text-[8.5px] text-slate-400 font-medium mt-0.5">vs. periodo anterior</div>
-              </div>
-              <svg class="h-6 w-20 overflow-visible" viewBox="0 0 68 22" fill="none">
+            <div class="flex items-end justify-between relative mt-2">
+              <div class="text-[9px] text-white/70 font-medium">vs. periodo anterior</div>
+              <svg class="h-6 w-16 sm:w-20 overflow-visible opacity-90" viewBox="0 0 68 22" fill="none">
                 <defs>
                   <linearGradient id="c2-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.35"/>
-                    <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0"/>
+                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+                    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
                   </linearGradient>
                 </defs>
                 <path d="M 0 19 C 10 18, 16 13, 24 13 C 30 13, 34 16, 40 12 C 46 8, 50 3, 58 7 C 62 10, 65 13, 68 17 L 68 22 L 0 22 Z" fill="url(#c2-grad)"/>
-                <path d="M 0 19 C 10 18, 16 13, 24 13 C 30 13, 34 16, 40 12 C 46 8, 50 3, 58 7 C 62 10, 65 13, 68 17" stroke="#3B82F6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 0 19 C 10 18, 16 13, 24 13 C 30 13, 34 16, 40 12 C 46 8, 50 3, 58 7 C 62 10, 65 13, 68 17" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
           </div>
 
           <!-- Card 3: Ventas totales -->
-          <div onclick="showView('reportes')" class="card-kpi-3 group rounded-3xl p-3.5 relative overflow-hidden cursor-pointer transition duration-200 hover:-translate-y-0.5 hover:shadow-lg h-[104px] flex flex-col justify-between">
-            <div class="absolute -right-7 -top-9 h-24 w-24 rounded-full bg-[#10B981]/10 blur-2xl pointer-events-none"></div>
-            <div class="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#10B981] via-[#34D399] to-[#6EE7B7]"></div>
-            <div class="flex items-start justify-between relative">
-              <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-2xl bg-white/85 border border-white shadow-sm flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-[#10B981]" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <div onclick="showView('reportes')" class="kpi-card kpi-green group rounded-3xl p-4 relative overflow-hidden cursor-pointer transition duration-200 hover:-translate-y-1 hover:shadow-xl min-h-[118px] flex flex-col justify-between">
+            <div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-white/10 pointer-events-none"></div>
+            <div class="absolute -left-8 -bottom-12 h-28 w-28 rounded-full bg-white/5 pointer-events-none"></div>
+            <div class="flex items-start justify-between gap-2 relative">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-2xl bg-white/20 border border-white/25 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                     <path d="M20 7V6a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h15a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6"/>
                     <path d="M16 13h2"/>
                   </svg>
                 </div>
-                <div>
-                  <div class="text-[8px] font-extrabold uppercase tracking-[0.07em] text-slate-400 leading-tight">Ventas totales</div>
-                  <div id="statTotalSales" class="text-[21px] font-extrabold text-slate-900 leading-none mt-0.5 whitespace-nowrap">S/ 0.00</div>
+                <div class="min-w-0">
+                  <div class="text-[8px] font-extrabold uppercase tracking-[0.12em] text-white/75 leading-tight">Ventas totales</div>
+                  <div id="statTotalSales" class="text-[26px] font-extrabold text-white leading-none mt-1 whitespace-nowrap">S/ 0.00</div>
                 </div>
               </div>
+              <span id="statSalesTrend" class="rounded-full bg-white/20 border border-white/20 px-2 py-0.5 text-[8.5px] font-bold text-white whitespace-nowrap shrink-0">—</span>
             </div>
-            <div class="flex items-end justify-between relative">
-              <div>
-                <div id="statSalesTrend" class="text-[9.5px] font-bold text-slate-400">—</div>
-                <div class="text-[8.5px] text-slate-400 font-medium mt-0.5">vs. periodo anterior</div>
-              </div>
-              <svg class="h-6 w-20 overflow-visible" viewBox="0 0 68 22" fill="none">
+            <div class="flex items-end justify-between relative mt-2">
+              <div class="text-[9px] text-white/70 font-medium">vs. periodo anterior</div>
+              <svg class="h-6 w-16 sm:w-20 overflow-visible opacity-90" viewBox="0 0 68 22" fill="none">
                 <defs>
                   <linearGradient id="c3-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#10B981" stop-opacity="0.35"/>
-                    <stop offset="100%" stop-color="#10B981" stop-opacity="0.0"/>
+                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+                    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
                   </linearGradient>
                 </defs>
                 <path d="M 0 19 C 12 18, 18 13, 26 13 C 32 13, 36 15, 42 12 C 48 8, 52 3, 56 4 C 60 5, 64 8, 68 14 L 68 22 L 0 22 Z" fill="url(#c3-grad)"/>
-                <path d="M 0 19 C 12 18, 18 13, 26 13 C 32 13, 36 15, 42 12 C 48 8, 52 3, 56 4 C 60 5, 64 8, 68 14" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 0 19 C 12 18, 18 13, 26 13 C 32 13, 36 15, 42 12 C 48 8, 52 3, 56 4 C 60 5, 64 8, 68 14" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
           </div>
 
-          <!-- Card 4: Productos en stock bajo -->
-          <div onclick="showView('catalogo', 'low-stock')" class="card-kpi-4 group rounded-3xl p-3.5 relative overflow-hidden cursor-pointer transition duration-200 hover:-translate-y-0.5 hover:shadow-lg h-[104px] flex flex-col justify-between">
-            <div class="absolute -right-7 -top-9 h-24 w-24 rounded-full bg-[#8B5CF6]/10 blur-2xl pointer-events-none"></div>
-            <div class="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#8B5CF6] via-[#A78BFA] to-[#C4B5FD]"></div>
-            <div class="flex items-start justify-between relative">
-              <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-2xl bg-white/85 border border-white shadow-sm flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-[#8B5CF6]" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <!-- Card 4: Stock bajo -->
+          <div onclick="showView('catalogo', 'low-stock')" class="kpi-card kpi-purple group rounded-3xl p-4 relative overflow-hidden cursor-pointer transition duration-200 hover:-translate-y-1 hover:shadow-xl min-h-[118px] flex flex-col justify-between">
+            <div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-white/10 pointer-events-none"></div>
+            <div class="absolute -left-8 -bottom-12 h-28 w-28 rounded-full bg-white/5 pointer-events-none"></div>
+            <div class="flex items-start justify-between gap-2 relative">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-2xl bg-white/20 border border-white/25 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                     <path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/>
                     <path d="m3 8 9 5 9-5M12 13v8"/>
                   </svg>
                 </div>
-                <div>
-                  <div class="text-[8px] font-extrabold uppercase tracking-[0.07em] text-slate-400 leading-tight">Stock bajo</div>
-                  <div id="statLowStock" class="text-[21px] font-extrabold text-slate-900 leading-none mt-0.5 whitespace-nowrap">0</div>
+                <div class="min-w-0">
+                  <div class="text-[8px] font-extrabold uppercase tracking-[0.12em] text-white/75 leading-tight">Stock bajo</div>
+                  <div id="statLowStock" class="text-[26px] font-extrabold text-white leading-none mt-1 whitespace-nowrap">0</div>
                 </div>
               </div>
+              <span class="rounded-full bg-white/20 border border-white/20 px-2 py-0.5 text-[8.5px] font-bold text-white whitespace-nowrap shrink-0">Alerta</span>
             </div>
-            <div class="flex items-end justify-between relative">
-              <div>
-                <div class="text-[9px] font-bold text-purple-600">Reponer stock</div>
-                <div class="text-[8.5px] text-slate-400 font-medium mt-0.5">Menos de 20 u.</div>
-              </div>
-              <button onclick="event.stopPropagation(); showView('catalogo', 'low-stock')" class="flex items-center gap-0.5 rounded-full bg-white/80 border border-white px-2 py-1 text-[8.5px] font-bold text-[#9333EA] shadow-2xs hover:bg-white transition whitespace-nowrap">
+            <div class="flex items-end justify-between relative mt-2">
+              <div class="text-[9px] text-white/70 font-medium">Menos de 20 unidades</div>
+              <button onclick="event.stopPropagation(); showView('catalogo', 'low-stock')" class="flex items-center gap-0.5 rounded-full bg-white/20 border border-white/20 px-2.5 py-1 text-[8.5px] font-bold text-white hover:bg-white/30 transition whitespace-nowrap">
                 Ver <span>→</span>
               </button>
             </div>
@@ -465,6 +474,9 @@
             </button>
           </div>
 
+          <div id="dashboardOrdersHint" class="sm:hidden text-[9px] text-slate-400 font-medium mb-1">Desliza para ver todas las columnas →</div>
+          <div class="overflow-x-auto -mx-1 px-1">
+            <div class="min-w-[640px]">
           <!-- Table Header -->
           <div class="grid grid-cols-12 bg-[#F8FAFC] py-1 px-3 rounded-lg text-[9px] font-bold text-slate-600 mb-1 border border-slate-100">
             <div class="col-span-2">Nº Pedido</div>
@@ -473,6 +485,13 @@
             <div class="col-span-2">Total</div>
             <div class="col-span-2">Estado</div>
             <div class="col-span-1 text-right">Acciones</div>
+          </div>
+
+          <!-- Dynamic Orders List -->
+          <div id="dynamicOrdersList" class="divide-y divide-slate-100 hidden">
+            <!-- Populated via JS -->
+          </div>
+            </div>
           </div>
 
           <!-- Empty State Illustration (Crafted Pure Vector SVG Mascot) -->
@@ -622,10 +641,7 @@
             <button onclick="showView('catalogo')" class="mt-3 px-3.5 py-1.5 rounded-full bg-[#FFF5EE] text-[#F99C32] text-[10px] font-bold hover:bg-[#ffe3cf] transition">Explorar catálogo</button>
           </div>
 
-          <!-- Dynamic Orders List -->
-          <div id="dynamicOrdersList" class="divide-y divide-slate-100 hidden">
-            <!-- Populated via JS -->
-          </div>
+
 
         </div>
 
@@ -639,7 +655,7 @@
               <h3 class="font-bold text-slate-900 text-[10.5px] tracking-tight">Módulos disponibles</h3>
             </div>
             
-            <div class="text-[8.5px] text-slate-400 flex items-center gap-1 font-medium">
+            <div class="hidden sm:flex text-[8.5px] text-slate-400 items-center gap-1 font-medium">
               <span>Gestiona tu tienda de forma más eficiente</span>
               <svg class="w-2.5 h-2.5 text-blue-500 fill-current" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
@@ -648,7 +664,7 @@
           </div>
 
           <!-- 5 Horizontal Module Cards -->
-          <div class="grid grid-cols-5 gap-2">
+          <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2">
 
             <!-- Card 1: Gestionar Pedidos -->
             <div onclick="showView('pedidos')" class="bg-white rounded-2xl border border-slate-200/80 p-2 flex items-center justify-between shadow-2xs hover:shadow-sm cursor-pointer transition group h-[56px]">
@@ -733,8 +749,8 @@
       <!-- =================================================================== -->
       <!-- VIEW 2: GESTIÓN DE PEDIDOS (Aparece exactamente al costado)         -->
       <!-- =================================================================== -->
-      <section id="view-pedidos" class="flex-1 px-5 pb-6 pt-3 hidden w-full">
-        <div class="flex items-center justify-between mb-3">
+      <section id="view-pedidos" class="flex-1 px-3 sm:px-5 pb-6 pt-3 hidden w-full">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
           <div>
             <button onclick="showView('dashboard')" class="text-[11px] font-bold text-slate-400 hover:text-slate-700 mb-0.5 flex items-center gap-1">
               <span>←</span> <span>Volver al Dashboard</span>
@@ -742,7 +758,7 @@
             <h2 class="text-[18px] font-extrabold text-slate-900 tracking-tight">Gestión de Pedidos</h2>
             <p class="text-[10px] text-slate-500 font-medium">Control de pedidos, validación de transferencias Yape/Plin y autorización COD.</p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
             <button onclick="exportOrdersCsv()" class="px-3 py-1 rounded-xl bg-white border border-slate-200/80 text-[11px] font-bold text-slate-700 hover:bg-slate-50 shadow-2xs">
               Exportar CSV
             </button>
@@ -754,13 +770,16 @@
 
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-4">
           <!-- Filters -->
-          <div class="flex items-center gap-1.5 mb-3">
+          <div class="flex flex-wrap items-center gap-1.5 mb-3">
             <button onclick="filterOrdersByStatus('all')" id="filter-ord-all" class="px-2.5 py-1 rounded-full text-[10.5px] font-bold bg-[#FFF5EE] text-[#F99C32]">Todos (<span id="count-all-orders">0</span>)</button>
             <button onclick="filterOrdersByStatus('captured')" id="filter-ord-captured" class="px-2.5 py-1 rounded-full text-[10.5px] font-medium text-slate-600 hover:bg-slate-100">Pagados</button>
             <button onclick="filterOrdersByStatus('awaiting')" id="filter-ord-awaiting" class="px-2.5 py-1 rounded-full text-[10.5px] font-medium text-slate-600 hover:bg-slate-100">Por Verificar (Manual)</button>
             <button onclick="filterOrdersByStatus('cod')" id="filter-ord-cod" class="px-2.5 py-1 rounded-full text-[10.5px] font-medium text-slate-600 hover:bg-slate-100">Contra Entrega (COD)</button>
           </div>
 
+          <div id="fullOrdersHint" class="sm:hidden text-[9px] text-slate-400 font-medium mb-1">Desliza para ver todas las columnas →</div>
+          <div class="overflow-x-auto -mx-1 px-1">
+            <div class="min-w-[720px]">
           <div class="grid grid-cols-12 bg-[#F8FAFC] py-1.5 px-3 rounded-lg text-[9.5px] font-bold text-slate-600 mb-1.5 border border-slate-100">
             <div class="col-span-2">Nº Pedido</div>
             <div class="col-span-2">Cliente</div>
@@ -770,17 +789,25 @@
             <div class="col-span-2 text-right">Acciones</div>
           </div>
 
-          <div id="fullOrdersTable" class="divide-y divide-slate-100">
+          <div id="fullOrdersTable" class="divide-y divide-slate-100 hidden">
             <!-- Rendered via JS -->
           </div>
+            </div>
+          </div>
+
+          <div id="fullOrdersEmpty" class="py-8 text-center">
+            <p class="text-xs font-bold text-slate-800">No hay pedidos registrados aún.</p>
+            <p class="text-[10px] text-slate-400 mt-0.5">Aparecerán aquí cuando tus clientes compren en la tienda.</p>
+          </div>
+
         </div>
       </section>
 
       <!-- =================================================================== -->
       <!-- VIEW 3: CATÁLOGO DE PRODUCTOS (Aparece exactamente al costado)      -->
       <!-- =================================================================== -->
-      <section id="view-catalogo" class="flex-1 px-5 pb-6 pt-3 hidden w-full">
-        <div class="flex items-center justify-between mb-3">
+      <section id="view-catalogo" class="flex-1 px-3 sm:px-5 pb-6 pt-3 hidden w-full">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
           <div>
             <button onclick="showView('dashboard')" class="text-[11px] font-bold text-slate-400 hover:text-slate-700 mb-0.5 flex items-center gap-1">
               <span>←</span> <span>Volver al Dashboard</span>
@@ -822,7 +849,7 @@
           </button>
         </div>
 
-        <div id="catalogGrid" class="grid grid-cols-3 gap-3">
+        <div id="catalogGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           <!-- Rendered via JS -->
         </div>
       </section>
@@ -830,7 +857,7 @@
       <!-- =================================================================== -->
       <!-- VIEW 4: CLIENTES (Aparece al costado)                               -->
       <!-- =================================================================== -->
-      <section id="view-clientes" class="flex-1 px-5 pb-6 pt-3 hidden w-full">
+      <section id="view-clientes" class="flex-1 px-3 sm:px-5 pb-6 pt-3 hidden w-full">
         <div class="flex items-center justify-between mb-3">
           <div>
             <button onclick="showView('dashboard')" class="text-[11px] font-bold text-slate-400 hover:text-slate-700 mb-0.5 flex items-center gap-1">
@@ -842,8 +869,13 @@
         </div>
 
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-4">
-          <div id="customersTable" class="divide-y divide-slate-100">
-            <!-- Rendered via JS -->
+          <div id="customersScrollHint" class="sm:hidden text-[9px] text-slate-400 font-medium mb-1">Desliza para ver todos los datos →</div>
+          <div class="overflow-x-auto -mx-1 px-1">
+            <div class="min-w-[520px]">
+              <div id="customersTable" class="divide-y divide-slate-100">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -851,8 +883,8 @@
       <!-- =================================================================== -->
       <!-- VIEW 5: REPORTES (Aparece al costado)                               -->
       <!-- =================================================================== -->
-      <section id="view-reportes" class="flex-1 px-5 pb-6 pt-3 hidden w-full">
-        <div class="flex items-center justify-between mb-3">
+      <section id="view-reportes" class="flex-1 px-3 sm:px-5 pb-6 pt-3 hidden w-full">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
           <div>
             <button onclick="showView('dashboard')" class="text-[11px] font-bold text-slate-400 hover:text-slate-700 mb-0.5 flex items-center gap-1">
               <span>←</span> <span>Volver al Dashboard</span>
@@ -866,7 +898,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3.5">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
           <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-2xs">
             <h3 class="font-bold text-slate-900 text-xs mb-2">Ingresos por Método de Pago</h3>
             <div id="paymentBreakdown" class="space-y-2 text-xs">
@@ -904,7 +936,7 @@
       <!-- =================================================================== -->
       <!-- VIEW 6: CONFIGURACIÓN (Aparece al costado)                          -->
       <!-- =================================================================== -->
-      <section id="view-configuracion" class="flex-1 px-5 pb-6 pt-3 hidden w-full">
+      <section id="view-configuracion" class="flex-1 px-3 sm:px-5 pb-6 pt-3 hidden w-full">
         <div class="flex items-center justify-between mb-3">
           <div>
             <button onclick="showView('dashboard')" class="text-[11px] font-bold text-slate-400 hover:text-slate-700 mb-0.5 flex items-center gap-1">
@@ -1109,6 +1141,17 @@
           if (menu) menu.classList.add('hidden');
         }
       });
+      window.addEventListener('resize', () => {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (window.innerWidth >= 1024) {
+          if (sidebar) sidebar.classList.remove('-translate-x-full');
+          if (overlay) overlay.classList.add('hidden');
+          document.body.classList.remove('overflow-hidden');
+        } else {
+          closeSidebar();
+        }
+      });
       loadSettings();
       await bootstrap();
     });
@@ -1174,6 +1217,9 @@
       const emptyIllustration = document.getElementById('emptyOrdersIllustration');
       const dynamicList = document.getElementById('dynamicOrdersList');
 
+      const dashboardHint = document.getElementById('dashboardOrdersHint');
+      if (dashboardHint) dashboardHint.classList.toggle('hidden', orders.length === 0);
+
       if (orders.length === 0) {
         emptyIllustration.classList.remove('hidden');
         dynamicList.classList.add('hidden');
@@ -1230,20 +1276,21 @@
     function updateKpiTrend(id, current, previous) {
       const el = document.getElementById(id);
       if (!el) return;
+      const base = 'rounded-full bg-white/20 border border-white/20 px-2 py-0.5 text-[8.5px] font-bold whitespace-nowrap shrink-0 ';
       if (previous === null) {
         el.textContent = 'Histórico';
-        el.className = 'text-[9.5px] font-bold text-slate-400';
+        el.className = base + 'text-white/60';
         return;
       }
       if (!previous) {
         el.textContent = current > 0 ? '↑ Nuevo' : '— Sin datos';
-        el.className = 'text-[9.5px] font-bold ' + (current > 0 ? 'text-emerald-600' : 'text-slate-400');
+        el.className = base + (current > 0 ? 'text-white' : 'text-white/60');
         return;
       }
       const pct = ((current - previous) / previous) * 100;
       const arrow = pct > 0 ? '↑' : pct < 0 ? '↓' : '→';
       el.textContent = `${arrow} ${Math.abs(pct).toFixed(0)}%`;
-      el.className = 'text-[9.5px] font-bold ' + (pct > 0 ? 'text-emerald-600' : pct < 0 ? 'text-rose-600' : 'text-slate-400');
+      el.className = base + (pct > 0 ? 'text-white' : pct < 0 ? 'text-rose-100' : 'text-white/70');
     }
 
     function updateKpiRangeLabels() {
@@ -1266,6 +1313,30 @@
       if (repLow) repLow.textContent = lowStockCount;
       const activeCount = document.getElementById('catalogActiveCount');
       if (activeCount) activeCount.textContent = `${products.length} Productos Activos`;
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (!sidebar || !overlay) return;
+      const isOpen = !sidebar.classList.contains('-translate-x-full');
+      if (isOpen) {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      } else {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      }
+    }
+
+    function closeSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (sidebar) sidebar.classList.add('-translate-x-full');
+      if (overlay) overlay.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
     }
 
     function showView(viewId, subFilter) {
@@ -1308,6 +1379,7 @@
       }
 
       window.location.hash = viewId;
+      if (window.innerWidth < 1024) closeSidebar();
     }
 
     function toggleCatalogSubmenu() {
@@ -1328,15 +1400,20 @@
       document.getElementById('count-all-orders').textContent = orders.length;
       const container = document.getElementById('fullOrdersTable');
 
+      const emptyState = document.getElementById('fullOrdersEmpty');
+      const fullOrdersHint = document.getElementById('fullOrdersHint');
+
       if (orders.length === 0) {
-        container.innerHTML = `
-          <div class="py-8 text-center">
-            <p class="text-xs font-bold text-slate-800">No hay pedidos registrados aún.</p>
-            <p class="text-[10px] text-slate-400 mt-0.5">Aparecerán aquí cuando tus clientes compren en la tienda.</p>
-          </div>
-        `;
+        container.innerHTML = '';
+        container.classList.add('hidden');
+        if (emptyState) emptyState.classList.remove('hidden');
+        if (fullOrdersHint) fullOrdersHint.classList.add('hidden');
         return;
       }
+
+      container.classList.remove('hidden');
+      if (emptyState) emptyState.classList.add('hidden');
+      if (fullOrdersHint) fullOrdersHint.classList.remove('hidden');
 
       container.innerHTML = orders.map(o => {
         const isCaptured = o.payment_status === 'captured';
@@ -1431,7 +1508,7 @@
       if (!grid) return;
 
       if (products.length === 0) {
-        grid.innerHTML = '<div class="col-span-3 py-10 text-center text-slate-400 text-xs font-semibold">No hay productos para mostrar.</div>';
+        grid.innerHTML = '<div class="col-span-full py-10 text-center text-slate-400 text-xs font-semibold">No hay productos para mostrar.</div>';
         return;
       }
 
@@ -1476,7 +1553,7 @@
         const grid = document.getElementById('catalogGrid');
         if (grid) {
           grid.innerHTML = `
-            <div class="col-span-3 py-12 text-center">
+            <div class="col-span-full py-12 text-center">
               <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-purple-600">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -1512,7 +1589,7 @@
         const grid = document.getElementById('catalogGrid');
         if (grid) {
           grid.innerHTML = `
-            <div class="col-span-3 py-12 text-center">
+            <div class="col-span-full py-12 text-center">
               <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF5EE] text-[#F99C32]">
                 ${CATEGORY_ICONS[def.key] || ''}
               </div>
@@ -1545,6 +1622,7 @@
 
     function renderCustomersView(orders) {
       const container = document.getElementById('customersTable');
+      const scrollHint = document.getElementById('customersScrollHint');
       if (!container) return;
 
       const customerMap = new Map();
@@ -1567,6 +1645,7 @@
 
       const customers = Array.from(customerMap.values());
       if (customers.length === 0) {
+        if (scrollHint) scrollHint.classList.add('hidden');
         container.innerHTML = `
           <div class="py-8 text-center text-slate-400">
             <p class="text-xs font-bold text-slate-700">Aún no hay clientes registrados.</p>
@@ -1576,6 +1655,7 @@
         return;
       }
 
+      if (scrollHint) scrollHint.classList.remove('hidden');
       container.innerHTML = customers.map(c => `
         <div class="py-2.5 px-3 text-xs flex items-center justify-between hover:bg-slate-50 transition rounded-xl">
           <div class="flex items-center gap-2.5">
@@ -1858,14 +1938,14 @@
       if (!grid) return;
       const total = allProducts.length;
       grid.innerHTML = `
-        <div class="col-span-3 flex items-center justify-between mb-1">
+        <div class="col-span-full flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
           <div>
             <h3 class="text-sm font-extrabold text-slate-900">Categorías</h3>
             <p class="text-[10px] text-slate-400 font-medium">Elegí una categoría para filtrar el catálogo.</p>
           </div>
           <button onclick="showView('catalogo','all')" class="text-[10px] font-bold text-[#F99C32] hover:text-[#e0851e]">Ver todos los productos →</button>
         </div>
-        <div class="col-span-3 grid grid-cols-3 gap-3">
+        <div class="col-span-full grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           ${CATEGORY_DEFS.map((def) => `
             <button onclick="filterCatalogCategory('${def.key}')" class="text-left bg-white rounded-2xl border border-slate-200/80 p-4 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition">
               <div class="w-10 h-10 rounded-2xl ${def.color} flex items-center justify-center mb-3">
