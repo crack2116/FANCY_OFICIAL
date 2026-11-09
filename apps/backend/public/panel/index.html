@@ -937,7 +937,7 @@
               <span>←</span> <span>Volver al Dashboard</span>
             </button>
             <h2 class="text-[18px] font-extrabold text-slate-900 tracking-tight">Configuración de la Tienda</h2>
-            <p class="text-[10px] text-slate-500 font-medium">Ajustes generales, pasarelas de pago y datos fiscales.</p>
+            <p class="text-[10px] text-slate-500 font-medium">Ajustes generales y datos de contacto sincronizados con Medusa.</p>
           </div>
         </div>
 
@@ -945,7 +945,7 @@
           <div class="space-y-3">
             <div>
               <label class="block text-[10px] font-bold text-slate-700 mb-1">Nombre Comercial</label>
-              <input id="settingBusinessName" type="text" value="Fancy Pets Perú" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+              <input id="settingBusinessName" type="text" value="" placeholder="Fancy Pets Perú" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
             </div>
             <div>
               <label class="block text-[10px] font-bold text-slate-700 mb-1">Moneda Principal</label>
@@ -953,16 +953,17 @@
             </div>
             <div>
               <label class="block text-[10px] font-bold text-slate-700 mb-1">Número de WhatsApp Oficial</label>
-              <input id="settingWhatsapp" type="text" value="+51 987 654 321" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+              <input id="settingWhatsapp" type="text" value="" placeholder="+51 987 654 321" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
             </div>
             <div>
               <label class="block text-[10px] font-bold text-slate-700 mb-1">Cuentas Bancarias</label>
-              <input id="settingBankAccounts" type="text" value="BCP Soles: 191-12345678-0-12" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+              <input id="settingBankAccounts" type="text" value="" placeholder="BCP Soles: 191-12345678-0-12" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
             </div>
           </div>
-          <div class="mt-4 flex items-center gap-2">
-            <button onclick="saveSettings()" class="px-3 py-1.5 rounded-xl bg-[#F99C32] text-white text-[11px] font-bold hover:bg-[#e0851e] transition">Guardar cambios</button>
-            <button onclick="loadSettings(true)" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-[11px] font-bold hover:bg-slate-200 transition">Restaurar</button>
+          <div class="mt-4 flex flex-wrap items-center gap-2">
+            <button onclick="saveSettings()" class="px-3 py-1.5 rounded-xl bg-[#F99C32] text-white text-[11px] font-bold hover:bg-[#e0851e] transition">Guardar en Medusa</button>
+            <button onclick="loadSettings(true)" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-[11px] font-bold hover:bg-slate-200 transition">Recargar</button>
+            <span class="text-[9px] text-slate-400 font-medium">El nombre se guarda en la tienda de Medusa; WhatsApp y cuentas en su metadata.</span>
           </div>
         </div>
       </section>
@@ -1026,9 +1027,10 @@
     let token = localStorage.getItem(TOKEN_KEY) || '';
     let allOrders = [];
     let allProducts = [];
+    let allCustomers = [];
+    let allStore = null;
     let dateRangeDays = 30;
     let activeOrderFilter = 'all';
-    const SETTINGS_KEY = 'fancy_admin_settings';
 
     function setToken(value) {
       token = value || '';
@@ -1083,7 +1085,7 @@
       }
       hideLogin();
       await loadMetrics();
-      loadSettings();
+      await loadSettings();
       renderNotifications();
       const hash = window.location.hash.replace('#', '') || 'dashboard';
       showView(hash);
@@ -1116,7 +1118,7 @@
             document.getElementById('loginPassword').value = '';
             hideLogin();
             await loadMetrics();
-            loadSettings();
+            await loadSettings();
             renderNotifications();
             const hash = window.location.hash.replace('#', '') || 'dashboard';
             showView(hash);
@@ -1146,27 +1148,34 @@
           closeSidebar();
         }
       });
-      loadSettings();
       await bootstrap();
     });
 
     async function loadMetrics() {
       try {
-        const ordersRes = await apiFetch('/admin/orders?limit=100&order=-created_at&fields=id,display_id,email,total,payment_status,created_at,metadata,payment_provider_id,*shipping_address,*items');
+        const [ordersRes, prodRes, customersRes] = await Promise.all([
+          apiFetch('/admin/orders?limit=100&order=-created_at&fields=id,display_id,email,total,payment_status,created_at,metadata,payment_provider_id,*shipping_address,*items'),
+          apiFetch('/admin/products?limit=100&fields=id,title,description,thumbnail,status,*variants,*variants.prices,*variants.inventory_items.inventory.location_levels,*categories'),
+          apiFetch('/admin/customers?limit=500&fields=id,email,first_name,last_name,phone,created_at')
+        ]);
+
         if (ordersRes.ok) {
           const data = await ordersRes.json();
           allOrders = data.orders || [];
-          refreshViewsWithRange();
         }
 
-        const prodRes = await apiFetch('/admin/products?limit=100&fields=id,title,description,thumbnail,*variants.prices,*categories');
         if (prodRes.ok) {
           const data = await prodRes.json();
           allProducts = (data.products || []).map(normalizeProduct);
-          renderDashboardProducts(allProducts);
-          renderCatalogView(allProducts);
-          renderNotifications();
         }
+
+        if (customersRes.ok) {
+          const data = await customersRes.json();
+          allCustomers = data.customers || [];
+        }
+
+        refreshViewsWithRange();
+        renderCatalogView(allProducts);
       } catch (err) {
         console.error(err);
       }
@@ -1174,15 +1183,31 @@
 
     function normalizeProduct(product) {
       const variants = (product.variants || []).map((variant) => {
-        const penPrice = (variant.prices || []).find((price) => price.currency_code === 'pen');
-        const amount = penPrice?.amount ?? variant.prices?.[0]?.amount ?? null;
+        const prices = variant.prices || [];
+        const penPrice = prices.find((price) => price.currency_code === 'pen') || null;
+        const amount = penPrice?.amount ?? null;
+        const levels = (variant.inventory_items || []).flatMap((item) => item.inventory?.location_levels || []);
+        const stock = levels.length
+          ? levels.reduce((sum, level) => sum + Number(level.stocked_quantity ?? level.available_quantity ?? 0), 0)
+          : (variant.inventory_quantity ?? (variant.manage_inventory === false ? null : 0));
         return {
           ...variant,
+          pen_price: penPrice,
+          inventory_levels: levels,
           calculated_price: { calculated_amount: amount },
-          inventory_quantity: variant.inventory_quantity ?? 25,
+          inventory_quantity: stock,
         };
       });
       return { ...product, variants };
+    }
+
+    function formatStock(value) {
+      if (value == null) return '∞';
+      const number = Number(value);
+      if (!Number.isFinite(number)) return '—';
+      if (number >= 1000000) return `${(number / 1000000).toFixed(number % 1000000 === 0 ? 0 : 1)}M`;
+      if (number >= 10000) return `${(number / 1000).toFixed(0)}k`;
+      return number.toLocaleString('es-PE');
     }
 
     function renderDashboardOrders(orders) {
@@ -1193,19 +1218,17 @@
         .reduce((sum, o) => sum + Number(o.total || 0), 0);
       document.getElementById('statTotalSales').textContent = `S/ ${totalSales.toFixed(2)}`;
 
-      const uniqueEmails = new Set(orders.map(o => o.email).filter(Boolean));
-      document.getElementById('statTotalCustomers').textContent = uniqueEmails.size;
+      const rangeCustomers = getCustomersInRange();
+      document.getElementById('statTotalCustomers').textContent = rangeCustomers.length;
 
       const previousOrders = getPreviousRangeOrders();
       const previousSales = previousOrders
         ? previousOrders.filter(o => o.payment_status === 'captured').reduce((sum, o) => sum + Number(o.total || 0), 0)
         : null;
-      const previousCustomers = previousOrders
-        ? new Set(previousOrders.map(o => o.email).filter(Boolean)).size
-        : null;
+      const previousCustomers = getPreviousRangeCustomers();
       updateKpiTrend('statOrdersTrend', orders.length, previousOrders ? previousOrders.length : null);
       updateKpiTrend('statSalesTrend', totalSales, previousSales);
-      updateKpiTrend('statCustomersTrend', uniqueEmails.size, previousCustomers);
+      updateKpiTrend('statCustomersTrend', rangeCustomers.length, previousCustomers ? previousCustomers.length : null);
       updateKpiRangeLabels();
 
       const emptyIllustration = document.getElementById('emptyOrdersIllustration');
@@ -1267,6 +1290,27 @@
       });
     }
 
+    function getCustomersInRange() {
+      if (!dateRangeDays) return allCustomers;
+      const cutoff = Date.now() - dateRangeDays * 86400000;
+      return allCustomers.filter((customer) => {
+        const t = new Date(customer.created_at).getTime();
+        return Number.isFinite(t) && t >= cutoff;
+      });
+    }
+
+    function getPreviousRangeCustomers() {
+      if (!dateRangeDays) return null;
+      const now = Date.now();
+      const rangeMs = dateRangeDays * 86400000;
+      const start = now - 2 * rangeMs;
+      const end = now - rangeMs;
+      return allCustomers.filter((customer) => {
+        const t = new Date(customer.created_at).getTime();
+        return Number.isFinite(t) && t >= start && t < end;
+      });
+    }
+
     function updateKpiTrend(id, current, previous) {
       const el = document.getElementById(id);
       if (!el) return;
@@ -1296,7 +1340,7 @@
       let lowStockCount = 0;
       products.forEach(p => {
         p.variants?.forEach(v => {
-          if (v.inventory_quantity < 20) lowStockCount++;
+          if (v.inventory_quantity != null && Number(v.inventory_quantity) < 20) lowStockCount++;
         });
       });
       document.getElementById('statLowStock').textContent = lowStockCount;
@@ -1511,7 +1555,8 @@
         const price = variant.calculated_price?.calculated_amount != null
           ? Number(variant.calculated_price.calculated_amount).toFixed(2)
           : 'Consultar';
-        const stock = variant.inventory_quantity ?? 25;
+        const stock = variant.inventory_quantity;
+        const isLowStock = stock != null && Number(stock) < 20;
         const thumbnail = p.thumbnail || FALLBACK_IMG;
 
         return `
@@ -1522,8 +1567,8 @@
               </div>
               <div class="flex items-start justify-between gap-2 mb-1">
                 <h4 class="font-bold text-xs text-slate-900 leading-snug line-clamp-2">${escapeHtml(p.title)}</h4>
-                <span class="text-[9.5px] font-bold px-1.5 py-0.5 rounded-full ${stock < 20 ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'} shrink-0">
-                  Stock: ${stock}
+                <span class="text-[9.5px] font-bold px-1.5 py-0.5 rounded-full ${isLowStock ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'} shrink-0">
+                  Stock: ${formatStock(stock)}
                 </span>
               </div>
               <p class="text-[10px] text-slate-400 line-clamp-1">${escapeHtml(p.description || 'Producto veterinario para mascotas')}</p>
@@ -1541,7 +1586,7 @@
 
     function filterCatalogByLowStock() {
       const lowStockProds = allProducts.filter(p => {
-        return p.variants?.some(v => v.inventory_quantity < 20);
+        return p.variants?.some(v => v.inventory_quantity != null && Number(v.inventory_quantity) < 20);
       });
       if (!lowStockProds.length) {
         const grid = document.getElementById('catalogGrid');
@@ -1614,36 +1659,59 @@
       applyOrderFilter();
     }
 
-    function renderCustomersView(orders) {
+    function renderCustomersView() {
       const container = document.getElementById('customersTable');
       const scrollHint = document.getElementById('customersScrollHint');
       if (!container) return;
 
       const customerMap = new Map();
-      orders.forEach(o => {
-        if (!o.email) return;
-        if (!customerMap.has(o.email)) {
-          customerMap.set(o.email, {
-            name: `${o.shipping_address?.first_name || ''} ${o.shipping_address?.last_name || ''}`.trim() || 'Cliente Frecuente',
-            email: o.email,
-            phone: o.shipping_address?.phone || '-',
-            ordersCount: 1,
-            totalSpent: Number(o.total || 0)
-          });
-        } else {
-          const c = customerMap.get(o.email);
-          c.ordersCount++;
-          c.totalSpent += Number(o.total || 0);
-        }
+      allCustomers.forEach((customer) => {
+        const email = (customer.email || '').toLowerCase();
+        if (!email) return;
+        const name = [customer.first_name, customer.last_name].filter(Boolean).join(' ') || 'Cliente';
+        customerMap.set(email, {
+          name,
+          email: customer.email,
+          phone: customer.phone || '',
+          ordersCount: 0,
+          totalSpent: 0,
+          createdAt: customer.created_at,
+          registered: true
+        });
       });
 
-      const customers = Array.from(customerMap.values());
+      getOrdersInRange().forEach((order) => {
+        const email = (order.email || '').toLowerCase();
+        if (!email) return;
+        if (!customerMap.has(email)) {
+          const name = [order.shipping_address?.first_name, order.shipping_address?.last_name].filter(Boolean).join(' ') || 'Cliente invitado';
+          customerMap.set(email, {
+            name,
+            email: order.email,
+            phone: order.shipping_address?.phone || '',
+            ordersCount: 0,
+            totalSpent: 0,
+            createdAt: order.created_at,
+            registered: false
+          });
+        }
+        const customer = customerMap.get(email);
+        customer.ordersCount++;
+        customer.totalSpent += Number(order.total || 0);
+        if (!customer.phone) customer.phone = order.shipping_address?.phone || '';
+      });
+
+      const customers = Array.from(customerMap.values()).sort((a, b) => {
+        if (a.registered !== b.registered) return a.registered ? -1 : 1;
+        return b.totalSpent - a.totalSpent || new Date(b.createdAt) - new Date(a.createdAt);
+      });
+
       if (customers.length === 0) {
         if (scrollHint) scrollHint.classList.add('hidden');
         container.innerHTML = `
           <div class="py-8 text-center text-slate-400">
-            <p class="text-xs font-bold text-slate-700">Aún no hay clientes registrados.</p>
-            <p class="text-[10px] mt-0.5">Los clientes aparecerán aquí tras realizar un pedido.</p>
+            <p class="text-xs font-bold text-slate-700">Aún no hay clientes registrados en Medusa.</p>
+            <p class="text-[10px] mt-0.5">Cuando se registren o realicen un pedido, aparecerán aquí.</p>
           </div>
         `;
         return;
@@ -1652,16 +1720,21 @@
       if (scrollHint) scrollHint.classList.remove('hidden');
       container.innerHTML = customers.map(c => `
         <div class="py-2.5 px-3 text-xs flex items-center justify-between hover:bg-slate-50 transition rounded-xl">
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center text-[11px]">
-              ${c.name.slice(0, 2).toUpperCase()}
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center text-[11px] shrink-0">
+              ${escapeHtml(c.name.slice(0, 2).toUpperCase())}
             </div>
-            <div>
-              <div class="font-bold text-slate-900">${c.name}</div>
-              <div class="text-[10px] text-slate-400 font-medium">${c.email} • Tel: ${c.phone}</div>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <span class="truncate">${escapeHtml(c.name)}</span>
+                ${c.registered
+                  ? '<span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 shrink-0">Registrado</span>'
+                  : '<span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 shrink-0">Invitado</span>'}
+              </div>
+              <div class="text-[10px] text-slate-400 font-medium truncate">${escapeHtml(c.email)}${c.phone ? ' • Tel: ' + escapeHtml(c.phone) : ''}</div>
             </div>
           </div>
-          <div class="text-right">
+          <div class="text-right shrink-0 pl-2">
             <div class="font-extrabold text-slate-900">S/ ${c.totalSpent.toFixed(2)}</div>
             <div class="text-[10px] text-slate-400 font-medium">${c.ordersCount} pedido(s)</div>
           </div>
@@ -1795,7 +1868,7 @@
       const orders = getOrdersInRange();
       renderDashboardOrders(orders);
       applyOrderFilter();
-      renderCustomersView(orders);
+      renderCustomersView();
       renderReportsView(orders);
       renderDashboardProducts(allProducts);
       renderNotifications();
@@ -1819,7 +1892,7 @@
       const cod = allOrders.filter((o) => o.metadata?.fancyperu_cod?.status === 'authorized');
       let lowStock = 0;
       allProducts.forEach((p) => (p.variants || []).forEach((v) => {
-        if (Number(v.inventory_quantity) < 20) lowStock++;
+        if (v.inventory_quantity != null && Number(v.inventory_quantity) < 20) lowStock++;
       }));
       const total = pending.length + cod.length + lowStock;
 
@@ -1972,10 +2045,43 @@
         showToast('Producto no encontrado.', 'error');
         return;
       }
-      const variant = product.variants?.[0] || {};
-      const price = variant.calculated_price?.calculated_amount;
-      const stock = variant.inventory_quantity ?? 25;
       const status = product.status || 'published';
+      const variants = product.variants || [];
+      const variantRows = variants.length
+        ? variants.map((variant, index) => {
+            const level = (variant.inventory_levels || [])[0] || null;
+            const price = variant.pen_price?.amount;
+            const stock = level ? Number(level.stocked_quantity ?? 0) : null;
+            return `
+              <div class="rounded-xl border border-slate-200 p-3 space-y-2"
+                   data-variant-row
+                   data-variant-id="${variant.id}"
+                   data-price-id="${variant.pen_price?.id || ''}"
+                   data-inventory-item-id="${level?.inventory_item_id || ''}"
+                   data-location-id="${level?.location_id || ''}">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="min-w-0">
+                    <div class="text-[11px] font-bold text-slate-800 truncate">${escapeHtml(variant.title || 'Variante ' + (index + 1))}</div>
+                    <div class="text-[9px] text-slate-400 font-medium">${escapeHtml(variant.sku || 'Sin SKU')}</div>
+                  </div>
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full ${stock != null && stock < 20 ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'} shrink-0">
+                    ${stock == null ? 'Sin inventario' : 'Stock: ' + formatStock(stock)}
+                  </span>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-[9.5px] font-bold text-slate-600 mb-1">Precio (PEN)</label>
+                    <input data-price-input type="number" min="0" step="0.01" value="${price != null ? Number(price).toFixed(2) : ''}" placeholder="0.00" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+                  </div>
+                  <div>
+                    <label class="block text-[9.5px] font-bold text-slate-600 mb-1">Stock</label>
+                    <input data-stock-input type="number" min="0" step="1" value="${stock != null ? stock : ''}" placeholder="0" ${level ? '' : 'disabled'} class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-900 disabled:bg-slate-100 disabled:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')
+        : '<div class="rounded-xl bg-slate-50 px-3 py-2 text-[10px] text-slate-500">Este producto no tiene variantes editables.</div>';
       openModal('Editar producto', `
         <div class="space-y-3">
           <div>
@@ -1986,21 +2092,22 @@
             <label class="block text-[10px] font-bold text-slate-700 mb-1">Descripción</label>
             <textarea id="editProductDescription" rows="3" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">${escapeHtml(product.description || '')}</textarea>
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-[10px] font-bold text-slate-700 mb-1">Estado</label>
-              <select id="editProductStatus" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
-                <option value="published" ${status === 'published' ? 'selected' : ''}>Publicado</option>
-                <option value="draft" ${status === 'draft' ? 'selected' : ''}>Borrador</option>
-              </select>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-700 mb-1">Estado</label>
+            <select id="editProductStatus" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F99C32]/30 focus:border-[#F99C32]">
+              <option value="published" ${status === 'published' ? 'selected' : ''}>Publicado</option>
+              <option value="draft" ${status === 'draft' ? 'selected' : ''}>Borrador</option>
+            </select>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold text-slate-700">Variantes, precio y stock</span>
+              <span class="text-[9px] font-medium text-slate-400">Medusa</span>
             </div>
-            <div>
-              <label class="block text-[10px] font-bold text-slate-700 mb-1">Precio (PEN)</label>
-              <input value="${price != null ? 'S/ ' + Number(price).toFixed(2) : 'Consultar'}" readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-500 cursor-not-allowed">
-            </div>
+            <div class="space-y-2 max-h-56 overflow-y-auto pr-1">${variantRows}</div>
           </div>
           <div class="rounded-xl bg-[#FFF5EE] px-3 py-2 text-[10px] text-slate-500 font-medium">
-            El stock actual es <b class="text-slate-800">${stock}</b>. Para editar precio, variantes y stock usá el editor completo de Medusa.
+            Los cambios de precio y stock se guardan directamente en Medusa.
           </div>
           <div class="flex items-center justify-between gap-2 pt-1">
             <button onclick="openMedusaAdmin('/app/products/${product.id}')" class="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 text-[11px] font-bold hover:bg-slate-200 transition">Abrir en Medusa</button>
@@ -2014,6 +2121,11 @@
     }
 
     async function saveProduct(productId) {
+      const product = findProduct(productId);
+      if (!product) {
+        showToast('Producto no encontrado.', 'error');
+        return;
+      }
       const title = document.getElementById('editProductTitle')?.value.trim();
       const description = document.getElementById('editProductDescription')?.value.trim();
       const status = document.getElementById('editProductStatus')?.value;
@@ -2021,19 +2133,89 @@
         showToast('El título no puede estar vacío.', 'error');
         return;
       }
+
+      const rows = Array.from(document.querySelectorAll('[data-variant-row]'));
+      const variantUpdates = [];
+      for (const row of rows) {
+        const variantId = row.getAttribute('data-variant-id');
+        const variant = (product.variants || []).find((v) => v.id === variantId);
+        if (!variant) continue;
+
+        const priceRaw = row.querySelector('[data-price-input]')?.value.trim() ?? '';
+        const stockRaw = row.querySelector('[data-stock-input]')?.value.trim() ?? '';
+        const priceValue = priceRaw === '' ? null : Number(priceRaw);
+        const stockValue = stockRaw === '' ? null : Number(stockRaw);
+
+        if (priceValue != null && (!Number.isFinite(priceValue) || priceValue < 0)) {
+          showToast(`Precio inválido para ${variant.title || 'la variante'}.`, 'error');
+          return;
+        }
+        if (stockValue != null && (!Number.isInteger(stockValue) || stockValue < 0)) {
+          showToast(`Stock inválido para ${variant.title || 'la variante'}.`, 'error');
+          return;
+        }
+
+        const priceId = row.getAttribute('data-price-id') || '';
+        const inventoryItemId = row.getAttribute('data-inventory-item-id') || '';
+        const locationId = row.getAttribute('data-location-id') || '';
+        const originalPrice = variant.pen_price?.amount;
+
+        if (priceValue != null && Number(originalPrice ?? NaN) !== priceValue) {
+          variantUpdates.push({ type: 'price', variantId, priceId, amount: priceValue });
+        }
+
+        if (stockValue != null && inventoryItemId && locationId) {
+          const level = (variant.inventory_levels || [])[0];
+          const originalStock = level ? Number(level.stocked_quantity ?? 0) : null;
+          if (originalStock !== stockValue) {
+            variantUpdates.push({ type: 'stock', inventoryItemId, locationId, quantity: stockValue });
+          }
+        }
+      }
+
       try {
-        const res = await apiFetch(`/admin/products/${productId}`, {
+        const productRes = await apiFetch(`/admin/products/${productId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title, description, status })
         });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
+        if (!productRes.ok) {
+          const data = await productRes.json().catch(() => ({}));
           showToast(data.message || 'No se pudo guardar el producto.', 'error');
           return;
         }
+
+        const failures = [];
+        for (const update of variantUpdates) {
+          let res;
+          if (update.type === 'price') {
+            const payload = update.priceId
+              ? { prices: [{ id: update.priceId, amount: update.amount }] }
+              : { prices: [{ currency_code: 'pen', amount: update.amount }] };
+            res = await apiFetch(`/admin/products/${productId}/variants/${update.variantId}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+          } else {
+            res = await apiFetch(`/admin/inventory-items/${update.inventoryItemId}/location-levels/${update.locationId}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ stocked_quantity: update.quantity })
+            });
+          }
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            failures.push(data.message || 'Error al actualizar una variante.');
+          }
+        }
+
         closeModal();
-        showToast('Producto actualizado correctamente.');
+        if (failures.length) {
+          showToast(failures[0] || 'Algunos cambios no se pudieron guardar.', 'error');
+        } else {
+          showToast(variantUpdates.length ? 'Producto, precio y stock actualizados en Medusa.' : 'Producto actualizado en Medusa.');
+        }
         await loadMetrics();
       } catch (err) {
         console.error(err);
@@ -2106,33 +2288,34 @@
     }
 
     // ------------------------------ Settings ------------------------------
-    function loadSettings(showMessage = false) {
-      const defaults = {
-        businessName: 'Fancy Pets Perú',
-        whatsapp: '+51 987 654 321',
-        bankAccounts: 'BCP Soles: 191-12345678-0-12'
-      };
-      let saved = {};
-      if (showMessage) {
-        localStorage.removeItem(SETTINGS_KEY);
-      } else {
-        try {
-          saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
-        } catch {
-          saved = {};
-        }
-      }
-      const values = { ...defaults, ...saved };
+    async function loadSettings(showMessage = false) {
       const business = document.getElementById('settingBusinessName');
       const whatsapp = document.getElementById('settingWhatsapp');
       const bank = document.getElementById('settingBankAccounts');
-      if (business) business.value = values.businessName;
-      if (whatsapp) whatsapp.value = values.whatsapp;
-      if (bank) bank.value = values.bankAccounts;
-      if (showMessage) showToast('Configuración restaurada.', 'info');
+
+      try {
+        if (token) {
+          const res = await apiFetch('/admin/stores?limit=1');
+          if (res.ok) {
+            const data = await res.json();
+            allStore = data.stores?.[0] || null;
+          }
+        }
+        const metadata = allStore?.metadata || {};
+        if (business) business.value = allStore?.name || '';
+        if (whatsapp) whatsapp.value = metadata.fancypets_whatsapp || '';
+        if (bank) bank.value = metadata.fancypets_bank_accounts || '';
+        if (showMessage) {
+          if (allStore) showToast('Configuración recargada desde Medusa.', 'info');
+          else showToast('No se pudo cargar la tienda de Medusa.', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        if (showMessage) showToast('Error de conexión al cargar la configuración.', 'error');
+      }
     }
 
-    function saveSettings() {
+    async function saveSettings() {
       const business = document.getElementById('settingBusinessName');
       const whatsapp = document.getElementById('settingWhatsapp');
       const bank = document.getElementById('settingBankAccounts');
@@ -2141,8 +2324,41 @@
         whatsapp: whatsapp ? whatsapp.value.trim() : '',
         bankAccounts: bank ? bank.value.trim() : ''
       };
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(values));
-      showToast('Configuración guardada.');
+
+      if (!values.businessName) {
+        showToast('El nombre comercial no puede estar vacío.', 'error');
+        return;
+      }
+      if (!allStore?.id) {
+        showToast('No se pudo cargar la tienda de Medusa.', 'error');
+        return;
+      }
+
+      try {
+        const res = await apiFetch(`/admin/stores/${allStore.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: values.businessName,
+            metadata: {
+              ...(allStore.metadata || {}),
+              fancypets_whatsapp: values.whatsapp,
+              fancypets_bank_accounts: values.bankAccounts
+            }
+          })
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          showToast(data.message || 'No se pudo guardar la configuración.', 'error');
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (data.store) allStore = data.store;
+        showToast('Configuración guardada en Medusa.');
+      } catch (err) {
+        console.error(err);
+        showToast('Error de conexión al guardar la configuración.', 'error');
+      }
     }
 
     // --------------------------- Reports / CSV ----------------------------
