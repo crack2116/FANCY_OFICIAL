@@ -20,13 +20,8 @@ import CollectionRail from "@modules/home/components/collection-rail"
 import FeaturedProductsRail from "@modules/home/components/featured-products-rail"
 import ProductRailSkeleton from "@modules/home/components/product-rail/skeleton"
 import SecondaryBanner from "@modules/home/components/secondary-banner"
-import TrustStrip from "@modules/home/components/trust-strip"
 import { Suspense } from "react"
 
-/**
- * A rail or a banner, on the shared ordering scale from `home-config.ts`.
- * The discriminant keeps the props narrowed in the render map below.
- */
 type HomeSection =
   | { kind: "rail"; id: string; order: number; rail: ResolvedRail }
   | {
@@ -36,7 +31,6 @@ type HomeSection =
       banner: HomeSecondaryBanner
     }
 
-/** Shown when there is no region or the taxonomy request fails. */
 function Unavailable() {
   return (
     <div className="site-section">
@@ -53,17 +47,6 @@ function Unavailable() {
   )
 }
 
-/**
- * Everything on the home page below the hero.
- *
- * Server Component. It fetches the taxonomy and the collections once, turns the
- * configuration into data-verified descriptors, and lets merchandising order the
- * rails and the banner through a shared `order` scale. The only client code
- * reachable from here is the hero carousel's sibling rail controls.
- *
- * Failures degrade to a friendly Spanish message: no exception message and no
- * stack fragment ever reaches the visitor.
- */
 export default async function HomeSections({
   region,
 }: {
@@ -84,21 +67,20 @@ export default async function HomeSections({
 
   const [categories, collectionList] = taxonomy
 
-  // Read here rather than inside `resolveCategoryCards` so that resolver stays a
-  // pure function: it is the guard rail between config and UI, and a resolver
-  // that fetches cannot be reasoned about or unit-tested without a network.
-  // `getBranding` resolves to the shipped palette instead of throwing, and the
-  // extra `.catch` keeps that guarantee local — a future change that made it
-  // throw would cost the demo artwork, not the whole taxonomy fetch.
   const categoryArtwork = await getBranding()
     .then((branding) => branding.category_artwork)
     .catch(() => ({}))
 
-  const cards = resolveCategoryCards(homeCategoryCards, categories ?? [], categoryArtwork)
+  const cards = resolveCategoryCards(
+    homeCategoryCards,
+    categories ?? [],
+    categoryArtwork
+  )
   const rails = resolveRails(homeRails, collectionList?.collections ?? [])
   const banners = getActiveBanners()
   const hasFeaturedRail = rails.some(
-    (rail) => rail.id === "featured" || rail.titleKey === "home.rails.featured.title"
+    (rail) =>
+      rail.id === "featured" || rail.titleKey === "home.rails.featured.title"
   )
 
   const sections: HomeSection[] = [
@@ -118,12 +100,6 @@ export default async function HomeSections({
 
   return (
     <>
-      {/* Trust first */}
-      <TrustStrip />
-
-      {/* One category system, not two competing ones. The old circular row
-          repeated the same six categories immediately above this grid, which
-          made the page longer without adding a destination. */}
       <CategoryShowcase cards={cards} />
 
       {/* Primary Featured Rail: PRODUCTOS DEL MES */}

@@ -1,5 +1,28 @@
 import "server-only"
-import { cookies as nextCookies } from "next/headers"
+import { cookies as nextCookies, headers } from "next/headers"
+
+async function shouldUseSecureCookies(): Promise<boolean> {
+  if (process.env.COOKIE_SECURE === "true") {
+    return true
+  }
+  if (process.env.COOKIE_SECURE === "false") {
+    return false
+  }
+  try {
+    const reqHeaders = await headers()
+    const forwardedProto = reqHeaders.get("x-forwarded-proto")
+    if (forwardedProto) {
+      return forwardedProto.split(",")[0].trim() === "https"
+    }
+    const origin = reqHeaders.get("origin") || reqHeaders.get("referer")
+    if (origin) {
+      return origin.startsWith("https://")
+    }
+  } catch {
+    // Fallback outside active request context
+  }
+  return process.env.NEXT_PUBLIC_BASE_URL?.startsWith("https://") ?? false
+}
 
 export const getAuthHeaders = async (): Promise<
   { authorization: string } | Record<string, never>
@@ -83,12 +106,15 @@ export const getCacheOptions = async (
 // the checkout page instead of resuming the order. "lax" is sent on top-level
 // GET navigations while still blocking cross-site subrequests.
 export const setAuthToken = async (token: string) => {
-  const cookies = await nextCookies()
+  const [cookies, secure] = await Promise.all([
+    nextCookies(),
+    shouldUseSecureCookies(),
+  ])
   cookies.set("_medusa_jwt", token, {
     maxAge: 60 * 60 * 24 * 7,
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure,
   })
 }
 
@@ -111,12 +137,15 @@ export type PendingCustomer = {
 // extra signup fields in a cookie so they survive the customer leaving to open
 // their inbox, and read them back when creating the customer at login.
 export const setPendingCustomer = async (customer: PendingCustomer) => {
-  const cookies = await nextCookies()
+  const [cookies, secure] = await Promise.all([
+    nextCookies(),
+    shouldUseSecureCookies(),
+  ])
   cookies.set("_medusa_pending_customer", JSON.stringify(customer), {
     maxAge: 60 * 60 * 24,
     httpOnly: true,
     sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    secure,
   })
 }
 
@@ -150,12 +179,15 @@ export const getCartId = async () => {
 // See the note on `setAuthToken`: `sameSite: "lax"` so the cart cookie survives
 // the cross-site return navigation from a redirect-based payment method.
 export const setCartId = async (cartId: string) => {
-  const cookies = await nextCookies()
+  const [cookies, secure] = await Promise.all([
+    nextCookies(),
+    shouldUseSecureCookies(),
+  ])
   cookies.set("_medusa_cart_id", cartId, {
     maxAge: 60 * 60 * 24 * 7,
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure,
   })
 }
 

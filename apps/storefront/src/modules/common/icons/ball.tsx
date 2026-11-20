@@ -1,29 +1,24 @@
 import { IconProps } from "types/icon"
 
 /**
- * Ball. The header nav icon for "Juguetes".
- *
- * A ball with a single seam. The seam is what stops it reading as a plain
- * circle, which would be indistinguishable from the dots used elsewhere in the
- * header; it is drawn to meet the circle at both edges so no gap shows at
- * 18px.
+ * Play ball. The header nav icon for "Juguetes".
  */
-const Ball = ({ size = "18", color = "currentColor", ...props }: IconProps) => (
+const Ball = ({ size = "19", color = "currentColor", ...props }: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
-    viewBox="0 0 20 20"
+    viewBox="0 0 24 24"
     fill="none"
     aria-hidden="true"
     {...props}
   >
-    <circle cx="10" cy="10" r="7.2" stroke={color} strokeWidth="1.5" />
-    <path d="M10 2.8v14.4" stroke={color} strokeWidth="1.5" />
+    <circle cx="12" cy="12" r="8.4" stroke={color} strokeWidth="1.9" />
+    <path d="M12 3.6v16.8" stroke={color} strokeWidth="1.8" />
     <path
-      d="M4.3 6.4c3.7 2.3 7.7 2.3 11.4 0"
+      d="M5.2 7.6c4.3 2.7 9.3 2.7 13.6 0"
       stroke={color}
-      strokeWidth="1.5"
+      strokeWidth="1.8"
       strokeLinecap="round"
     />
   </svg>

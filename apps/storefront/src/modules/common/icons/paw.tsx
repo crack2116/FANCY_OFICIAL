@@ -1,35 +1,51 @@
 import { IconProps } from "types/icon"
 
 /**
- * Paw print. The header nav icon for "Perros".
- *
- * Drawn on the same 20-unit grid and at the same 1.5 stroke weight as `bag.tsx`,
- * so the eight nav icons read as one family instead of eight clip-art pieces.
- * `currentColor` is the default, which is what lets the icon inherit the link
- * colour and stay correct on the white nav row and on the yellow header.
- *
- * `aria-hidden` is the default rather than a prop: the icon always sits beside
- * the category label, so the label is the accessible name and the icon is
- * decoration.
+ * Friendly Dog / Puppy face icon. The header nav icon for "Perros".
  */
-const Paw = ({ size = "18", color = "currentColor", ...props }: IconProps) => (
+const Paw = ({ size = "19", color = "currentColor", ...props }: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
-    viewBox="0 0 20 20"
+    viewBox="0 0 24 24"
     fill="none"
     aria-hidden="true"
     {...props}
   >
-    <circle cx="5.2" cy="7.8" r="1.7" stroke={color} strokeWidth="1.5" />
-    <circle cx="8.4" cy="5.7" r="1.8" stroke={color} strokeWidth="1.5" />
-    <circle cx="11.6" cy="5.7" r="1.8" stroke={color} strokeWidth="1.5" />
-    <circle cx="14.8" cy="7.8" r="1.7" stroke={color} strokeWidth="1.5" />
+    {/* Left & right floppy puppy ears */}
     <path
-      d="M10 18.6c-2.7 0-4.7-1.4-4.7-3.4 0-2 2-3.5 4.7-3.5s4.7 1.5 4.7 3.5c0 2-2 3.4-4.7 3.4Z"
+      d="M6.4 7.2C3.9 7.2 2.4 9.5 3.1 13.1c.35 1.8 1.9 2.2 2.9 1.1"
       stroke={color}
-      strokeWidth="1.5"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M17.6 7.2c2.5 0 4 2.3 3.3 5.9-.35 1.8-1.9 2.2-2.9 1.1"
+      stroke={color}
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Rounded dog head */}
+    <path
+      d="M6 11c0-3.8 2.6-6.2 6-6.2s6 2.4 6 6.2c0 4.6-2.5 8.5-6 8.5S6 15.6 6 11Z"
+      stroke={color}
+      strokeWidth="1.9"
+      strokeLinejoin="round"
+    />
+    {/* Eyes */}
+    <circle cx="9.6" cy="11" r="1.15" fill={color} />
+    <circle cx="14.4" cy="11" r="1.15" fill={color} />
+    {/* Cute oval dog nose */}
+    <ellipse cx="12" cy="13.7" rx="1.6" ry="1.1" fill={color} />
+    {/* Happy puppy smile */}
+    <path
+      d="M9.7 15.8c.7.7 1.6.8 2.3 0 .7.8 1.6.7 2.3 0"
+      stroke={color}
+      strokeWidth="1.7"
+      strokeLinecap="round"
       strokeLinejoin="round"
     />
   </svg>

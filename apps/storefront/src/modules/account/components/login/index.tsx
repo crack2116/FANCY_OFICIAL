@@ -1,17 +1,23 @@
-import { useActionState } from "react"
+"use client"
+
+import { useActionState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { login } from "@lib/data/customer"
 import { t } from "@lib/i18n/translations"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
-
 import GoogleSignInButton from "../google-button"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
   /** True when the shopper arrived here because their session expired. */
-  sessionExpired: boolean
+  sessionExpired?: boolean
+  /** Optional callback fired when login completes successfully (e.g. to close a modal). */
+  onSuccess?: () => void
+  /** If false, suppresses the internal h1/p header (useful when a parent card or modal already has one). */
+  showHeading?: boolean
 }
 
 /**
@@ -26,38 +32,55 @@ type Props = {
  * The error text comes from the shared public-error layer via `login`, so a
  * Medusa payload, an auth-provider string or a stack can never reach this form.
  */
-const Login = ({ setCurrentView, sessionExpired }: Props) => {
+const Login = ({
+  setCurrentView,
+  sessionExpired = false,
+  onSuccess,
+  showHeading = true,
+}: Props) => {
   const [message, formAction] = useActionState(login, null)
+  const router = useRouter()
+
+  useEffect(() => {
+    if (message?.state === "success") {
+      if (onSuccess) {
+        onSuccess()
+      }
+      router.refresh()
+    }
+  }, [message, router, onSuccess])
 
   return (
     <div
-      className="max-w-sm w-full flex flex-col items-center"
+      className="w-full max-w-sm flex flex-col items-center"
       data-testid="login-page"
     >
-      <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-700">
-        {t("account.login.eyebrow")}
-      </p>
-      <h1 className="mb-3 text-center font-display text-3xl font-semibold tracking-tight text-fg-base">
-        {t("account.login.title")}
-      </h1>
-      <p className="mb-8 text-center text-sm leading-relaxed text-fg-subtle">
-        {t("account.login.body")}
-      </p>
+      {showHeading ? (
+        <div className="text-center mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#1E293B] mb-1.5 tracking-tight">
+            {t("account.login.title")}
+          </h1>
+          <p className="text-sm text-slate-500 max-w-xs mx-auto">
+            {t("account.login.body")}
+          </p>
+        </div>
+      ) : null}
 
       {sessionExpired ? (
         <div
-          className="w-full mb-6 text-base-regular text-ui-fg-base bg-ui-bg-subtle border border-ui-border-base rounded-rounded p-4"
+          className="w-full mb-5 text-sm text-amber-900 bg-amber-50 border border-amber-200/80 rounded-2xl p-3.5 flex items-center gap-2.5 shadow-xs"
           role="status"
           data-testid="session-expired-message"
         >
-          {t("error.auth.sessionExpired")}
+          <span className="text-amber-600 font-bold">ℹ</span>
+          <span>{t("error.auth.sessionExpired")}</span>
         </div>
       ) : null}
 
       <GoogleSignInButton />
 
       <form className="w-full" action={formAction} noValidate>
-        <div className="flex flex-col w-full gap-y-2">
+        <div className="flex flex-col w-full gap-y-3">
           <Input
             label={t("account.login.field.email")}
             name="email"
@@ -76,30 +99,32 @@ const Login = ({ setCurrentView, sessionExpired }: Props) => {
             data-testid="password-input"
           />
         </div>
+
         <ErrorMessage
           error={message?.state === "error" ? message.error : null}
           data-testid="login-error-message"
         />
+
         <SubmitButton
+          variant="brand"
           data-testid="sign-in-button"
-          className="mt-6 w-full !bg-brand-700 text-white shadow-[0_12px_24px_-16px_rgba(163,81,15,0.9)] hover:!bg-brand-800 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+          className="w-full mt-6 h-12 rounded-2xl font-bold text-[15px] shadow-[0_4px_16px_rgba(243,111,33,0.3)] hover:shadow-[0_6px_20px_rgba(243,111,33,0.4)]"
         >
           {t("account.login.submit")}
         </SubmitButton>
       </form>
 
-      <span className="text-center text-ui-fg-base text-small-regular mt-6">
-        {t("account.login.notMember")}{" "}
+      <div className="text-center text-slate-600 text-xs sm:text-sm mt-6">
+        <span>{t("account.login.notMember")} </span>
         <button
           type="button"
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="rounded-sm font-semibold text-brand-700 underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          className="font-bold text-[#F36F21] hover:text-[#D95300] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36F21] rounded-sm transition-colors"
           data-testid="register-button"
         >
           {t("account.login.join")}
         </button>
-        .
-      </span>
+      </div>
     </div>
   )
 }

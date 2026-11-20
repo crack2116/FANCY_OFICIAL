@@ -35,24 +35,23 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
       value={paymentProviderId}
       disabled={disabled}
       className={clx(
-        "flex flex-col gap-y-2 text-small-regular cursor-pointer py-4 border rounded-rounded px-8 mb-2 hover:shadow-borders-interactive-with-active",
-        {
-          "border-ui-border-interactive":
-            selectedPaymentOptionId === paymentProviderId,
-        }
+        "flex flex-col gap-y-2 text-small-regular cursor-pointer py-3.5 border rounded-xl px-4 sm:px-5 mb-2.5 transition-colors",
+        selectedPaymentOptionId === paymentProviderId
+          ? "border-[#0F352E] bg-[#FAF8F4]"
+          : "border-[#E7E5DF] bg-white hover:border-[#0F352E]/40"
       )}
     >
-      <div className="flex items-center justify-between ">
-        <div className="flex items-center gap-x-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-x-3.5 min-w-0">
           <Radio checked={selectedPaymentOptionId === paymentProviderId} />
-          <Text className="text-base-regular">
+          <Text className="text-sm sm:text-base font-medium text-[#111827]">
             {paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
           </Text>
           {isManual(paymentProviderId) && isDevelopment && (
             <PaymentTest className="hidden small:block" />
           )}
         </div>
-        <span className="justify-self-end text-ui-fg-base">
+        <span className="justify-self-end text-[#0F352E] shrink-0">
           {paymentInfoMap[paymentProviderId]?.icon}
         </span>
       </div>
@@ -89,7 +88,7 @@ export const StripePaymentContainer = ({
       {selectedPaymentOptionId === paymentProviderId &&
         (stripeReady ? (
           <div className="my-4 transition-all duration-150 ease-in-out">
-            <Text className="txt-medium-plus text-ui-fg-base mb-1">
+            <Text className="text-sm font-semibold text-[#0F352E] mb-2">
               {t("checkout.payment.enterDetailsLabel")}
             </Text>
             <PaymentElement

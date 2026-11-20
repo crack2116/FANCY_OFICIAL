@@ -1,7 +1,6 @@
 "use client"
 
 import { acceptTransferRequest, declineTransferRequest } from "@lib/data/orders"
-import { t } from "@lib/i18n/translations"
 import { Button, Text } from "@modules/common/components/ui"
 import { useState } from "react"
 
@@ -41,12 +40,12 @@ const TransferActions = ({ id, token }: { id: string; token: string }) => {
     <div className="flex flex-col gap-y-4">
       {status?.accept === "success" && (
         <Text className="text-emerald-500">
-          {t("order.transfer.actions.accepted")}
+          Order transferred successfully!
         </Text>
       )}
       {status?.decline === "success" && (
         <Text className="text-emerald-500">
-          {t("order.transfer.actions.declined")}
+          Order transfer declined successfully!
         </Text>
       )}
       {status?.accept !== "success" && status?.decline !== "success" && (
@@ -59,7 +58,7 @@ const TransferActions = ({ id, token }: { id: string; token: string }) => {
               status?.accept === "pending" || status?.decline === "pending"
             }
           >
-            {t("order.transfer.actions.accept")}
+            Accept transfer
           </Button>
           <Button
             size="large"
@@ -70,7 +69,7 @@ const TransferActions = ({ id, token }: { id: string; token: string }) => {
               status?.accept === "pending" || status?.decline === "pending"
             }
           >
-            {t("order.transfer.actions.decline")}
+            Decline transfer
           </Button>
         </div>
       )}

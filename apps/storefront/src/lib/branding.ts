@@ -198,76 +198,6 @@ const normalizeBranding = (value: unknown): StoreBranding => {
   }
 }
 
-const BRAND_HEX = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i
-
-type Channels = [number, number, number]
-
-const parseChannels = (hex: string): Channels | null => {
-  const match = BRAND_HEX.exec(hex)
-  if (!match) {
-    return null
-  }
-
-  return [parseInt(match[1], 16), parseInt(match[2], 16), parseInt(match[3], 16)]
-}
-
-const channelLuminance = (value: number): number => {
-  const channel = value / 255
-  return channel <= 0.03928
-    ? channel / 12.92
-    : ((channel + 0.055) / 1.055) ** 2.4
-}
-
-/** Contrast of a colour against white, the lightest surface in the palette. */
-const contrastOnWhite = ([red, green, blue]: Channels): number => {
-  const luminance =
-    0.2126 * channelLuminance(red) +
-    0.7152 * channelLuminance(green) +
-    0.0722 * channelLuminance(blue)
-
-  return 1.05 / (luminance + 0.05)
-}
-
-const toHex = ([red, green, blue]: Channels): string =>
-  `#${[red, green, blue]
-    .map((value) => value.toString(16).padStart(2, "0"))
-    .join("")}`
-
-/**
- * Darken a colour until it clears `target` contrast against white.
- *
- * The Admin colour picker only checks that a value is a hex colour, so an
- * operator can save a primary dark that is legible as a swatch and unreadable as
- * 12px text: the shipped #bd6212 reaches 4.27:1 on white and 3.57:1 on the
- * tinted category tiles. Deriving the interactive shades here rather than
- * trusting the raw value keeps text and buttons at AA no matter what the store
- * has saved, and the original colour is still used for the decorative 400/500
- * steps and the already-fetched accent-500 surface.
- *
- * The target is 5.6:1 rather than 4.5:1 so the same token also clears AA on the
- * tinted card surfaces, where contrast drops by roughly a point.
- */
-const accessibleShade = (hex: string, target: number): string => {
-  const parsed = parseChannels(hex)
-  if (!parsed) {
-    return hex
-  }
-
-  let [red, green, blue] = parsed
-
-  for (let step = 0; step < 220; step++) {
-    if (contrastOnWhite([red, green, blue]) >= target) {
-      break
-    }
-
-    red = Math.max(0, Math.floor(red * 0.97))
-    green = Math.max(0, Math.floor(green * 0.97))
-    blue = Math.max(0, Math.floor(blue * 0.97))
-  }
-
-  return toHex([red, green, blue])
-}
-
 /**
  * The branding as CSS custom properties.
  *
@@ -275,10 +205,6 @@ const accessibleShade = (hex: string, target: number): string => {
  * including the derived shades, so a re-skin reaches every component that uses
  * `--brand-*` without a single component change. That mapping is the contract:
  * `globals.css` declares these tokens, this file only overrides their values.
- *
- * The 700/800/900 and accent 600/700 steps are derived instead of aliased to the
- * same colour. Aliasing made hover and pressed states invisible, and it forced
- * small text to live with whatever contrast the picker produced.
  */
 export const brandingCssVariables = (branding: StoreBranding): Record<string, string> => {
   const { primary, primaryDark, accent, surface, text } = branding.colors
@@ -287,12 +213,12 @@ export const brandingCssVariables = (branding: StoreBranding): Record<string, st
     "--brand-400": primary,
     "--brand-500": primary,
     "--brand-600": primaryDark,
-    "--brand-700": accessibleShade(primaryDark, 5.6),
-    "--brand-800": accessibleShade(primaryDark, 6.8),
-    "--brand-900": accessibleShade(primaryDark, 8),
+    "--brand-700": primaryDark,
+    "--brand-800": primaryDark,
+    "--brand-900": primaryDark,
     "--accent-500": accent,
-    "--accent-600": accessibleShade(accent, 4.7),
-    "--accent-700": accessibleShade(accent, 5.6),
+    "--accent-600": accent,
+    "--accent-700": accent,
     "--surface": surface,
     "--bg-base": surface,
     "--fg-base": text,

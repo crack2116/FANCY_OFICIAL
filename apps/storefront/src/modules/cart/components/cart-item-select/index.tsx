@@ -1,6 +1,5 @@
 "use client"
 
-import { t } from "@lib/i18n/translations"
 import { IconBadge, clx } from "@modules/common/components/ui"
 import {
   SelectHTMLAttributes,
@@ -20,7 +19,7 @@ type NativeSelectProps = {
 } & Omit<SelectHTMLAttributes<HTMLSelectElement>, "size">
 
 const CartItemSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
-  ({ placeholder = t("common.select"), className, children, ...props }, ref) => {
+  ({ placeholder = "Select...", className, children, ...props }, ref) => {
     const innerRef = useRef<HTMLSelectElement>(null)
     const [isPlaceholder, setIsPlaceholder] = useState(false)
 

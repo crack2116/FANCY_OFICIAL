@@ -9,12 +9,8 @@ import Hero from "@modules/home/components/hero"
 import HomeSections from "@modules/home/components/home-sections"
 import HomeSectionsSkeleton from "@modules/home/components/home-sections/skeleton"
 
-/**
- * Title and description come from `home-config.ts`, so SEO copy is merchandised
- * next to the rest of the page instead of being hardcoded here. The root layout
- * appends the brand, and the file-based `opengraph-image` still supplies the
- * social preview because `openGraph.images` is deliberately left unset.
- */
+export const dynamic = "force-dynamic"
+
 export const metadata: Metadata = {
   title: t(homeSeo.titleKey),
   description: t(homeSeo.descriptionKey),
@@ -31,19 +27,6 @@ export const metadata: Metadata = {
   },
 }
 
-/**
- * Home.
- *
- * Server Component. The hero needs only the branding document, which the root
- * layout has already fetched for the CSS variables, so it resolves from cache
- * without its own suspense boundary; everything that needs the catalogue streams
- * in behind a skeleton. Only the hero carousel inside `<Hero />` is a Client
- * Component.
- *
- * `<Hero />` is a SIBLING of `<HomeSections />`, not a child: the hero has to
- * paint without waiting for the taxonomy, so it cannot live behind the same
- * Suspense boundary.
- */
 export default async function Home(props: {
   params: Promise<{ countryCode: string }>
 }) {

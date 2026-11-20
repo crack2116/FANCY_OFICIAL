@@ -30,11 +30,7 @@ export const getPricesForVariant = (variant: VariantWithPrice) => {
       currency_code: variant.calculated_price.currency_code,
     }),
     currency_code: variant.calculated_price.currency_code,
-    // Older cached Store API responses (and the custom core server before its
-    // compatibility layer) may omit the nested price-list descriptor. A flat
-    // price is the correct default and must not crash the whole page.
-    price_type:
-      variant.calculated_price.calculated_price?.price_list_type ?? "flat",
+    price_type: variant.calculated_price.calculated_price.price_list_type,
     percentage_diff: getPercentageDiff(
       variant.calculated_price.original_amount,
       variant.calculated_price.calculated_amount

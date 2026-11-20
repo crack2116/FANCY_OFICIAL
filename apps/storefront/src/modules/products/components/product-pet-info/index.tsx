@@ -63,24 +63,18 @@ export default function ProductPetInfo({
   }
 
   return (
-    <div
-      className="mt-6 rounded-2xl border border-[#eadfce] bg-white p-4 shadow-[var(--shadow-card)]"
-      data-testid="product-pet-info"
-    >
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fg-muted">
+    <div className="mt-6" data-testid="product-pet-info">
+      <h2 className="text-sm font-semibold text-fg-base">
         {t("product.petInfo.heading")}
       </h2>
 
-      <dl className="mt-3 grid grid-cols-2 gap-2.5">
+      <dl className="mt-3 flex flex-col gap-y-3">
         {rows.map((row) => (
-          <div
-            key={row.key}
-            className="flex flex-col gap-y-0.5 rounded-xl bg-[var(--surface-subtle)] px-3 py-2.5"
-          >
-            <dt className="text-[10px] uppercase tracking-[0.12em] text-fg-muted">
+          <div key={row.key} className="flex flex-col gap-y-0.5">
+            <dt className="text-xs uppercase tracking-wider text-fg-muted">
               {row.label}
             </dt>
-            <dd className="text-sm font-medium text-fg-base">
+            <dd className="text-sm text-fg-base">
               {/*
                 The brand is the one row that links. Its destination is the brand
                 page, and the label spells out where it goes so the link is not

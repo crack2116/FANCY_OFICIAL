@@ -76,9 +76,9 @@ export default async function Orders(props: Props) {
 
   return (
     <div className="w-full" data-testid="orders-page-wrapper">
-      <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl font-semibold text-fg-base">{t("account.orders")}</h1>
-        <p className="text-base-regular text-fg-base">{t("account.orders.body")}</p>
+      <div className="mb-6 flex flex-col gap-y-1.5">
+        <h1 className="text-2xl font-bold text-[#0F352E]">{t("account.orders")}</h1>
+        <p className="text-sm text-slate-600">{t("account.orders.body")}</p>
       </div>
 
       <OrderOverview orders={result.orders} />
@@ -128,8 +128,9 @@ export default async function Orders(props: Props) {
         </>
       ) : null}
 
-      <Divider className="mb-8 mt-8" />
-      <TransferRequestForm />
+      <div className="mt-6 rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-[0_8px_24px_rgba(15,53,46,0.04)]">
+        <TransferRequestForm />
+      </div>
     </div>
   )
 }

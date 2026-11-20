@@ -1,6 +1,5 @@
 "use client"
 
-import { t } from "@lib/i18n/translations"
 import React, { useState } from "react"
 
 const GoogleIcon = () => (
@@ -42,17 +41,13 @@ export const GoogleSignInButton: React.FC = () => {
         data-testid="google-sign-in-button"
       >
         <GoogleIcon />
-        <span>
-          {loading
-            ? t("account.login.googleLoading")
-            : t("account.login.google")}
-        </span>
+        <span>{loading ? "Conectando con Google..." : "Continuar con Google"}</span>
       </button>
 
       <div className="w-full flex items-center justify-between my-2">
         <div className="w-full h-px bg-ui-border-base" />
         <span className="px-3 text-xs text-ui-fg-muted uppercase tracking-wider whitespace-nowrap">
-          {t("account.login.orEmail")}
+          o con correo
         </span>
         <div className="w-full h-px bg-ui-border-base" />
       </div>

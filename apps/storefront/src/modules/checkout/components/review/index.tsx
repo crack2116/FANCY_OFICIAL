@@ -22,31 +22,46 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
     (cart.payment_collection || paidByGiftcard)
 
   return (
-    <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
-          className={clx(
-            "flex flex-row text-3xl-regular gap-x-2 items-baseline",
-            {
-              "opacity-50 pointer-events-none select-none": !isOpen,
-            }
-          )}
-        >
-          {t("checkout.review")}
-        </Heading>
+    <div
+      className={clx(
+        "rounded-2xl border bg-white p-5 sm:p-7 shadow-xs transition-all",
+        isOpen ? "border-[#0F352E]/30 ring-1 ring-[#0F352E]/10" : "border-[#E7E5DF]"
+      )}
+    >
+      <div className="flex flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <span
+            className={clx(
+              "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+              isOpen ? "bg-[#F36F21] text-white" : "bg-[#EFECE6] text-[#6B7280]"
+            )}
+          >
+            4
+          </span>
+          <Heading
+            level="h2"
+            className={clx(
+              "flex flex-row text-xl sm:text-2xl font-bold tracking-tight gap-x-2 items-center",
+              isOpen
+                ? "text-[#0F352E]"
+                : "text-[#9CA3AF] pointer-events-none select-none"
+            )}
+          >
+            {t("checkout.review.title")}
+          </Heading>
+        </div>
       </div>
       {isOpen && previousStepsCompleted && (
-        <>
-          <div className="flex items-start gap-x-1 w-full mb-6">
+        <div className="mt-6">
+          <div className="flex items-start gap-x-1 w-full mb-5 rounded-xl bg-[#FAF8F4] border border-[#E7E5DF] p-4">
             <div className="w-full">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
+              <Text className="text-sm text-[#4B5563] leading-relaxed">
                 {t("checkout.review.terms")}
               </Text>
             </div>
           </div>
           <PaymentButton cart={cart} data-testid="submit-order-button" />
-        </>
+        </div>
       )}
     </div>
   )

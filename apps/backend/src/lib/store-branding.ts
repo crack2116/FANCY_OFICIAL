@@ -65,11 +65,11 @@ export type StoreBrandingInput = z.infer<typeof brandingValidator>
 
 /** The payload the storefront and the admin form both consume. */
 export const DEFAULT_BRANDING: StoreBrandingInput = {
-  primary: "#f99c32",
-  primaryDark: "#bd6212",
-  accent: "#f24534",
-  surface: "#ffffff",
-  text: "#12211f",
+  primary: "#e8681c",
+  primaryDark: "#a8440b",
+  accent: "#c93b2c",
+  surface: "#faf7f2",
+  text: "#1c2b27",
 }
 
 /** Logo is an optional URL rather than a required colour. */

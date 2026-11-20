@@ -1,19 +1,8 @@
 /**
  * Account dashboard.
  *
- * WHAT IS ON THIS PAGE, AND WHY NOTHING ELSE
- * Three cards (orders, data, addresses) plus the customer's most recent order,
- * and nothing else. There is deliberately no loyalty tier, no points balance,
- * no "you saved S/ X" and no membership level: none of those exist in this
- * build, and a number a shopper cannot verify is worse than an absent one.
- *
- * The two counts are REAL and come from data the page already loaded — the
- * customer's own addresses and the order count returned by the orders API.
- * There is no extra query whose only purpose is to produce a number.
- *
- * The `profile completion` percentage the upstream starter showed was removed:
- * it scored four arbitrary fields out of four and called the result a
- * "completion", which tells a shopper nothing actionable.
+ * Displays the customer's real summary cards (orders, profile data, saved
+ * addresses, and local browser favorites) plus the customer's most recent order.
  */
 
 import { HttpTypes } from "@medusajs/types"
@@ -25,11 +14,12 @@ import {
   resolveOrderStatus,
   resolvePaymentStatus,
 } from "@lib/order-status"
-import { Badge, Container } from "@modules/common/components/ui"
+import { Badge } from "@modules/common/components/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import MapPin from "@modules/common/icons/map-pin"
 import Package from "@modules/common/icons/package"
 import User from "@modules/common/icons/user"
+import FavoritesDashboardCard from "./favorites-card"
 
 type OverviewProps = {
   customer: HttpTypes.StoreCustomer
@@ -56,38 +46,60 @@ type CardProps = {
   href: string
   titleKey: TranslationKey
   bodyKey: TranslationKey
-  countLabel: string
+  statusText: string
+  hasPositiveValue: boolean
   Icon: React.ComponentType<{ size?: string }>
   testId: string
 }
 
-const DashboardCard = ({ href, titleKey, bodyKey, countLabel, Icon, testId }: CardProps) => (
-  <Container
-    className="flex flex-col gap-y-4 h-full justify-between border border-gray-200 shadow-none"
+const DashboardCard = ({
+  href,
+  titleKey,
+  bodyKey,
+  statusText,
+  hasPositiveValue,
+  Icon,
+  testId,
+}: CardProps) => (
+  <div
+    className="group rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_8px_24px_rgba(15,53,46,0.04)] transition-all duration-150 hover:border-[#FFD8B8] hover:shadow-[0_12px_30px_rgba(243,111,33,0.08)] flex flex-col justify-between gap-5"
     data-testid={testId}
   >
-    <div className="flex items-start justify-between gap-x-4">
-      <h2 className="text-large-semi">{t(titleKey)}</h2>
-      <Icon size="22" />
-    </div>
-    <p className="text-small-regular text-fg-subtle">{t(bodyKey)}</p>
-    <div className="flex items-end justify-between gap-x-4">
-      <span className="text-2xl-semi leading-none">{countLabel}</span>
+    <div className="flex items-start justify-between gap-3">
+      <div className="flex items-center gap-3 min-w-0">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FFF3E8] text-[#F36F21]">
+          <Icon size="21" />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-base font-bold text-[#0F352E]">{t(titleKey)}</h2>
+        </div>
+      </div>
       <LocalizedClientLink
         href={href}
-        className="text-small-regular underline hover:text-fg-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black rounded-sm"
+        className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#FFF5EB] px-3 py-1 text-xs font-semibold text-[#D85A0E] transition-colors hover:bg-[#FFE8D6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36F21]"
         data-testid={`${testId}-link`}
       >
-        {t("account.dashboard.action")}
+        <span>{t("account.dashboard.action")}</span>
+        <span aria-hidden="true">→</span>
       </LocalizedClientLink>
     </div>
-  </Container>
+
+    <p className="text-sm text-slate-600 leading-relaxed">{t(bodyKey)}</p>
+
+    <div className="pt-1">
+      {hasPositiveValue ? (
+        <span className="text-lg font-bold text-[#0F352E] break-words">{statusText}</span>
+      ) : (
+        <span className="inline-flex items-center rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">
+          {statusText}
+        </span>
+      )}
+    </div>
+  </div>
 )
 
 const Overview = ({ customer, orders, orderCount, orderError }: OverviewProps) => {
   const addressCount = customer.addresses?.length ?? 0
-  // Only the newest order is surfaced, and only when there is one. The list
-  // itself lives at /account/orders.
   const lastOrder = orders && orders.length > 0 ? orders[0] : null
 
   const orderStatus = resolveOrderStatus(lastOrder?.status)
@@ -96,27 +108,45 @@ const Overview = ({ customer, orders, orderCount, orderError }: OverviewProps) =
 
   const lastOrderDate = lastOrder ? formatEsPeDate(lastOrder.created_at) : null
 
+  const fullName = [customer.first_name, customer.last_name].filter(Boolean).join(" ")
+  const phoneText = customer.phone?.trim()
+    ? customer.phone.trim()
+    : t("account.dashboard.card.profile.emptyPhone")
+  const profileStatus = fullName ? `${fullName} · ${phoneText}` : phoneText
+
   return (
-    <div className="flex flex-col gap-y-8" data-testid="overview-page-wrapper">
-      <div className="flex flex-col gap-y-1">
-        <h1 className="text-2xl font-semibold text-fg-base" data-testid="welcome-message">
-          {customer.first_name
-            ? t("account.dashboard.greeting", { name: customer.first_name })
-            : t("account.dashboard.greeting.anonymous")}
-        </h1>
-        {customer.email ? (
-          <p className="text-small-regular text-fg-subtle">
-            {t("account.dashboard.signedInAs", { email: customer.email })}
-          </p>
-        ) : null}
+    <div className="flex flex-col gap-y-6" data-testid="overview-page-wrapper">
+      <div className="rounded-3xl border border-[#FFE4CC] bg-gradient-to-r from-[#FFF8F1] via-[#FFFDF9] to-white p-6 sm:p-8 shadow-[0_8px_24px_rgba(243,111,33,0.06)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col gap-y-1.5 min-w-0">
+          <h1
+            className="text-2xl sm:text-3xl font-bold text-[#0F352E] tracking-tight"
+            data-testid="welcome-message"
+          >
+            {customer.first_name
+              ? t("account.dashboard.greeting", { name: customer.first_name })
+              : t("account.dashboard.greeting.anonymous")}
+          </h1>
+          {customer.email ? (
+            <p className="text-sm text-slate-600 truncate">
+              {t("account.dashboard.signedInAs", { email: customer.email })}
+            </p>
+          ) : null}
+        </div>
+        <LocalizedClientLink
+          href="/store"
+          className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#F36F21] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#E05E10]"
+        >
+          {t("account.menu.viewStore")}
+        </LocalizedClientLink>
       </div>
 
-      <div className="grid grid-cols-1 medium:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
         <DashboardCard
           href="/account/orders"
           titleKey="account.dashboard.card.orders.title"
           bodyKey="account.dashboard.card.orders.body"
-          countLabel={
+          hasPositiveValue={orderCount > 0}
+          statusText={
             orderCount > 0
               ? countLabel(
                   orderCount,
@@ -128,19 +158,23 @@ const Overview = ({ customer, orders, orderCount, orderError }: OverviewProps) =
           Icon={Package}
           testId="dashboard-card-orders"
         />
+
         <DashboardCard
           href="/account/profile"
           titleKey="account.dashboard.card.profile.title"
           bodyKey="account.dashboard.card.profile.body"
-          countLabel={customer.phone ?? t("account.profile.field.phone")}
+          hasPositiveValue={Boolean(customer.phone?.trim())}
+          statusText={profileStatus}
           Icon={User}
           testId="dashboard-card-profile"
         />
+
         <DashboardCard
           href="/account/addresses"
           titleKey="account.dashboard.card.addresses.title"
           bodyKey="account.dashboard.card.addresses.body"
-          countLabel={
+          hasPositiveValue={addressCount > 0}
+          statusText={
             addressCount > 0
               ? countLabel(
                   addressCount,
@@ -152,6 +186,8 @@ const Overview = ({ customer, orders, orderCount, orderError }: OverviewProps) =
           Icon={MapPin}
           testId="dashboard-card-addresses"
         />
+
+        <FavoritesDashboardCard />
       </div>
 
       {orderError ? (
@@ -161,31 +197,39 @@ const Overview = ({ customer, orders, orderCount, orderError }: OverviewProps) =
       ) : null}
 
       {lastOrder ? (
-        <section className="flex flex-col gap-y-4" aria-labelledby="last-order-heading">
-          <h2 id="last-order-heading" className="text-large-semi">
-            {t("account.dashboard.lastOrder.title")}
-          </h2>
-          <Container
-            className="flex flex-col gap-y-4 border border-gray-200 shadow-none"
+        <section className="flex flex-col gap-y-3" aria-labelledby="last-order-heading">
+          <div className="flex items-center justify-between">
+            <h2 id="last-order-heading" className="text-lg font-bold text-[#0F352E]">
+              {t("account.dashboard.lastOrder.title")}
+            </h2>
+            <LocalizedClientLink
+              href="/account/orders"
+              className="text-xs font-semibold text-[#D85A0E] hover:underline"
+            >
+              {t("account.dashboard.help.cta")} →
+            </LocalizedClientLink>
+          </div>
+          <div
+            className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_8px_24px_rgba(15,53,46,0.04)] flex flex-col gap-y-4"
             data-testid="last-order-card"
           >
             <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-              <span className="text-base-semi" data-testid="last-order-number">
+              <span className="text-base font-bold text-[#0F352E]" data-testid="last-order-number">
                 {t("account.order.number")} {lastOrder.display_id}
               </span>
               {lastOrderDate ? (
-                <span className="text-small-regular text-fg-subtle" data-testid="last-order-date">
+                <span className="text-xs font-medium text-slate-500" data-testid="last-order-date">
                   {t("account.order.date")}: {lastOrderDate}
                 </span>
               ) : null}
-              <span className="text-base-semi" data-testid="last-order-total">
+              <span className="text-base font-bold text-[#0F352E]" data-testid="last-order-total">
                 {convertToLocale({
                   amount: lastOrder.total,
                   currency_code: lastOrder.currency_code,
                 })}
               </span>
             </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge color={TONE_TO_BADGE[orderStatus.tone]} data-testid="last-order-status">
                 {t("account.order.status.order")}: {orderStatus.label}
               </Badge>
@@ -202,13 +246,14 @@ const Overview = ({ customer, orders, orderCount, orderError }: OverviewProps) =
             <div>
               <LocalizedClientLink
                 href={`/account/orders/details/${lastOrder.id}`}
-                className="text-small-regular underline hover:text-fg-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black rounded-sm"
+                className="inline-flex items-center gap-1 rounded-full bg-[#FFF5EB] px-4 py-1.5 text-xs font-semibold text-[#D85A0E] transition-colors hover:bg-[#FFE8D6]"
                 data-testid="last-order-link"
               >
-                {t("account.orders.viewDetail")}
+                <span>{t("account.orders.viewDetail")}</span>
+                <span aria-hidden="true">→</span>
               </LocalizedClientLink>
             </div>
-          </Container>
+          </div>
         </section>
       ) : null}
     </div>

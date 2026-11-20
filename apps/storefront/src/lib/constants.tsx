@@ -1,4 +1,3 @@
-import { t } from "@lib/i18n/translations"
 import { CreditCard } from "@medusajs/icons"
 import Bancontact from "@modules/common/icons/bancontact"
 import Ideal from "@modules/common/icons/ideal"
@@ -11,11 +10,11 @@ export const paymentInfoMap: Record<
   { title: string; icon: React.JSX.Element }
 > = {
   pp_stripe_stripe: {
-    title: t("checkout.payment.creditCard"),
+    title: "Tarjeta de crédito / débito",
     icon: <CreditCard />,
   },
   "pp_medusa-payments_default": {
-    title: t("checkout.payment.creditCard"),
+    title: "Tarjeta de crédito / débito",
     icon: <CreditCard />,
   },
   "pp_stripe-ideal_stripe": {

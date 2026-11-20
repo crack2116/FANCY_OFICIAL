@@ -11,7 +11,6 @@ import { Fragment, useEffect, useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import ReactCountryFlag from "react-country-flag"
 
-import { t } from "@lib/i18n/translations"
 import { StateType } from "@lib/hooks/use-toggle-state"
 import { updateLocale } from "@lib/data/locale-actions"
 import { Locale } from "@lib/data/locales"
@@ -50,7 +49,7 @@ type LanguageSelectProps = {
 const getLocalizedLanguageName = (
   code: string,
   fallbackName: string,
-  displayLocale: string = "es-PE"
+  displayLocale: string = "en-US"
 ): string => {
   try {
     const displayNames = new Intl.DisplayNames([displayLocale], {
@@ -64,8 +63,8 @@ const getLocalizedLanguageName = (
 
 const DEFAULT_OPTION: LanguageOption = {
   code: "",
-  name: t("common.default"),
-  localizedName: t("common.default"),
+  name: "Default",
+  localizedName: "Default",
   countryCode: "",
 }
 
@@ -87,7 +86,7 @@ const LanguageSelect = ({
       localizedName: getLocalizedLanguageName(
         locale.code,
         locale.name,
-        currentLocale ?? "es-PE"
+        currentLocale ?? "en-US"
       ),
       countryCode: getCountryCodeFromLocale(locale.code),
     }))
@@ -129,7 +128,7 @@ const LanguageSelect = ({
       >
         <ListboxButton className="py-1 w-full">
           <div className="txt-compact-small flex items-start gap-x-2">
-            <span>{t("common.language")}</span>
+            <span>Language:</span>
             {current && (
               <span className="txt-compact-small flex items-center gap-x-2">
                 {current.countryCode && (

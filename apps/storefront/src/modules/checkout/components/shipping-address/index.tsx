@@ -98,8 +98,8 @@ const ShippingAddress = ({
   return (
     <>
       {customer && (addressesInRegion?.length || 0) > 0 && (
-        <Container className="mb-6 flex flex-col gap-y-4 p-5">
-          <p className="text-small-regular">
+        <Container className="mb-6 flex flex-col gap-y-3 rounded-xl border border-[#E7E5DF] bg-[#FAF8F4] p-4 sm:p-5">
+          <p className="text-sm font-medium text-[#0F352E]">
             {customer.first_name
               ? t("checkout.address.useSaved", { name: customer.first_name })
               : t("checkout.address.useSavedGeneric")}
@@ -115,7 +115,7 @@ const ShippingAddress = ({
           />
         </Container>
       )}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
           label={t("address.field.firstName")}
           name="shipping_address.first_name"
@@ -187,7 +187,7 @@ const ShippingAddress = ({
           data-testid="shipping-province-input"
         />
       </div>
-      <div className="my-8">
+      <div className="my-6">
         <Checkbox
           label={t("checkout.address.sameAsShipping")}
           name="same_as_billing"
@@ -196,7 +196,7 @@ const ShippingAddress = ({
           data-testid="billing-address-checkbox"
         />
       </div>
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
         <Input
           label={t("checkout.address.email")}
           name="email"

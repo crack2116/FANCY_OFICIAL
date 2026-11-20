@@ -39,9 +39,15 @@ export function loadApprovedShippingMatrix(): ShippingOptionConfig[] {
     }
   }
 
-  // Check for local config file
-  const configPath = path.resolve(process.cwd(), "config/shipping-matrix.json")
-  if (fs.existsSync(configPath)) {
+  // Check for local config file (supports both `apps/backend` and `.medusa/server` cwd)
+  const candidatePaths = [
+    path.resolve(process.cwd(), "config/shipping-matrix.json"),
+    path.resolve(process.cwd(), "../../config/shipping-matrix.json"),
+    path.resolve(__dirname, "../../config/shipping-matrix.json"),
+    path.resolve(__dirname, "../../../../config/shipping-matrix.json"),
+  ]
+  const configPath = candidatePaths.find((candidate) => fs.existsSync(candidate))
+  if (configPath) {
     try {
       const raw = fs.readFileSync(configPath, "utf-8")
       const parsed = JSON.parse(raw)

@@ -20,31 +20,26 @@ export default function StoreTemplate({
   const queryLabel = typeof query === "string" ? query : undefined
 
   return (
-    <div className="bg-[var(--surface-warm)]" data-testid="store-page">
-      <div className="site-container py-8 small:py-10">
-        <header className="mb-8 border-b border-[var(--border-subtle)] pb-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-700">
-            {t("store.eyebrow")}
-          </p>
-          <h1
-            className="mt-2 font-display text-3xl font-semibold tracking-tight text-fg-base small:text-4xl"
-            data-testid="store-page-title"
-          >
-            {queryLabel
-              ? t("catalogue.results.searchHeading", { query: queryLabel })
-              : t("store.title")}
-          </h1>
+    <div className="site-container py-8" data-testid="store-page">
+      <header className="mb-8">
+        <h1
+          className="text-3xl font-semibold tracking-tight text-fg-base"
+          data-testid="store-page-title"
+        >
+          {queryLabel
+            ? t("catalogue.results.searchHeading", { query: queryLabel })
+            : t("nav.allProducts")}
+        </h1>
 
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-fg-subtle small:text-base">
-            {t("store.description")}
-          </p>
-        </header>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-fg-subtle">
+          {t("home.meta.description")}
+        </p>
+      </header>
 
-        <CatalogueResults
-          countryCode={countryCode}
-          searchParams={searchParams}
-        />
-      </div>
+      <CatalogueResults
+        countryCode={countryCode}
+        searchParams={searchParams}
+      />
     </div>
   )
 }

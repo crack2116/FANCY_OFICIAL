@@ -1,27 +1,30 @@
 import { IconProps } from "types/icon"
 
 /**
- * Medical cross. The header nav icon for "Farmacia".
- *
- * Deliberately NOT the red cross of the Red Cross emblem, which is a protected
- * symbol in several jurisdictions. This is a plain geometric cross in
- * `currentColor`, so it takes the link colour and makes no colour claim.
+ * Diagonal two-half capsule pill. The header nav icon for "Farmacia".
  */
-const Cross = ({ size = "18", color = "currentColor", ...props }: IconProps) => (
+const Cross = ({ size = "19", color = "currentColor", ...props }: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
-    viewBox="0 0 20 20"
+    viewBox="0 0 24 24"
     fill="none"
     aria-hidden="true"
     {...props}
   >
     <path
-      d="M8.3 2.8h3.4v5.5h5.5v3.4h-5.5v5.5H8.3v-5.5H2.8V8.3h5.5V2.8Z"
+      d="m8.5 19.1-3.6-3.6a4.5 4.5 0 0 1 0-6.4l4.2-4.2a4.5 4.5 0 0 1 6.4 0l3.6 3.6a4.5 4.5 0 0 1 0 6.4l-4.2 4.2a4.5 4.5 0 0 1-6.4 0Z"
       stroke={color}
-      strokeWidth="1.5"
+      strokeWidth="1.9"
+      strokeLinecap="round"
       strokeLinejoin="round"
+    />
+    <path
+      d="m8.8 8.8 6.4 6.4"
+      stroke={color}
+      strokeWidth="1.9"
+      strokeLinecap="round"
     />
   </svg>
 )

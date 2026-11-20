@@ -36,18 +36,11 @@ export default function ProductPrice({
   return (
     <div className="flex flex-col text-fg-base">
       <span
-        className={clx(
-          "font-display text-3xl font-semibold tracking-tight",
-          {
-            "text-accent-600": isSale,
-          }
-        )}
+        className={clx("text-xl-semi", {
+          "text-accent-600": isSale,
+        })}
       >
-        {!variant ? (
-          <span className="mr-1 text-sm font-medium text-fg-muted">
-            {t("product.priceFrom")}
-          </span>
-        ) : null}
+        {!variant ? `${t("product.priceFrom")} ` : null}
         <span
           data-testid="product-price"
           data-value={selectedPrice.calculated_price_number}
@@ -57,9 +50,11 @@ export default function ProductPrice({
       </span>
 
       {isSale ? (
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-          <span className="text-fg-subtle">
-            {t("product.priceOriginalLabel")}:{" "}
+        <>
+          <p>
+            <span className="text-fg-subtle">
+              {t("product.priceOriginalLabel")}:{" "}
+            </span>
             <span
               className="line-through"
               data-testid="original-product-price"
@@ -67,11 +62,11 @@ export default function ProductPrice({
             >
               {selectedPrice.original_price}
             </span>
-          </span>
-          <span className="rounded-full bg-accent-50 px-2.5 py-0.5 text-xs font-semibold text-accent-600">
+          </p>
+          <span className="text-accent-600">
             -{selectedPrice.percentage_diff}%
           </span>
-        </div>
+        </>
       ) : null}
     </div>
   )

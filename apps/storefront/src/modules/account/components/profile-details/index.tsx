@@ -124,7 +124,7 @@ const ProfileDetails = ({ customer }: { customer: HttpTypes.StoreCustomer }) => 
 
       <AccountInfo
         label={t("account.profile.section.phone")}
-        currentInfo={customer.phone ?? t("account.profile.phone.empty")}
+        currentInfo={customer.phone?.trim() || t("account.profile.phone.empty")}
         isSuccess={state.success}
         isError={!!state.error}
         errorMessage={state.error}

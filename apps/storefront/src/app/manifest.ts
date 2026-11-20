@@ -3,12 +3,8 @@ import type { MetadataRoute } from "next"
 /**
  * PWA manifest.
  *
- * Without this file `/manifest.webmanifest` was handled by the root
- * `[countryCode]` route, which returned the storefront HTML with a 200 status.
- * A browser asking for a manifest got a page, and a crawler got a soft 404.
- *
- * The icons are the existing paw favicon, not the official wordmark logo: the
- * manifest is exactly where a small, square, legible mark is required.
+ * Uses the storefront F monogram icon (`icon.svg` and `favicon.ico`) and
+ * keeps the root manifest response clean instead of falling back to HTML.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -22,8 +18,8 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#FBF7F0",
-    theme_color: "#00546C",
+    background_color: "#FFF8F0",
+    theme_color: "#0E352E",
     categories: ["shopping", "pets"],
     icons: [
       {
@@ -34,7 +30,7 @@ export default function manifest(): MetadataRoute.Manifest {
       },
       {
         src: "/favicon.ico",
-        sizes: "16x16 32x32",
+        sizes: "16x16 32x32 48x48",
         type: "image/x-icon",
       },
     ],

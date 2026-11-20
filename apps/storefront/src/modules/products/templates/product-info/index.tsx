@@ -21,14 +21,14 @@ const ProductInfo = ({ product }: { product: HttpTypes.StoreProduct }) => {
         {product.collection ? (
           <LocalizedClientLink
             href={`/collections/${product.collection.handle}`}
-            className="inline-flex w-fit items-center rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-brand-700 transition-colors hover:bg-brand-100"
+            className="text-xs uppercase tracking-wide text-fg-muted transition-colors hover:text-brand-700"
           >
             {product.collection.title}
           </LocalizedClientLink>
         ) : null}
 
         <h1
-          className="font-display text-3xl font-semibold leading-[1.1] tracking-tight text-fg-base small:text-4xl"
+          className="text-3xl leading-tight tracking-tight text-fg-base"
           data-testid="product-title"
         >
           {product.title}
@@ -36,7 +36,7 @@ const ProductInfo = ({ product }: { product: HttpTypes.StoreProduct }) => {
 
         {product.subtitle ? (
           <p
-            className="max-w-xl text-base leading-relaxed text-fg-subtle"
+            className="text-base text-fg-subtle"
             data-testid="product-subtitle"
           >
             {product.subtitle}

@@ -21,43 +21,43 @@ const LineItemPrice = ({
   const hasReducedPrice = currentPrice < originalPrice
 
   return (
-    <div className="flex flex-col gap-x-2 text-ui-fg-subtle items-end">
-      <div className="text-left">
-        {hasReducedPrice && (
-          <>
-            <p>
-              {style === "default" && (
-                <span className="text-ui-fg-subtle">{t("common.original")} </span>
-              )}
-              <span
-                className="line-through text-ui-fg-muted"
-                data-testid="product-original-price"
-              >
-                {convertToLocale({
-                  amount: originalPrice,
-                  currency_code: currencyCode,
-                })}
-              </span>
-            </p>
+    <div className="flex flex-col items-end text-right tabular-nums">
+      {hasReducedPrice && (
+        <div className="flex flex-col items-end">
+          <p className="whitespace-nowrap text-xs">
             {style === "default" && (
-              <span className="text-ui-fg-interactive">
-                -{getPercentageDiff(originalPrice, currentPrice || 0)}%
+              <span className="text-fg-subtle">
+                {t("product.priceOriginalLabel")}:{" "}
               </span>
             )}
-          </>
-        )}
-        <span
-          className={clx("text-base-regular", {
-            "text-ui-fg-interactive": hasReducedPrice,
-          })}
-          data-testid="product-price"
-        >
-          {convertToLocale({
-            amount: currentPrice,
-            currency_code: currencyCode,
-          })}
-        </span>
-      </div>
+            <span
+              className="line-through text-fg-muted"
+              data-testid="product-original-price"
+            >
+              {convertToLocale({
+                amount: originalPrice,
+                currency_code: currencyCode,
+              })}
+            </span>
+          </p>
+          {style === "default" && (
+            <span className="text-xs font-semibold text-accent-600">
+              -{getPercentageDiff(originalPrice, currentPrice || 0)}%
+            </span>
+          )}
+        </div>
+      )}
+      <span
+        className={clx("whitespace-nowrap text-sm font-bold text-[#0F352E]", {
+          "text-accent-600": hasReducedPrice,
+        })}
+        data-testid="product-price"
+      >
+        {convertToLocale({
+          amount: currentPrice,
+          currency_code: currencyCode,
+        })}
+      </span>
     </div>
   )
 }

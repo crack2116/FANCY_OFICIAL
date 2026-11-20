@@ -28,7 +28,10 @@ const Summary = ({ cart }: SummaryProps) => {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <Heading level="h2" className="text-[2rem] leading-[2.75rem]">
+      <Heading
+        level="h2"
+        className="text-xl sm:text-2xl font-bold tracking-tight text-[#0F352E] pb-3 border-b border-[#EFECE6]"
+      >
         {t("cart.summary")}
       </Heading>
       <DiscountCode cart={cart} />
@@ -37,9 +40,21 @@ const Summary = ({ cart }: SummaryProps) => {
       <LocalizedClientLink
         href={"/checkout?step=" + step}
         data-testid="checkout-button"
+        className="block w-full"
       >
-        <Button className="w-full h-10">{t("cart.checkout")}</Button>
+        <Button className="w-full h-11 rounded-xl !bg-[#0F352E] hover:!bg-[#164A40] text-white font-semibold shadow-xs transition-colors">
+          {t("cart.checkout")}
+        </Button>
       </LocalizedClientLink>
+      <LocalizedClientLink
+        href="/store"
+        className="text-center text-sm font-medium text-[#0F352E] hover:text-[#F36F21] transition-colors py-1"
+      >
+        {t("cart.continueShopping")}
+      </LocalizedClientLink>
+      <p className="text-center text-xs text-[#6B7280] pt-1">
+        {t("cart.trustLine")}
+      </p>
     </div>
   )
 }

@@ -1,27 +1,29 @@
 import { IconProps } from "types/icon"
 
 /**
- * Droplet. The header nav icon for "Higiene".
- *
- * Soap, shampoo and bathing products; a droplet is the one shape every hygiene
- * category shares regardless of what the product actually is. Same 20-unit grid
- * and 1.5 stroke as the rest of the nav icon set.
+ * Grooming / hygiene droplet with sparkle. The header nav icon for "Higiene".
  */
-const Droplet = ({ size = "18", color = "currentColor", ...props }: IconProps) => (
+const Droplet = ({ size = "19", color = "currentColor", ...props }: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
-    viewBox="0 0 20 20"
+    viewBox="0 0 24 24"
     fill="none"
     aria-hidden="true"
     {...props}
   >
     <path
-      d="M10 2.6c3 3.3 5 5.9 5 8.4a5 5 0 0 1-10 0c0-2.5 2-5.1 5-8.4Z"
+      d="M12 3.2c3.8 4.2 6.2 7.4 6.2 10.6a6.2 6.2 0 0 1-12.4 0c0-3.2 2.4-6.4 6.2-10.6Z"
       stroke={color}
-      strokeWidth="1.5"
+      strokeWidth="1.9"
       strokeLinejoin="round"
+    />
+    <path
+      d="M9.6 14.5a2.6 2.6 0 0 0 2.4 2.2"
+      stroke={color}
+      strokeWidth="1.7"
+      strokeLinecap="round"
     />
   </svg>
 )

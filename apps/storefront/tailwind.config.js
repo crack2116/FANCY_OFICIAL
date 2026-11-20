@@ -33,12 +33,6 @@ module.exports = {
           80: "#1F2937",
           90: "#111827",
         },
-        /**
-         * Semantic brand tokens. The values live as CSS custom properties in
-         * src/styles/globals.css so the palette can be re-skinned in one place.
-         * `brand` is the primary colour; `accent` is reserved for offers and
-         * badges so it never competes with the primary action colour.
-         */
         brand: {
           50: "var(--brand-50)",
           100: "var(--brand-100)",
@@ -63,12 +57,6 @@ module.exports = {
         },
         surface: {
           DEFAULT: "var(--surface)",
-          warm: "var(--surface-warm)",
-          cream: "var(--surface-cream)",
-          sage: "var(--surface-sage)",
-          blush: "var(--surface-blush)",
-          sky: "var(--surface-sky)",
-          lilac: "var(--surface-lilac)",
           subtle: "var(--surface-subtle)",
           muted: "var(--surface-muted)",
         },
@@ -115,13 +103,13 @@ module.exports = {
       },
       fontFamily: {
         /**
-         * `--font-sans` is injected by next/font in the root layout, so the
-         * webfont is self-hosted at build time with no runtime request to a
-         * font CDN. The literal "Inter" stays as a fallback.
+         * `--font-sans` is injected by next/font in the root layout (Plus Jakarta
+         * Sans, weights 400–800). Both `sans` and `display` resolve to the same
+         * geometric sans-serif family.
          */
         sans: [
           "var(--font-sans)",
-          "Inter",
+          "Plus Jakarta Sans",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
@@ -131,12 +119,12 @@ module.exports = {
           "sans-serif",
         ],
         display: [
-          "var(--font-display)",
-          "Fredoka",
-          "Inter",
+          "var(--font-sans)",
+          "Plus Jakarta Sans",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
+          "Roboto",
           "sans-serif",
         ],
       },

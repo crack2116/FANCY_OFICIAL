@@ -1,29 +1,25 @@
 import { IconProps } from "types/icon"
 
 /**
- * Price tag. The header nav icon for "Accesorios".
- *
- * A tag rather than a collar: a collar needs a curve and a buckle to read at
- * all, and at 18px that collapses into a smudge. The tag's straight edges and
- * single hole stay legible at the rendered size.
+ * Pet collar / accessory tag. The header nav icon for "Accesorios".
  */
-const Tag = ({ size = "18", color = "currentColor", ...props }: IconProps) => (
+const Tag = ({ size = "19", color = "currentColor", ...props }: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
-    viewBox="0 0 20 20"
+    viewBox="0 0 24 24"
     fill="none"
     aria-hidden="true"
     {...props}
   >
     <path
-      d="M10.5 2.9H17v6.5l-7.6 7.6-6.5-6.5 7.6-7.6Z"
+      d="M12.6 3.5H20v7.4l-8.9 8.9a1.8 1.8 0 0 1-2.5 0l-4.9-4.9a1.8 1.8 0 0 1 0-2.5l8.9-8.9Z"
       stroke={color}
-      strokeWidth="1.5"
+      strokeWidth="1.9"
       strokeLinejoin="round"
     />
-    <circle cx="14.2" cy="6.2" r="1.3" stroke={color} strokeWidth="1.5" />
+    <circle cx="16.4" cy="7.6" r="1.5" fill={color} />
   </svg>
 )
 

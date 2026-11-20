@@ -52,41 +52,23 @@ export default function CatalogueFilters({
     <>
       {/* ------------------------------------------------------- desktop --- */}
       <aside
-        className="hidden w-[272px] shrink-0 small:block"
+        className="hidden w-[260px] shrink-0 small:block"
         aria-labelledby="catalogue-filters-heading"
         data-testid="filters-sidebar"
       >
-        <div className="rounded-2xl border border-[#eadfce] bg-white p-5 shadow-[var(--shadow-card)]">
-          <div className="mb-5 flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-4">
-            <h2
-              id="catalogue-filters-heading"
-              className="text-sm font-semibold text-fg-base"
-            >
-              {t("catalogue.filters.title")}
-            </h2>
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-50 text-brand-700">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4"
-                aria-hidden="true"
-              >
-                <path d="M4 7h16M7 12h10M10 17h4" />
-              </svg>
-            </span>
-          </div>
+        <h2
+          id="catalogue-filters-heading"
+          className="mb-5 text-sm font-semibold text-fg-base"
+        >
+          {t("catalogue.filters.title")}
+        </h2>
 
-          <FilterPanel
-            categories={categories}
-            priceBounds={priceBounds}
-            petFacets={petFacets}
-            currencyCode={currencyCode}
-          />
-        </div>
+        <FilterPanel
+          categories={categories}
+          priceBounds={priceBounds}
+          petFacets={petFacets}
+          currencyCode={currencyCode}
+        />
       </aside>
 
       {/* -------------------------------------------------------- mobile --- */}
@@ -95,10 +77,10 @@ export default function CatalogueFilters({
           type="button"
           onClick={open}
           className={clx(
-            "inline-flex h-11 items-center justify-center gap-2 rounded-full border px-5 text-sm font-semibold shadow-sm transition-colors",
+            "inline-flex h-11 items-center justify-center gap-2 rounded-md border px-4 text-sm font-medium transition-colors",
             count > 0
               ? "border-brand-700 bg-brand-700 text-white"
-              : "border-[#eadfce] bg-white text-fg-base hover:bg-brand-50"
+              : "border-[var(--border-subtle)] bg-surface text-fg-base"
           )}
           aria-expanded={isSheetOpen}
           aria-haspopup="dialog"

@@ -1,9 +1,9 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef } from "react"
 
-import { t } from "@lib/i18n/translations"
 import NativeSelect, {
   NativeSelectProps,
 } from "@modules/common/components/native-select"
+import { t } from "@lib/i18n/translations"
 import { HttpTypes } from "@medusajs/types"
 
 const CountrySelect = forwardRef<

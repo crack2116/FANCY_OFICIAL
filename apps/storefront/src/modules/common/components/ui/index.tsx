@@ -61,7 +61,7 @@ Heading.displayName = "Heading"
 
 // Button Component
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "transparent"
+  variant?: "primary" | "secondary" | "transparent" | "brand"
   size?: "small" | "medium" | "large"
   isLoading?: boolean
 }
@@ -84,12 +84,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={clsx(
-          "inline-flex gap-2 items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-          variant === "primary" &&
-            "bg-brand-700 text-white shadow-[0_10px_24px_-16px_rgba(163,81,15,0.9)] hover:bg-brand-800",
+          "inline-flex gap-2 items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+          variant === "primary" && "bg-black text-white hover:bg-gray-800",
           variant === "secondary" &&
-            "border border-[#e6d8c4] bg-white text-fg-base hover:bg-brand-50",
+            "bg-white text-black border border-gray-200 hover:bg-gray-50",
           variant === "transparent" && "bg-transparent hover:bg-gray-100",
+          variant === "brand" &&
+            "bg-gradient-to-r from-[#F36F21] to-[#FB8C00] text-white hover:from-[#E05D10] hover:to-[#EA7D00] shadow-sm hover:shadow active:scale-[0.99]",
           size === "small" && "h-8 px-3 text-sm",
           size === "medium" && "h-10 px-4",
           size === "large" && "h-12 px-6 text-lg",

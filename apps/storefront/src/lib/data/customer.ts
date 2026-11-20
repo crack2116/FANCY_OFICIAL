@@ -219,14 +219,32 @@ export async function signup(
   _currentState: unknown,
   formData: FormData
 ): Promise<CustomerAuthState> {
-  const password = formData.get("password") as string
+  const password = readField(formData, "password")
   const customerForm = {
-    email: formData.get("email") as string,
-    first_name: formData.get("first_name") as string,
-    last_name: formData.get("last_name") as string,
-    phone: formData.get("phone") as string,
+    email: readField(formData, "email"),
+    first_name: readField(formData, "first_name"),
+    last_name: readField(formData, "last_name"),
+    phone: readField(formData, "phone"),
   }
 
+  const fieldErrors = validateProfile({
+    firstName: customerForm.first_name,
+    lastName: customerForm.last_name,
+    phone: customerForm.phone,
+    email: customerForm.email,
+  })
+  const firstProfileError = Object.values(fieldErrors).find(Boolean)
+  if (firstProfileError) {
+    return { state: "error", error: firstProfileError }
+  }
+  if (password.length < 6) {
+    return {
+      state: "error",
+      error: "La contraseña debe tener al menos 6 caracteres.",
+    }
+  }
+
+  let identityAlreadyExists = false
   try {
     await sdk.auth.register("customer", "emailpass", {
       email: customerForm.email,
@@ -246,6 +264,7 @@ export async function signup(
         error: shopperAuthError(error, t("account.register.error.generic")),
       }
     }
+    identityAlreadyExists = true
   }
 
   // Persist the extra signup fields. The customer record is created during
@@ -255,7 +274,15 @@ export async function signup(
 
   // Continue by logging in. The login response tells us whether the backend
   // requires email verification — we don't need a storefront-side flag.
-  return completeLogin(customerForm.email, password)
+  const loginResult = await completeLogin(customerForm.email, password)
+  if (identityAlreadyExists && loginResult?.state === "error") {
+    await removePendingCustomer()
+    return {
+      state: "error",
+      error: t("error.auth.emailRegistered"),
+    }
+  }
+  return loginResult
 }
 
 export async function login(

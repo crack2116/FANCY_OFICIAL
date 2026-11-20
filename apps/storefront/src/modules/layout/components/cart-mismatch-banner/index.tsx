@@ -1,7 +1,6 @@
 "use client"
 
 import { transferCart } from "@lib/data/customer"
-import { t } from "@lib/i18n/translations"
 import { ExclamationCircleSolid } from "@medusajs/icons"
 import { StoreCart, StoreCustomer } from "@medusajs/types"
 import { Button } from "@modules/common/components/ui"
@@ -12,7 +11,7 @@ function CartMismatchBanner(props: {
 }) {
   const { customer, cart } = props
   const [isPending, setIsPending] = useState(false)
-  const [actionText, setActionText] = useState(t("common.retryTransfer"))
+  const [actionText, setActionText] = useState("Run transfer again")
 
   if (!customer || !!cart.customer_id) {
     return
@@ -21,11 +20,11 @@ function CartMismatchBanner(props: {
   const handleSubmit = async () => {
     try {
       setIsPending(true)
-      setActionText(t("common.transferring"))
+      setActionText("Transferring..")
 
       await transferCart()
     } catch {
-      setActionText(t("common.retryTransfer"))
+      setActionText("Run transfer again")
       setIsPending(false)
     }
   }
@@ -35,7 +34,7 @@ function CartMismatchBanner(props: {
       <div className="flex flex-col small:flex-row small:gap-2 gap-1 items-center">
         <span className="flex items-center gap-1">
           <ExclamationCircleSolid className="inline" />
-          {t("common.transferCartError")}
+          Something went wrong when we tried to transfer your cart
         </span>
 
         <span>·</span>

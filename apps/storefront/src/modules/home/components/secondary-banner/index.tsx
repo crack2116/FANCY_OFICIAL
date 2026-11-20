@@ -1,14 +1,42 @@
-import { t } from "@lib/i18n/translations"
+import { t, type TranslationKey } from "@lib/i18n/translations"
 import type { HomeSecondaryBanner } from "@lib/home-config"
 import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
+type RoutineLink = {
+  id: string
+  href: string
+  titleKey: TranslationKey
+  descriptionKey: TranslationKey
+}
+
+const ROUTINE_LINKS: RoutineLink[] = [
+  {
+    id: "hygiene",
+    href: "/categories/higiene",
+    titleKey: "home.banner.pillar.hygiene.title",
+    descriptionKey: "home.banner.pillar.hygiene.description",
+  },
+  {
+    id: "health",
+    href: "/categories/salud",
+    titleKey: "home.banner.pillar.health.title",
+    descriptionKey: "home.banner.pillar.health.description",
+  },
+  {
+    id: "accessories",
+    href: "/categories/accesorios",
+    titleKey: "home.banner.pillar.accessories.title",
+    descriptionKey: "home.banner.pillar.accessories.description",
+  },
+]
+
 /**
- * Secondary commercial block, rendered between rails.
+ * Daily-care band between the product rails.
  *
- * Server Component driven entirely by `secondaryBanners`. Copy is commercial
- * only: no delivery promise, no discount percentage, no medical or veterinary
- * claim, since none of those are backed by data yet.
+ * Deliberately plain: one flat panel, a single-colour heading, a photo and a
+ * short list of real category links. No decorative glows, badges or floating
+ * cards, so it reads like the rest of the storefront instead of a template.
  */
 export default function SecondaryBanner({
   banner,
@@ -16,59 +44,80 @@ export default function SecondaryBanner({
   banner: HomeSecondaryBanner
 }) {
   return (
-    <section className="site-section" aria-labelledby={`${banner.id}-heading`}>
+    <section
+      className="bg-white py-10 small:py-14"
+      aria-labelledby={`${banner.id}-heading`}
+    >
       <div className="site-container">
-        <div className="relative grid items-center gap-8 overflow-hidden rounded-[1.75rem] border border-[#dbe6da] bg-[var(--surface-sage)] px-6 py-10 shadow-[var(--shadow-card)] xsmall:px-10 medium:grid-cols-2 medium:gap-14 medium:rounded-[2rem] medium:py-14">
-          <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-white/50 blur-3xl" />
-
-          <div className="relative flex flex-col items-start gap-4">
+        <div className="grid grid-cols-1 overflow-hidden rounded-2xl bg-[#0E352E] small:grid-cols-12">
+          <div className="flex flex-col p-6 xsmall:p-8 small:col-span-7 medium:p-10 large:p-12">
             {banner.eyebrowKey ? (
-              <p className="rounded-full border border-white/70 bg-white/70 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-brand-700">
+              <p className="text-sm font-semibold text-[#F5A56D]">
                 {t(banner.eyebrowKey)}
               </p>
             ) : null}
 
             <h2
               id={`${banner.id}-heading`}
-              className="max-w-lg font-display text-3xl font-semibold leading-tight tracking-tight text-fg-base xsmall:text-4xl"
+              className="mt-2 max-w-[22ch] font-display text-[1.85rem] font-bold leading-tight text-white xsmall:text-[2.1rem] medium:text-[2.4rem]"
             >
               {t(banner.titleKey)}
             </h2>
 
-            <p className="max-w-lg text-sm leading-relaxed text-fg-subtle small:text-base">
+            <p className="mt-3 max-w-[34rem] text-[15px] leading-relaxed text-[#C9DAD5]">
               {t(banner.subtitleKey)}
             </p>
 
-            <LocalizedClientLink
-              href={banner.ctaHref}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#0e3b3a] px-7 text-sm font-semibold text-white shadow-[0_14px_28px_-18px_rgba(14,59,58,0.9)] transition-colors hover:bg-[#134a48]"
-            >
-              {t(banner.ctaKey)}
-              <svg
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4"
-                aria-hidden="true"
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <LocalizedClientLink
+                href={banner.ctaHref}
+                className="inline-flex items-center justify-center rounded-full bg-[#F36F21] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#DF5E14]"
               >
-                <path d="M4 10h11M11 5l5 5-5 5" />
-              </svg>
-            </LocalizedClientLink>
+                {t(banner.ctaKey)}
+              </LocalizedClientLink>
+
+              {banner.secondaryCtaKey && banner.secondaryCtaHref ? (
+                <LocalizedClientLink
+                  href={banner.secondaryCtaHref}
+                  className="text-sm font-semibold text-white underline decoration-white/40 underline-offset-4 transition-colors hover:decoration-white"
+                >
+                  {t(banner.secondaryCtaKey)}
+                </LocalizedClientLink>
+              ) : null}
+            </div>
+
+            <div className="mt-auto pt-8">
+              <ul className="grid grid-cols-1 border-t border-white/15 pt-2 xsmall:grid-cols-3 xsmall:gap-6 xsmall:pt-6">
+                {ROUTINE_LINKS.map((item) => (
+                  <li
+                    key={item.id}
+                    className="border-b border-white/10 last:border-b-0 xsmall:border-b-0"
+                  >
+                    <LocalizedClientLink
+                      href={item.href}
+                      className="group block py-3 xsmall:py-0"
+                    >
+                      <span className="block text-[15px] font-semibold text-white group-hover:underline group-hover:underline-offset-4">
+                        {t(item.titleKey)}
+                      </span>
+                      <span className="mt-1 block text-[13px] leading-snug text-[#A9C2BC]">
+                        {t(item.descriptionKey)}
+                      </span>
+                    </LocalizedClientLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.5rem] border border-white/70 bg-white/50 p-2.5 shadow-sm medium:aspect-[16/11]">
-            <div className="relative h-full w-full overflow-hidden rounded-[1.15rem]">
-              <Image
-                src={banner.image}
-                alt={t(banner.imageAltKey)}
-                fill
-                sizes="(min-width: 1280px) 560px, 100vw"
-                className="object-cover"
-              />
-            </div>
+          <div className="relative aspect-[4/3] w-full bg-[#E8E1D4] small:col-span-5 small:aspect-auto small:min-h-[22rem]">
+            <Image
+              src={banner.image}
+              alt={t(banner.imageAltKey)}
+              fill
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              className="object-cover object-center"
+            />
           </div>
         </div>
       </div>

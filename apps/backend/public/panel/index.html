@@ -161,6 +161,19 @@
             <span id="navProductCount" class="ml-auto text-[8.5px] bg-[#FFF5EE] text-[#F99C32] font-bold px-1.5 rounded-full">0</span>
           </button>
 
+          <!-- Item: Carruseles -->
+          <button onclick="showView('carruseles')" id="nav-btn-carruseles"
+                  class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-[11px] font-medium relative transition text-slate-600 hover:text-slate-900 hover:bg-slate-50">
+            <span id="nav-indicator-carruseles" class="absolute left-0 inset-y-1 w-1 bg-[#F99C32] rounded-r-full hidden"></span>
+            <svg class="w-3.5 h-3.5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <rect x="3" y="5" width="18" height="14" rx="2.5" stroke-width="1.8"/>
+              <circle cx="8.5" cy="10" r="1.5" stroke-width="1.6"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 15l-4.5-4.5L9 18"/>
+            </svg>
+            <span>Carruseles</span>
+            <span id="navCarouselCount" class="ml-auto text-[8.5px] bg-[#FFF5EE] text-[#F99C32] font-bold px-1.5 rounded-full">2</span>
+          </button>
+
           <!-- Item: Clientes -->
           <button onclick="showView('clientes')" id="nav-btn-clientes"
                   class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-[11px] font-medium relative transition text-slate-600 hover:text-slate-900 hover:bg-slate-50">
@@ -915,6 +928,57 @@
       </section>
 
       <!-- =================================================================== -->
+      <!-- VIEW 4B: CARRUSELES DE TIENDA (Sincronizado en vivo con Storefront) -->
+      <!-- =================================================================== -->
+      <section id="view-carruseles" class="flex-1 px-3 sm:px-5 pb-6 pt-3 hidden w-full space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <button onclick="showView('dashboard')" class="text-[11px] font-bold text-slate-400 hover:text-slate-700 mb-0.5 flex items-center gap-1">
+              <span>←</span> <span>Volver al Dashboard</span>
+            </button>
+            <h2 class="text-[18px] font-extrabold text-slate-900 tracking-tight">Carruseles de Tienda</h2>
+            <p class="text-[10px] text-slate-500 font-medium">Administrá los banners principales que se muestran en la portada de Fancy Pets.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <a id="openStorefrontCarouselBtn" href="http://shop.192.168.1.38.nip.io/pe" target="_blank" rel="noopener"
+               class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-200/80 text-slate-700 text-[11px] font-bold hover:bg-slate-50 transition shadow-2xs">
+              <span>Ver en Tienda</span>
+              <span>↗</span>
+            </a>
+            <button onclick="openCreateSlide()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#F36F21] text-white text-[11px] font-bold hover:bg-[#e05e10] transition shadow-sm">
+              <span class="text-sm leading-none">+</span> Agregar slide
+            </button>
+          </div>
+        </div>
+
+        <!-- Vista previa interactiva en vivo -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-4">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Vista previa en vivo de la portada</h3>
+            </div>
+            <span id="carouselPreviewCounter" class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">Slide 1 de 2</span>
+          </div>
+          <div id="adminCarouselPreview"></div>
+        </div>
+
+        <!-- Lista de slides configurados -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <div>
+              <h3 class="text-xs font-extrabold text-slate-900">Slides del Carrusel Principal</h3>
+              <p class="text-[10px] text-slate-400 font-medium">Ordená, ocultá, editá o agregá nuevos slides promocionales. Los cambios impactan al instante en la tienda.</p>
+            </div>
+            <button onclick="restoreDefaultSlides()" class="text-[10px] font-bold text-slate-500 hover:text-[#F36F21] transition self-start sm:self-auto">
+              ↺ Restaurar predeterminados
+            </button>
+          </div>
+          <div id="carouselSlidesList" class="space-y-2.5"></div>
+        </div>
+      </section>
+
+      <!-- =================================================================== -->
       <!-- VIEW 5: CLIENTES (Aparece al costado)                               -->
       <!-- =================================================================== -->
       <section id="view-clientes" class="flex-1 px-3 sm:px-5 pb-6 pt-3 hidden w-full">
@@ -1052,45 +1116,116 @@
   <!-- TOAST -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 hidden max-w-xs rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-semibold text-white shadow-xl"></div>
 
-  <!-- LOGIN OVERLAY -->
-  <div id="loginOverlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-    <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
-      <div class="mb-6 flex items-center gap-2.5">
-        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F99C32] text-white">
-          <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24">
-            <ellipse cx="12" cy="15" rx="5.2" ry="4.2"/>
-            <ellipse cx="6.5" cy="10.5" rx="2.1" ry="2.7" transform="rotate(-18 6.5 10.5)"/>
-            <ellipse cx="10.2" cy="7.2" rx="2.1" ry="2.8" transform="rotate(-5 10.2 7.2)"/>
-            <ellipse cx="13.8" cy="7.2" rx="2.1" ry="2.8" transform="rotate(5 13.8 7.2)"/>
-            <ellipse cx="17.5" cy="10.5" rx="2.1" ry="2.7" transform="rotate(18 17.5 10.5)"/>
+  <!-- LOGIN UNIFICADO (mismo diseño que /app/login del admin de Medusa) -->
+  <div id="loginOverlay" class="fixed inset-0 z-50 hidden overflow-y-auto bg-white">
+    <div class="flex min-h-screen w-full">
+
+      <!-- Columna izquierda: foto + marca -->
+      <div class="relative hidden w-1/2 overflow-hidden bg-[#FFF7F0] lg:block">
+        <img src="/hero/fancy-login-hero.png" alt="Perro y gato de Fancy Pets"
+             class="absolute inset-0 h-full w-full object-cover">
+        <div class="relative z-10 flex h-full flex-col p-10 xl:p-14">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 70" width="180" height="55" role="img" aria-label="Fancy Pets Logo">
+            <style>
+              @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&amp;family=Montserrat:wght@600;700&amp;display=swap');
+              .fl-brand-funcy { font-family: 'Fredoka', 'Quicksand', 'Arial Rounded MT Bold', system-ui, sans-serif; font-size: 32px; font-weight: 700; }
+              .fl-brand-futura { font-family: 'Montserrat', 'Futura', 'Century Gothic', sans-serif; font-size: 8.5px; font-weight: 700; letter-spacing: 3.5px; fill: #F99C32; }
+            </style>
+            <g transform="translate(15, 36)">
+              <text class="fl-brand-funcy">
+                <tspan fill="#F24534">F</tspan>
+                <tspan fill="#F99C32">a</tspan>
+                <tspan fill="#3B82F6">n</tspan>
+                <tspan fill="#06B6D4">c</tspan>
+                <tspan fill="#8B5CF6">y</tspan>
+                <tspan fill="transparent"> </tspan>
+                <tspan fill="#EC4899">P</tspan>
+                <tspan fill="#F7B77B">e</tspan>
+                <tspan fill="#F99C32">t</tspan>
+                <tspan fill="#F24534">s</tspan>
+              </text>
+            </g>
+            <line x1="20" y1="52" x2="68" y2="52" stroke="#F99C32" stroke-width="2" stroke-linecap="round"/>
+            <text x="76" y="55" class="fl-brand-futura">PET SHOP</text>
+            <line x1="156" y1="52" x2="204" y2="52" stroke="#F99C32" stroke-width="2" stroke-linecap="round"/>
           </svg>
-        </div>
-        <div>
-          <h2 class="text-sm font-extrabold text-slate-900">Fancy Pets Perú</h2>
-          <p class="text-[10px] font-medium text-slate-400">Acceso administrativo</p>
+          <h1 class="mt-12 max-w-md text-5xl font-extrabold leading-[1.05] tracking-tight text-[#0B1B33] xl:text-6xl">
+            Juntos por<br>mascotas más<br><span class="text-[#F97316]">felices</span>
+          </h1>
         </div>
       </div>
-      <form id="loginForm" class="space-y-3">
-        <div>
-          <label class="mb-1 block text-xs font-semibold text-slate-700">Correo</label>
-          <input id="loginEmail" type="email" required autocomplete="username" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none focus:border-[#F99C32] focus:ring-2 focus:ring-[#F99C32]/20" placeholder="admin@fancyperu.com">
+
+      <!-- Columna derecha: formulario -->
+      <div class="flex w-full items-center justify-center px-6 py-10 lg:w-1/2">
+        <div class="w-full max-w-sm">
+          <div class="mb-8 flex justify-center lg:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 70" width="160" height="49" role="img" aria-label="Fancy Pets Logo">
+              <style>
+                .fl-brand-funcy { font-family: 'Fredoka', 'Quicksand', 'Arial Rounded MT Bold', system-ui, sans-serif; font-size: 32px; font-weight: 700; }
+                .fl-brand-futura { font-family: 'Montserrat', 'Futura', 'Century Gothic', sans-serif; font-size: 8.5px; font-weight: 700; letter-spacing: 3.5px; fill: #F99C32; }
+              </style>
+              <g transform="translate(15, 36)">
+                <text class="fl-brand-funcy">
+                  <tspan fill="#F24534">F</tspan><tspan fill="#F99C32">a</tspan><tspan fill="#3B82F6">n</tspan><tspan fill="#06B6D4">c</tspan><tspan fill="#8B5CF6">y</tspan><tspan fill="transparent"> </tspan><tspan fill="#EC4899">P</tspan><tspan fill="#F7B77B">e</tspan><tspan fill="#F99C32">t</tspan><tspan fill="#F24534">s</tspan>
+                </text>
+              </g>
+              <line x1="20" y1="52" x2="68" y2="52" stroke="#F99C32" stroke-width="2" stroke-linecap="round"/>
+              <text x="76" y="55" class="fl-brand-futura">PET SHOP</text>
+              <line x1="156" y1="52" x2="204" y2="52" stroke="#F99C32" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <h2 class="text-center text-3xl font-extrabold tracking-tight text-[#0B1B33]">Iniciar sesión</h2>
+          <p class="mt-2 text-center text-sm font-medium text-slate-500">Panel de administración</p>
+
+          <form id="loginForm" class="mt-9 space-y-5">
+            <div>
+              <label for="loginEmail" class="mb-2 block text-sm font-semibold text-slate-800">Correo electrónico</label>
+              <input id="loginEmail" type="email" required autocomplete="username" placeholder="Correo electrónico"
+                     class="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#F99C32] focus:ring-4 focus:ring-[#F99C32]/15">
+            </div>
+            <div>
+              <label for="loginPassword" class="mb-2 block text-sm font-semibold text-slate-800">Contraseña</label>
+              <div class="relative">
+                <input id="loginPassword" type="password" required autocomplete="current-password" placeholder="Contraseña"
+                       class="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#F99C32] focus:ring-4 focus:ring-[#F99C32]/15">
+                <button type="button" onclick="toggleLoginPassword()" aria-label="Mostrar u ocultar contraseña"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 transition hover:text-slate-600">
+                  <svg id="loginEyeIcon" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <p id="loginError" class="hidden text-xs font-semibold text-red-600"></p>
+            <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#F99C32] to-[#F24534] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition hover:brightness-105">
+              Iniciar sesión <span aria-hidden="true">→</span>
+            </button>
+          </form>
+
+          <p class="mt-8 flex items-center justify-center gap-1.5 text-xs text-slate-400">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+            </svg>
+            Acceso seguro solo para usuarios autorizados
+          </p>
         </div>
-        <div>
-          <label class="mb-1 block text-xs font-semibold text-slate-700">Contraseña</label>
-          <input id="loginPassword" type="password" required autocomplete="current-password" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none focus:border-[#F99C32] focus:ring-2 focus:ring-[#F99C32]/20" placeholder="••••••••">
-        </div>
-        <p id="loginError" class="hidden text-[11px] font-medium text-red-600"></p>
-        <button type="submit" class="w-full rounded-xl bg-[#F99C32] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#e0851e]">Ingresar</button>
-      </form>
-      <p class="mt-4 text-center text-[10px] text-slate-400">Acceso restringido al personal autorizado</p>
+      </div>
     </div>
   </div>
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
     const TOKEN_KEY = 'fancy_admin_token';
+    // Clave que usa el admin de Medusa. Si el panel y /app viven en el mismo
+    // origen (por ejemplo a traves del proxy :8080), comparten la sesion.
+    const MEDUSA_TOKEN_KEY = 'medusa_auth_token';
     const FALLBACK_IMG = "data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22160%22%20height=%22160%22%3E%3Crect%20width=%22160%22%20height=%22160%22%20rx=%2220%22%20fill=%22%23FFF5EE%22/%3E%3Ctext%20x=%2280%22%20y=%2286%22%20font-family=%22Arial%22%20font-size=%2213%22%20text-anchor=%22middle%22%20fill=%22%23F99C32%22%3EFancy%20Pets%3C/text%3E%3C/svg%3E";
-    let token = localStorage.getItem(TOKEN_KEY) || '';
+    function readStoredToken() {
+      return localStorage.getItem(TOKEN_KEY) || localStorage.getItem(MEDUSA_TOKEN_KEY) || '';
+    }
+    let token = readStoredToken();
     let allOrders = [];
     let allProducts = [];
     let allCustomers = [];
@@ -1099,13 +1234,61 @@
     let allStockLocations = [];
     let allShippingProfiles = [];
     let allSalesChannels = [];
+    let allRegions = [];
+    const DEFAULT_CAROUSEL_SLIDES = [
+      {
+        id: 'bienestar-diario',
+        eyebrow: 'Cuidado de tu mascota',
+        title: 'Bienestar todos los',
+        titleHighlight: 'días',
+        subtitle: 'Productos seleccionados para acompañar a tu mascota en cada etapa.',
+        ctaLabel: 'Ver alimentos',
+        ctaHref: '/categories/alimentos',
+        secondaryCtaLabel: 'Ver cuidados',
+        secondaryCtaHref: '/categories/salud',
+        imageDesktop: '/hero/hero-pets-bienestar.jpg',
+        imageMobile: '/hero/hero-pets-bienestar.jpg',
+        imageAlt: 'Cachorro Golden Retriever y gatito junto a su plato y juguetes',
+        active: true,
+        order: 10
+      },
+      {
+        id: 'cuidado-diario',
+        eyebrow: 'Todo para tu mascota',
+        title: 'Nutrición, salud y',
+        titleHighlight: 'diversión',
+        subtitle: 'Todo lo que tu perro o gato necesita con envíos rápidos en Piura.',
+        ctaLabel: 'Explorar tienda',
+        ctaHref: '/store',
+        secondaryCtaLabel: 'Ver ofertas',
+        secondaryCtaHref: '/collections/ofertas',
+        imageDesktop: '/hero/hero-pets-nutricion.jpg',
+        imageMobile: '/hero/hero-pets-nutricion.jpg',
+        imageAlt: 'Cachorro y gatito felices con juguetes y alimento premium',
+        active: true,
+        order: 20
+      }
+    ];
+    let allCarouselSlides = DEFAULT_CAROUSEL_SLIDES.map((s) => ({ ...s }));
+    let adminPreviewIndex = 0;
     let dateRangeDays = 30;
     let activeOrderFilter = 'all';
 
     function setToken(value) {
       token = value || '';
-      if (token) localStorage.setItem(TOKEN_KEY, token);
-      else localStorage.removeItem(TOKEN_KEY);
+      if (token) {
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(MEDUSA_TOKEN_KEY, token);
+      } else {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(MEDUSA_TOKEN_KEY);
+      }
+    }
+
+    function toggleLoginPassword() {
+      const input = document.getElementById('loginPassword');
+      if (!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
     }
 
     function showLogin(message) {
@@ -1223,7 +1406,11 @@
 
     async function loadMetrics() {
       try {
-        const [ordersRes, prodRes, customersRes, categoriesRes, locationsRes, shippingRes, salesRes, storeRes] = await Promise.all([
+        const sfBtn = document.getElementById('openStorefrontCarouselBtn');
+        if (sfBtn && window.location.hostname) {
+          sfBtn.href = "http://shop.192.168.1.38.nip.io/pe";
+        }
+        const [ordersRes, prodRes, customersRes, categoriesRes, locationsRes, shippingRes, salesRes, storeRes, regionsRes] = await Promise.all([
           apiFetch('/admin/orders?limit=100&order=-created_at&fields=id,display_id,email,total,payment_status,created_at,metadata,payment_provider_id,*shipping_address,*items'),
           apiFetch('/admin/products?limit=100&fields=id,title,description,thumbnail,status,*variants,*variants.prices,*variants.inventory_items.inventory.location_levels,*categories'),
           apiFetch('/admin/customers?limit=500&fields=id,email,first_name,last_name,phone,created_at'),
@@ -1231,7 +1418,8 @@
           apiFetch('/admin/stock-locations?limit=5'),
           apiFetch('/admin/shipping-profiles?limit=5'),
           apiFetch('/admin/sales-channels?limit=5'),
-          apiFetch('/admin/stores?limit=1')
+          apiFetch('/admin/stores?limit=1'),
+          apiFetch('/admin/regions?limit=10')
         ]);
 
         if (ordersRes.ok) {
@@ -1272,6 +1460,43 @@
         if (storeRes.ok) {
           const data = await storeRes.json();
           allStore = data.stores?.[0] || allStore;
+        }
+
+        if (regionsRes && regionsRes.ok) {
+          const data = await regionsRes.json();
+          allRegions = data.regions || [];
+        }
+
+        const regionWithSlides = (allRegions || []).find(
+          (r) => Array.isArray(r.metadata?.fancypets_hero_slides) && r.metadata.fancypets_hero_slides.length > 0
+        );
+        const storedSlides =
+          (Array.isArray(allStore?.metadata?.fancypets_hero_slides) && allStore.metadata.fancypets_hero_slides.length > 0
+            ? allStore.metadata.fancypets_hero_slides
+            : null) ||
+          (regionWithSlides ? regionWithSlides.metadata.fancypets_hero_slides : null);
+
+        if (Array.isArray(storedSlides) && storedSlides.length > 0) {
+          allCarouselSlides = storedSlides
+            .map((s, idx) => ({
+              id: s.id || `slide-${idx + 1}`,
+              eyebrow: s.eyebrow ?? 'Cuidado de tu mascota',
+              title: s.title ?? 'Bienestar todos los',
+              titleHighlight: s.titleHighlight ?? '',
+              subtitle: s.subtitle ?? '',
+              ctaLabel: s.ctaLabel ?? 'Explorar productos',
+              ctaHref: s.ctaHref ?? '/store',
+              secondaryCtaLabel: s.secondaryCtaLabel ?? '',
+              secondaryCtaHref: s.secondaryCtaHref ?? '/categories/salud',
+              imageDesktop: s.imageDesktop || '/hero/hero-pets-bienestar.jpg',
+              imageMobile: s.imageMobile || s.imageDesktop || '/hero/hero-pets-bienestar.jpg',
+              imageAlt: s.imageAlt || s.title || 'Fancy Pets',
+              active: s.active !== false,
+              order: typeof s.order === 'number' ? s.order : (idx + 1) * 10
+            }))
+            .sort((a, b) => a.order - b.order);
+        } else {
+          allCarouselSlides = DEFAULT_CAROUSEL_SLIDES.map((s) => ({ ...s }));
         }
 
         refreshViewsWithRange();
@@ -1478,7 +1703,7 @@
     }
 
     function showView(viewId, subFilter) {
-      const views = ['dashboard', 'pedidos', 'catalogo', 'productos', 'clientes', 'reportes', 'configuracion'];
+      const views = ['dashboard', 'pedidos', 'catalogo', 'productos', 'carruseles', 'clientes', 'reportes', 'configuracion'];
       views.forEach(v => {
         const el = document.getElementById(`view-${v}`);
         if (el) el.classList.add('hidden');
@@ -1506,6 +1731,10 @@
 
       if (viewId === 'productos') {
         renderProductsView();
+      }
+
+      if (viewId === 'carruseles') {
+        renderCarouselsView();
       }
 
       if (viewId === 'catalogo') {
@@ -2307,6 +2536,7 @@
       renderReportsView(orders);
       renderDashboardProducts(allProducts);
       renderProductsView();
+      renderCarouselsView();
       renderNotifications();
     }
 
@@ -2851,6 +3081,586 @@
       link.remove();
       URL.revokeObjectURL(url);
       showToast('CSV generado.', 'info');
+    }
+
+    // --------------------------- Carruseles CRUD --------------------------
+    const CAROUSEL_IMAGE_PRESETS = [
+      { label: 'Bienestar (Golden + Gatito)', url: '/hero/hero-pets-bienestar.jpg' },
+      { label: 'Nutrición (Frenchie + Gato)', url: '/hero/hero-pets-nutricion.jpg' },
+      { label: 'Ilustración Dúo Mascotas', url: '/hero/pets-duo-desktop.svg' },
+      { label: 'Ilustración Cuidado', url: '/hero/pets-care-desktop.svg' }
+    ];
+
+    function setAdminPreviewSlide(idx) {
+      const activeSlides = allCarouselSlides.filter((s) => s.active !== false);
+      if (!activeSlides.length) {
+        adminPreviewIndex = 0;
+      } else {
+        adminPreviewIndex = ((idx % activeSlides.length) + activeSlides.length) % activeSlides.length;
+      }
+      renderCarouselsView();
+    }
+
+    function renderCarouselsView() {
+      const navBadge = document.getElementById('navCarouselCount');
+      const activeSlides = allCarouselSlides
+        .filter((s) => s.active !== false)
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+      if (navBadge) navBadge.textContent = String(activeSlides.length);
+
+      const previewEl = document.getElementById('adminCarouselPreview');
+      const counterEl = document.getElementById('carouselPreviewCounter');
+      const listEl = document.getElementById('carouselSlidesList');
+      if (!previewEl || !listEl) return;
+
+      if (adminPreviewIndex >= activeSlides.length) {
+        adminPreviewIndex = 0;
+      }
+
+      if (activeSlides.length === 0) {
+        if (counterEl) counterEl.textContent = '0 slides activos';
+        previewEl.innerHTML = `
+          <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
+            <p class="text-xs font-bold text-slate-700">No hay slides activos en la portada.</p>
+            <p class="text-[10px] text-slate-400 mt-1">Activá al menos un slide de la lista inferior o creá uno nuevo.</p>
+          </div>
+        `;
+      } else {
+        const slide = activeSlides[adminPreviewIndex] || activeSlides[0];
+        if (counterEl) {
+          counterEl.textContent = `Slide ${adminPreviewIndex + 1} de ${activeSlides.length} · ${slide.title} ${slide.titleHighlight || ''}`;
+        }
+        previewEl.innerHTML = `
+          <div class="relative overflow-hidden rounded-[1.5rem] bg-[#FCEBD7] shadow-sm border border-[#F2D5B3]/60">
+            <!-- Decorative bottom-left orange wave -->
+            <svg viewBox="0 0 260 140" fill="none" class="pointer-events-none absolute bottom-0 left-0 z-[2] h-20 w-36" preserveAspectRatio="none">
+              <path d="M0 32C42 36 68 78 118 92C168 106 212 118 260 140H0V32Z" fill="#F6B256" fill-opacity="0.85"/>
+              <path d="M0 68C36 74 68 104 122 114C166 122 204 128 238 140H0V68Z" fill="#F38424"/>
+            </svg>
+
+            <div class="relative min-h-[240px] sm:min-h-[275px]">
+              <div class="pointer-events-none absolute inset-0 hidden sm:block overflow-hidden">
+                <div class="relative ml-auto h-full w-fit">
+                  <img src="${escapeHtml(slide.imageDesktop || '/hero/hero-pets-bienestar.jpg')}"
+                       alt="${escapeHtml(slide.imageAlt || slide.title || 'Fancy Pets')}"
+                       class="relative -top-[19%] h-[124%] w-auto max-w-none select-none object-contain object-right"
+                       onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">
+                  <div class="absolute inset-y-0 left-0 w-36 bg-gradient-to-r from-[#FCEBD7] via-[#FCEBD7]/85 to-transparent"></div>
+                  <div class="absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t from-[#FCEBD7] via-[#FCEBD7]/75 to-transparent"></div>
+                </div>
+              </div>
+
+              <div class="relative z-10 grid items-center gap-4 px-5 py-6 sm:grid-cols-[1.1fr_0.9fr] sm:px-8 sm:py-7">
+                <div class="flex flex-col items-start gap-2.5">
+                  ${slide.eyebrow ? `
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-[#F2D5B3] bg-[#FFF8F0] px-3 py-1 text-[10px] font-bold text-[#D97706] shadow-2xs">
+                      <svg viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3 text-[#F36F21]">
+                        <ellipse cx="10" cy="13.2" rx="4.2" ry="3.3"/>
+                        <circle cx="4.8" cy="8.5" r="1.7"/><circle cx="8.1" cy="6.2" r="1.8"/><circle cx="11.9" cy="6.2" r="1.8"/><circle cx="15.2" cy="8.5" r="1.7"/>
+                      </svg>
+                      <span>${escapeHtml(slide.eyebrow)}</span>
+                    </span>
+                  ` : ''}
+
+                  <div class="text-xl sm:text-2xl lg:text-[28px] font-extrabold leading-[1.08] tracking-tight text-[#0E352E]">
+                    <span>${escapeHtml(slide.title || '')}</span>
+                    ${slide.titleHighlight ? `
+                      <br>
+                      <span class="relative inline-block text-[#F36F21]">
+                        ${escapeHtml(slide.titleHighlight)}
+                        <svg viewBox="0 0 210 28" fill="none" class="-mt-1 h-3 w-[130%] max-w-[11rem] text-[#F5A623]" preserveAspectRatio="none">
+                          <path d="M4 16C58 26 146 24 204 4" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+                        </svg>
+                      </span>
+                    ` : ''}
+                  </div>
+
+                  ${slide.subtitle ? `
+                    <p class="max-w-sm text-[11.5px] font-medium leading-relaxed text-[#334E48]">${escapeHtml(slide.subtitle)}</p>
+                  ` : ''}
+
+                  <div class="mt-1 flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-[#F36F21] px-4 py-2 text-[11px] font-bold text-white shadow-sm">
+                      <span>${escapeHtml(slide.ctaLabel || 'Ver alimentos')}</span>
+                      <span>→</span>
+                    </span>
+                    ${slide.secondaryCtaLabel ? `
+                      <span class="inline-flex items-center gap-1.5 rounded-full border border-[#0E352E]/25 bg-white px-4 py-2 text-[11px] font-bold text-[#0E352E] shadow-2xs">
+                        <span class="h-2 w-2 rounded-full bg-[#15803D]"></span>
+                        <span>${escapeHtml(slide.secondaryCtaLabel)}</span>
+                      </span>
+                    ` : ''}
+                  </div>
+                </div>
+
+                <div class="sm:hidden">
+                  <img src="${escapeHtml(slide.imageDesktop || '/hero/hero-pets-bienestar.jpg')}"
+                       alt="${escapeHtml(slide.imageAlt || slide.title || 'Fancy Pets')}"
+                       class="aspect-[16/9] w-full rounded-xl object-cover object-right">
+                </div>
+              </div>
+            </div>
+
+            <!-- Selector de slides en vista previa -->
+            <div class="relative z-10 mx-4 mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white/95 px-4 py-2.5 shadow-2xs">
+              <div class="flex flex-wrap items-center gap-3 text-[10px] font-bold text-[#0E352E]">
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg border border-[#F9D0A3]/70 bg-gradient-to-br from-[#FFF3E4] to-[#FFE2C2] text-[#F36F21]">
+                    <svg viewBox="0 0 24 24" fill="none" class="h-4 w-4">
+                      <path d="M1.2 8.2h2.8M.6 11.2h3.4M1.8 14.2h2.2" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/>
+                      <rect x="5.4" y="5.2" width="10" height="10.2" rx="1.6" fill="currentColor"/>
+                      <path d="M15.4 8.2h3.3a1.3 1.3 0 0 1 1.08.58l2.05 3.05c.14.22.22.47.22.73v2.84h-6.65V8.2Z" fill="#FB8C00"/>
+                      <path d="M16.5 9.5h1.9l1.35 2h-3.25V9.5Z" fill="#FFF3E4"/>
+                      <circle cx="9.4" cy="16.2" r="2.7" fill="#FFF3E4"/><circle cx="9.4" cy="16.2" r="2" fill="#EA580C"/><circle cx="9.4" cy="16.2" r="0.8" fill="#FFF3E4"/>
+                      <circle cx="18.6" cy="16.2" r="2.7" fill="#FFF3E4"/><circle cx="18.6" cy="16.2" r="2" fill="#EA580C"/><circle cx="18.6" cy="16.2" r="0.8" fill="#FFF3E4"/>
+                    </svg>
+                  </span>
+                  <span>Envíos rápidos <span class="font-medium text-slate-500">en Piura</span></span>
+                </span>
+                <span class="text-slate-200">|</span>
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[#ECFDF5] text-[#15803D]">
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5"><path d="M10 2 3.5 4.8v4.8c0 4.4 2.8 8.3 6.5 9.4 3.7-1.1 6.5-5 6.5-9.4V4.8L10 2Zm-1.1 11-2.5-2.5 1.1-1.1 1.4 1.4 3.4-3.4 1.1 1.1-4.5 4.5Z"/></svg>
+                  </span>
+                  <span>Compra segura</span>
+                </span>
+                <span class="text-slate-200 hidden md:inline">|</span>
+                <span class="hidden md:inline-flex items-center gap-1.5">
+                  <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[#FFFBEB] text-[#D97706]">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" class="h-3.5 w-3.5"><path d="M4 11V9a6 6 0 1 1 12 0v2"/><rect x="2.5" y="10.5" width="2.8" height="4.5" rx="1.2" fill="currentColor"/><rect x="14.7" y="10.5" width="2.8" height="4.5" rx="1.2" fill="currentColor"/></svg>
+                  </span>
+                  <span>Atención personalizada</span>
+                </span>
+                <span class="text-slate-200 hidden lg:inline">|</span>
+                <span class="hidden lg:inline-flex items-center gap-1.5">
+                  <span class="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-[#FFFBEB] text-[#F59E0B]">
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5"><ellipse cx="10" cy="13.2" rx="4.2" ry="3.3"/><circle cx="4.8" cy="8.5" r="1.7"/><circle cx="8.1" cy="6.2" r="1.8"/><circle cx="11.9" cy="6.2" r="1.8"/><circle cx="15.2" cy="8.5" r="1.7"/></svg>
+                  </span>
+                  <span>Productos de calidad</span>
+                </span>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <button onclick="setAdminPreviewSlide(${adminPreviewIndex - 1})" class="h-6 w-6 rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-xs font-bold flex items-center justify-center" title="Slide anterior">‹</button>
+                ${activeSlides.map((s, idx) => `
+                  <button onclick="setAdminPreviewSlide(${idx})"
+                          class="px-2 py-0.5 rounded-full text-[9.5px] font-bold transition ${idx === adminPreviewIndex ? 'bg-[#F36F21] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+                    #${idx + 1}
+                  </button>
+                `).join('')}
+                <button onclick="setAdminPreviewSlide(${adminPreviewIndex + 1})" class="h-6 w-6 rounded-full border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-xs font-bold flex items-center justify-center" title="Siguiente slide">›</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      const sortedAll = [...allCarouselSlides].sort((a, b) => (a.order || 0) - (b.order || 0));
+      listEl.innerHTML = sortedAll.map((slide, index) => {
+        const isActive = slide.active !== false;
+        return `
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 rounded-2xl border ${isActive ? 'border-slate-200/90 bg-white' : 'border-slate-200/60 bg-slate-50/70 opacity-75'} p-3.5 shadow-2xs transition hover:border-[#F99C32]/50">
+            <div class="flex items-start sm:items-center gap-3.5 min-w-0">
+              <div class="relative h-20 w-36 shrink-0 overflow-hidden rounded-xl border border-[#F2D5B3] bg-[#FCEBD7]">
+                <img src="${escapeHtml(slide.imageDesktop || '/hero/hero-pets-bienestar.jpg')}"
+                     alt="${escapeHtml(slide.title || 'Slide')}"
+                     class="h-full w-full object-cover object-right"
+                     onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">
+                <span class="absolute left-1.5 top-1.5 rounded-md bg-slate-900/75 px-1.5 py-0.5 text-[9px] font-bold text-white">#${index + 1}</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[9.5px] font-bold ${isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-200 text-slate-600'}">
+                    ${isActive ? '● Activo en Tienda' : '○ Oculto'}
+                  </span>
+                  ${slide.eyebrow ? `<span class="inline-flex items-center rounded-full bg-[#FFF5EE] px-2 py-0.5 text-[9.5px] font-bold text-[#F36F21]">${escapeHtml(slide.eyebrow)}</span>` : ''}
+                </div>
+                <h4 class="text-xs sm:text-[13px] font-extrabold text-slate-900 truncate">
+                  ${escapeHtml(slide.title || '')}
+                  ${slide.titleHighlight ? `<span class="text-[#F36F21]"> ${escapeHtml(slide.titleHighlight)}</span>` : ''}
+                </h4>
+                <p class="text-[10.5px] text-slate-500 line-clamp-1 mt-0.5">${escapeHtml(slide.subtitle || '')}</p>
+                <div class="mt-1.5 flex flex-wrap items-center gap-2 text-[9.5px] text-slate-500 font-semibold">
+                  <span class="rounded bg-slate-100 px-1.5 py-0.5">CTA 1: <strong class="text-slate-800">${escapeHtml(slide.ctaLabel || 'Ver más')}</strong> (${escapeHtml(slide.ctaHref || '/store')})</span>
+                  ${slide.secondaryCtaLabel ? `<span class="rounded bg-slate-100 px-1.5 py-0.5">CTA 2: <strong class="text-slate-800">${escapeHtml(slide.secondaryCtaLabel)}</strong> (${escapeHtml(slide.secondaryCtaHref || '/categories/salud')})</span>` : ''}
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-end gap-1.5 shrink-0 border-t md:border-t-0 pt-2.5 md:pt-0 border-slate-100">
+              <button onclick="moveSlide('${slide.id}', -1)" ${index === 0 ? 'disabled' : ''}
+                      class="h-8 w-8 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold hover:bg-slate-50 disabled:opacity-35 transition" title="Subir orden">↑</button>
+              <button onclick="moveSlide('${slide.id}', 1)" ${index === sortedAll.length - 1 ? 'disabled' : ''}
+                      class="h-8 w-8 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold hover:bg-slate-50 disabled:opacity-35 transition" title="Bajar orden">↓</button>
+              <button onclick="toggleSlideActive('${slide.id}')"
+                      class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-[10.5px] font-bold hover:bg-slate-50 transition">
+                ${isActive ? 'Ocultar' : 'Activar'}
+              </button>
+              <button onclick="openSlideEditor('${slide.id}')"
+                      class="px-3 py-1.5 rounded-xl bg-[#FFF5EE] text-[#F36F21] text-[10.5px] font-bold hover:bg-[#ffe4d1] transition">
+                Editar
+              </button>
+              <button onclick="confirmDeleteSlide('${slide.id}')"
+                      class="px-2.5 py-1.5 rounded-xl bg-rose-50 text-rose-600 text-[10.5px] font-bold hover:bg-rose-100 transition">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function persistCarouselSlides(nextSlides, successMessage) {
+      const normalized = nextSlides
+        .map((s, idx) => ({
+          ...s,
+          order: (idx + 1) * 10
+        }));
+
+      try {
+        // Ensure we have store and regions loaded
+        if (!allStore?.id) {
+          const storeRes = await apiFetch('/admin/stores?limit=1');
+          if (storeRes.ok) {
+            const storeData = await storeRes.json();
+            allStore = storeData.stores?.[0] || null;
+          }
+        }
+        if (!allRegions.length) {
+          const regRes = await apiFetch('/admin/regions?limit=10');
+          if (regRes.ok) {
+            const regData = await regRes.json();
+            allRegions = regData.regions || [];
+          }
+        }
+
+        const requests = [];
+        if (allStore?.id) {
+          requests.push(
+            apiFetch(`/admin/stores/${allStore.id}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                metadata: {
+                  ...(allStore.metadata || {}),
+                  fancypets_hero_slides: normalized
+                }
+              })
+            })
+          );
+        }
+
+        for (const region of allRegions) {
+          requests.push(
+            apiFetch(`/admin/regions/${region.id}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                metadata: {
+                  ...(region.metadata || {}),
+                  fancypets_hero_slides: normalized
+                }
+              })
+            })
+          );
+        }
+
+        const results = await Promise.all(requests);
+        const anyFailed = results.some((r) => !r.ok);
+        if (anyFailed) {
+          showToast('No se pudieron sincronizar todos los cambios con Medusa.', 'error');
+          return false;
+        }
+
+        allCarouselSlides = normalized;
+        if (allStore) {
+          allStore.metadata = { ...(allStore.metadata || {}), fancypets_hero_slides: normalized };
+        }
+        allRegions = allRegions.map((r) => ({
+          ...r,
+          metadata: { ...(r.metadata || {}), fancypets_hero_slides: normalized }
+        }));
+
+        renderCarouselsView();
+        showToast(successMessage || 'Carrusel actualizado y publicado en la tienda.');
+        return true;
+      } catch (err) {
+        console.error(err);
+        showToast('Error de conexión al guardar el carrusel.', 'error');
+        return false;
+      }
+    }
+
+    function selectSlidePresetImage(url) {
+      const input = document.getElementById('slideImageDesktop');
+      if (input) {
+        input.value = url;
+        updateSlideModalPreview(url);
+      }
+    }
+
+    function updateSlideModalPreview(url) {
+      const img = document.getElementById('slideModalImagePreview');
+      if (img) {
+        img.src = url || '/hero/hero-pets-bienestar.jpg';
+      }
+    }
+
+    function buildSlideFormHtml(slide, isNew) {
+      const s = slide || {
+        id: '',
+        eyebrow: 'Cuidado de tu mascota',
+        title: 'Bienestar todos los',
+        titleHighlight: 'días',
+        subtitle: 'Productos seleccionados para acompañar a tu mascota en cada etapa.',
+        ctaLabel: 'Ver alimentos',
+        ctaHref: '/categories/alimentos',
+        secondaryCtaLabel: 'Ver cuidados',
+        secondaryCtaHref: '/categories/salud',
+        imageDesktop: '/hero/hero-pets-bienestar.jpg',
+        imageAlt: 'Mascotas felices en Fancy Pets',
+        active: true
+      };
+
+      const presetsHtml = CAROUSEL_IMAGE_PRESETS.map((p) => `
+        <button type="button" onclick="selectSlidePresetImage('${p.url}')"
+                class="px-2 py-1 rounded-lg border border-slate-200 bg-white hover:border-[#F36F21] hover:text-[#F36F21] text-[10px] font-bold text-slate-600 transition">
+          ${escapeHtml(p.label)}
+        </button>
+      `).join('');
+
+      return `
+        <div class="space-y-3">
+          <div class="relative h-28 w-full overflow-hidden rounded-xl border border-[#F2D5B3] bg-[#FCEBD7]">
+            <img id="slideModalImagePreview" src="${escapeHtml(s.imageDesktop || '/hero/hero-pets-bienestar.jpg')}"
+                 alt="Vista previa" class="h-full w-full object-cover object-right"
+                 onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">
+            <span class="absolute left-2.5 top-2.5 rounded-full bg-white/90 px-2.5 py-0.5 text-[9.5px] font-bold text-[#D97706] shadow-2xs">
+              Vista previa de imagen
+            </span>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-700 mb-1">Imagen del Banner (URL o ruta local)</label>
+            <input id="slideImageDesktop" type="text" value="${escapeHtml(s.imageDesktop || '')}"
+                   oninput="updateSlideModalPreview(this.value)"
+                   placeholder="/hero/hero-pets-bienestar.jpg"
+                   class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#F36F21]/30 focus:border-[#F36F21]">
+            <div class="mt-1.5 flex flex-wrap items-center gap-1">
+              <span class="text-[9.5px] font-bold text-slate-400 mr-1">Fondos rápidos:</span>
+              ${presetsHtml}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Etiqueta superior (Eyebrow)</label>
+              <input id="slideEyebrow" type="text" value="${escapeHtml(s.eyebrow || '')}"
+                     placeholder="Cuidado de tu mascota"
+                     class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Estado</label>
+              <select id="slideActive" class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+                <option value="true" ${s.active !== false ? 'selected' : ''}>Activo (Visible en Tienda)</option>
+                <option value="false" ${s.active === false ? 'selected' : ''}>Oculto (Borrador)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Título principal (Verde oscuro)</label>
+              <input id="slideTitle" type="text" value="${escapeHtml(s.title || '')}"
+                     placeholder="Bienestar todos los"
+                     class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Palabra destacada (Naranja + curva)</label>
+              <input id="slideTitleHighlight" type="text" value="${escapeHtml(s.titleHighlight || '')}"
+                     placeholder="días"
+                     class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-700 mb-1">Subtítulo descriptivo</label>
+            <textarea id="slideSubtitle" rows="2"
+                      placeholder="Productos seleccionados para acompañar a tu mascota en cada etapa."
+                      class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">${escapeHtml(s.subtitle || '')}</textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Texto Botón Principal (Naranja)</label>
+              <input id="slideCtaLabel" type="text" value="${escapeHtml(s.ctaLabel || '')}"
+                     placeholder="Ver alimentos"
+                     class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Enlace Botón Principal</label>
+              <input id="slideCtaHref" type="text" value="${escapeHtml(s.ctaHref || '')}"
+                     placeholder="/categories/alimentos"
+                     class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Texto Botón Secundario (Blanco)</label>
+              <input id="slideSecondaryCtaLabel" type="text" value="${escapeHtml(s.secondaryCtaLabel || '')}"
+                     placeholder="Ver cuidados"
+                     class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1">Enlace Botón Secundario</label>
+              <input id="slideSecondaryCtaHref" type="text" value="${escapeHtml(s.secondaryCtaHref || '')}"
+                     placeholder="/categories/salud"
+                     class="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900">
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button type="button" onclick="closeModal()" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 text-[11px] font-bold hover:bg-slate-50 transition">
+              Cancelar
+            </button>
+            <button type="button" id="saveSlideModalBtn" onclick="saveSlide('${isNew ? '' : s.id}')"
+                    class="px-4 py-2 rounded-xl bg-[#F36F21] text-white text-[11px] font-bold hover:bg-[#e05e10] transition shadow-sm">
+              ${isNew ? 'Crear slide' : 'Guardar cambios'}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function openCreateSlide() {
+      openModal('Nuevo slide de carrusel', buildSlideFormHtml(null, true));
+    }
+
+    function openSlideEditor(slideId) {
+      const slide = allCarouselSlides.find((s) => s.id === slideId);
+      if (!slide) {
+        showToast('Slide no encontrado.', 'error');
+        return;
+      }
+      openModal(`Editar slide: ${slide.title || slide.id}`, buildSlideFormHtml(slide, false));
+    }
+
+    async function saveSlide(existingId) {
+      const title = document.getElementById('slideTitle')?.value.trim() || '';
+      const titleHighlight = document.getElementById('slideTitleHighlight')?.value.trim() || '';
+      const eyebrow = document.getElementById('slideEyebrow')?.value.trim() || '';
+      const subtitle = document.getElementById('slideSubtitle')?.value.trim() || '';
+      const ctaLabel = document.getElementById('slideCtaLabel')?.value.trim() || 'Explorar productos';
+      const ctaHref = document.getElementById('slideCtaHref')?.value.trim() || '/store';
+      const secondaryCtaLabel = document.getElementById('slideSecondaryCtaLabel')?.value.trim() || '';
+      const secondaryCtaHref = document.getElementById('slideSecondaryCtaHref')?.value.trim() || '/categories/salud';
+      const imageDesktop = document.getElementById('slideImageDesktop')?.value.trim() || '/hero/hero-pets-bienestar.jpg';
+      const active = document.getElementById('slideActive')?.value !== 'false';
+
+      if (!title) {
+        showToast('El título principal es obligatorio.', 'error');
+        return;
+      }
+
+      const sorted = [...allCarouselSlides].sort((a, b) => (a.order || 0) - (b.order || 0));
+      let nextSlides;
+      if (existingId) {
+        nextSlides = sorted.map((s) =>
+          s.id === existingId
+            ? {
+                ...s,
+                eyebrow,
+                title,
+                titleHighlight,
+                subtitle,
+                ctaLabel,
+                ctaHref,
+                secondaryCtaLabel,
+                secondaryCtaHref,
+                imageDesktop,
+                imageMobile: imageDesktop,
+                imageAlt: `${title} ${titleHighlight}`.trim(),
+                active
+              }
+            : s
+        );
+      } else {
+        const newId = `slide-${Date.now()}`;
+        nextSlides = [
+          ...sorted,
+          {
+            id: newId,
+            eyebrow,
+            title,
+            titleHighlight,
+            subtitle,
+            ctaLabel,
+            ctaHref,
+            secondaryCtaLabel,
+            secondaryCtaHref,
+            imageDesktop,
+            imageMobile: imageDesktop,
+            imageAlt: `${title} ${titleHighlight}`.trim(),
+            active,
+            order: (sorted.length + 1) * 10
+          }
+        ];
+      }
+
+      const ok = await persistCarouselSlides(
+        nextSlides,
+        existingId ? 'Slide actualizado en la tienda.' : 'Nuevo slide agregado al carrusel.'
+      );
+      if (ok) closeModal();
+    }
+
+    async function moveSlide(slideId, direction) {
+      const sorted = [...allCarouselSlides].sort((a, b) => (a.order || 0) - (b.order || 0));
+      const idx = sorted.findIndex((s) => s.id === slideId);
+      if (idx === -1) return;
+      const targetIdx = idx + direction;
+      if (targetIdx < 0 || targetIdx >= sorted.length) return;
+      const temp = sorted[idx];
+      sorted[idx] = sorted[targetIdx];
+      sorted[targetIdx] = temp;
+      await persistCarouselSlides(sorted, 'Orden del carrusel actualizado.');
+    }
+
+    async function toggleSlideActive(slideId) {
+      const sorted = [...allCarouselSlides].sort((a, b) => (a.order || 0) - (b.order || 0));
+      const nextSlides = sorted.map((s) =>
+        s.id === slideId ? { ...s, active: s.active === false } : s
+      );
+      await persistCarouselSlides(nextSlides, 'Visibilidad del slide actualizada.');
+    }
+
+    function confirmDeleteSlide(slideId) {
+      const slide = allCarouselSlides.find((s) => s.id === slideId);
+      if (!slide) return;
+      openModal('Eliminar slide', `
+        <div class="space-y-3">
+          <p class="text-xs text-slate-600">
+            ¿Estás seguro de eliminar el slide <strong class="text-slate-900">${escapeHtml(slide.title)} ${escapeHtml(slide.titleHighlight || '')}</strong>?
+          </p>
+          <div class="flex justify-end gap-2 pt-2">
+            <button onclick="closeModal()" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-[11px] font-bold hover:bg-slate-50">Cancelar</button>
+            <button onclick="deleteSlide('${slide.id}')" class="px-3.5 py-1.5 rounded-xl bg-rose-600 text-white text-[11px] font-bold hover:bg-rose-700">Sí, eliminar</button>
+          </div>
+        </div>
+      `);
+    }
+
+    async function deleteSlide(slideId) {
+      const nextSlides = allCarouselSlides.filter((s) => s.id !== slideId);
+      const ok = await persistCarouselSlides(nextSlides, 'Slide eliminado del carrusel.');
+      if (ok) closeModal();
+    }
+
+    async function restoreDefaultSlides() {
+      const defaults = DEFAULT_CAROUSEL_SLIDES.map((s) => ({ ...s }));
+      await persistCarouselSlides(defaults, 'Slides predeterminados restaurados en la tienda.');
     }
 
   </script>

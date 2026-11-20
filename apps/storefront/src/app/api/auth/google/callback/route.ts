@@ -1,23 +1,54 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getMedusaAuthConfig, resolveStorefrontOrigin } from "@lib/auth/google-config"
 import { setAuthToken } from "@lib/data/cookies"
+import { transferCart } from "@lib/data/customer"
+
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  const parts = token.split(".")
+  if (parts.length !== 3) {
+    return null
+  }
+  try {
+    return JSON.parse(Buffer.from(parts[1], "base64url").toString("utf-8"))
+  } catch {
+    try {
+      return JSON.parse(Buffer.from(parts[1], "base64").toString("utf-8"))
+    } catch {
+      return null
+    }
+  }
+}
+
+function buildStoreHeaders(token: string, publishableKey: string): Record<string, string> {
+  return {
+    "Content-Type": "application/json",
+    authorization: `Bearer ${token}`,
+    ...(publishableKey ? { "x-publishable-api-key": publishableKey } : {}),
+  }
+}
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams
   const code = searchParams.get("code")
   const state = searchParams.get("state")
+  const oauthError = searchParams.get("error")
   const countryCode = "pe"
+  const origin = resolveStorefrontOrigin(req)
+  const { backendUrl, publishableKey } = getMedusaAuthConfig()
 
-  if (!code) {
-    return NextResponse.redirect(new URL(`/${countryCode}/account?error=missing_code`, req.url))
+  if (oauthError) {
+    return NextResponse.redirect(
+      new URL(`/${countryCode}?login=true&auth_error=google_cancelled`, origin)
+    )
   }
 
-  const backendUrl =
-    process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ||
-    process.env.MEDUSA_BACKEND_URL ||
-    "http://localhost:9000"
+  if (!code) {
+    return NextResponse.redirect(
+      new URL(`/${countryCode}?login=true&auth_error=google_failed`, origin)
+    )
+  }
 
   try {
-    // 1. Validate callback with Medusa backend
     const callbackEndpoint = `${backendUrl}/auth/customer/google/callback?code=${encodeURIComponent(
       code
     )}${state ? `&state=${encodeURIComponent(state)}` : ""}`
@@ -31,67 +62,78 @@ export async function GET(req: NextRequest) {
     if (!res.ok) {
       const errText = await res.text()
       console.error("[Google Auth Callback] Error validating with backend:", errText)
-      return NextResponse.redirect(new URL(`/${countryCode}/account?error=auth_failed`, req.url))
+      return NextResponse.redirect(
+        new URL(`/${countryCode}?login=true&auth_error=google_failed`, origin)
+      )
     }
 
-    const { token } = await res.json()
-    if (!token) {
-      return NextResponse.redirect(new URL(`/${countryCode}/account?error=no_token`, req.url))
+    const data = await res.json()
+    const initialToken: unknown = data?.token
+    if (typeof initialToken !== "string" || !initialToken) {
+      return NextResponse.redirect(
+        new URL(`/${countryCode}?login=true&auth_error=google_failed`, origin)
+      )
     }
+    let activeToken: string = initialToken
 
-    // 2. Set Medusa JWT auth cookie
-    await setAuthToken(token)
+    const customerRes = await fetch(`${backendUrl}/store/customers/me`, {
+      method: "GET",
+      headers: buildStoreHeaders(activeToken, publishableKey),
+      cache: "no-store",
+    })
 
-    // 3. Ensure customer record exists in Customer Module
-    try {
-      const customerRes = await fetch(`${backendUrl}/store/customers/me`, {
-        method: "GET",
-        headers: {
-          authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        cache: "no-store",
-      })
+    if (!customerRes.ok) {
+      const payload = decodeJwtPayload(activeToken)
+      const userMeta = (payload?.user_metadata as Record<string, string> | undefined) || {}
+      const email = userMeta.email?.trim()
+      const fullName = userMeta.name?.trim() || ""
+      const nameParts = fullName ? fullName.split(/\s+/) : []
+      const firstName = userMeta.given_name?.trim() || nameParts[0] || "Cliente"
+      const lastName = userMeta.family_name?.trim() || nameParts.slice(1).join(" ")
 
-      if (!customerRes.ok) {
-        // First-time login: create customer in Medusa database using token user_metadata
-        const parts = token.split(".")
-        let userMeta: Record<string, string> = {}
-        if (parts.length === 3) {
-          try {
-            const payload = JSON.parse(Buffer.from(parts[1], "base64").toString("utf-8"))
-            userMeta = payload.user_metadata || {}
-          } catch {
-            // ignore decode failure
+      if (email) {
+        const createRes = await fetch(`${backendUrl}/store/customers`, {
+          method: "POST",
+          headers: buildStoreHeaders(activeToken, publishableKey),
+          body: JSON.stringify({
+            email,
+            first_name: firstName,
+            last_name: lastName,
+          }),
+        })
+
+        if (!createRes.ok) {
+          const createErr = await createRes.text()
+          console.warn("[Google Auth Callback] Profile create note:", createErr)
+        }
+
+        const refreshRes = await fetch(`${backendUrl}/auth/token/refresh`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${activeToken}`,
+          },
+          cache: "no-store",
+        })
+
+        if (refreshRes.ok) {
+          const refreshed = await refreshRes.json()
+          if (refreshed?.token) {
+            activeToken = refreshed.token
           }
         }
-
-        if (userMeta.email) {
-          await fetch(`${backendUrl}/store/customers`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              email: userMeta.email,
-              first_name: userMeta.given_name || userMeta.name || "Cliente",
-              last_name: userMeta.family_name || "",
-            }),
-          }).catch((err) => {
-            console.warn("[Google Auth Callback] Profile create warning:", err.message)
-          })
-        }
       }
-    } catch (profileErr: unknown) {
-      const msg = profileErr instanceof Error ? profileErr.message : "Profile check error"
-      console.warn("[Google Auth Callback] Profile sync note:", msg)
     }
 
-    return NextResponse.redirect(new URL(`/${countryCode}/account`, req.url))
+    await setAuthToken(activeToken)
+    await transferCart().catch(() => undefined)
+
+    return NextResponse.redirect(new URL(`/${countryCode}/account`, origin))
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Unexpected callback error"
     console.error("[Google Auth Callback] Unexpected error:", msg)
-    return NextResponse.redirect(new URL(`/${countryCode}/account?error=unexpected`, req.url))
+    return NextResponse.redirect(
+      new URL(`/${countryCode}?login=true&auth_error=google_failed`, origin)
+    )
   }
 }

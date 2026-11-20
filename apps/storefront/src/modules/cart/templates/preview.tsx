@@ -25,7 +25,7 @@ const ItemsPreviewTemplate = ({ cart }: ItemsTemplateProps) => {
       <Table>
         <Table.Body data-testid="items-table">
           {items
-            ? items
+            ? [...items]
                 .sort((a, b) => {
                   return (a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1
                 })

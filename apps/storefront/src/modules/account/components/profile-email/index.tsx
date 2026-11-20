@@ -28,14 +28,14 @@ import { t } from "@lib/i18n/translations"
 const ProfileEmail = ({ customer }: { customer: HttpTypes.StoreCustomer }) => {
   return (
     <div className="text-small-regular" data-testid="account-email-editor">
-      <div className="flex items-end justify-between gap-4">
-        <div className="flex flex-col min-w-0">
-          <span className="uppercase text-ui-fg-base">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-y-1 min-w-0">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             {t("account.profile.section.email")}
           </span>
-          <div className="flex items-center flex-1 basis-0 justify-end gap-x-4 min-w-0">
+          <div className="flex items-center min-w-0">
             <span
-              className="font-semibold truncate"
+              className="text-base font-semibold text-[#0F352E] truncate"
               data-testid="current-info"
               data-value={customer.email}
             >
@@ -44,10 +44,10 @@ const ProfileEmail = ({ customer }: { customer: HttpTypes.StoreCustomer }) => {
           </div>
         </div>
       </div>
-      <p className="text-base-regular text-fg-base mt-2" data-testid="email-readonly-note">
+      <p className="text-sm text-slate-600 mt-3" data-testid="email-readonly-note">
         {t("account.profile.email.readonlyNote")}
       </p>
-      <p className="txt-compact-small text-ui-fg-muted mt-1">{t("account.profile.email.hint")}</p>
+      <p className="text-xs text-slate-500 mt-1">{t("account.profile.email.hint")}</p>
     </div>
   )
 }

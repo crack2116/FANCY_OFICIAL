@@ -61,12 +61,17 @@ const AccountInfo = ({
 
   return (
     <div className="text-small-regular" data-testid={dataTestid}>
-      <div className="flex items-end justify-between gap-4">
-        <div className="flex flex-col min-w-0">
-          <span className="uppercase text-ui-fg-base">{label}</span>
-          <div className="flex items-center flex-1 basis-0 justify-end gap-x-4 min-w-0">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-y-1 min-w-0">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            {label}
+          </span>
+          <div className="flex items-center min-w-0">
             {typeof currentInfo === "string" ? (
-              <span className="font-semibold truncate" data-testid="current-info">
+              <span
+                className="text-base font-semibold text-[#0F352E] truncate"
+                data-testid="current-info"
+              >
                 {currentInfo}
               </span>
             ) : (

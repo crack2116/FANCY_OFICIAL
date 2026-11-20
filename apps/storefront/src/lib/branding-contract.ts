@@ -69,7 +69,7 @@ export const DEFAULT_BRANDING: BrandingColors = {
 export const DEFAULT_ANNOUNCEMENT_ENABLED = true
 export const DEFAULT_ANNOUNCEMENT_MESSAGES = [
   "Bienvenido a nuestra tienda",
-  "Envíos a todo el Perú",
+  "Envíos en Piura",
 ]
 
 /**

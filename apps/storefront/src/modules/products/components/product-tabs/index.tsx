@@ -34,7 +34,7 @@ const ProductTabs = ({ product }: { product: HttpTypes.StoreProduct }) => {
   ]
 
   return (
-    <div className="w-full rounded-2xl border border-[#eadfce] bg-white p-5 shadow-[var(--shadow-card)]">
+    <div className="w-full">
       <Accordion type="multiple">
         {tabs.map((tab) => (
           <Accordion.Item
@@ -78,7 +78,11 @@ const DetailsTab = ({ product }: { product: HttpTypes.StoreProduct }) => {
     { label: t("product.detailsType"), value: product.type?.value },
     {
       label: t("product.detailsWeight"),
-      value: product.weight ? `${product.weight} g` : null,
+      value: product.weight
+        ? product.weight >= 1000
+          ? `${Number((product.weight / 1000).toFixed(2))} kg`
+          : `${product.weight} g`
+        : null,
     },
     {
       label: t("product.detailsDimensions"),

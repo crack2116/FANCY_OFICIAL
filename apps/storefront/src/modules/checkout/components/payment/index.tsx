@@ -9,7 +9,6 @@ import ErrorMessage from "@modules/checkout/components/error-message"
 import PaymentContainer, {
   StripePaymentContainer,
 } from "@modules/checkout/components/payment-container"
-import Divider from "@modules/common/components/divider"
 import {
   Button,
   Container,
@@ -113,35 +112,56 @@ const Payment = ({
   }, [isOpen])
 
   return (
-    <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
-          className={clx(
-            "flex flex-row text-3xl-regular gap-x-2 items-baseline",
-            {
-              "opacity-50 pointer-events-none select-none":
-                !isOpen && !paymentReady,
-            }
-          )}
-        >
-          {t("checkout.payment")}
-          {!isOpen && paymentReady && <CheckCircleSolid />}
-        </Heading>
+    <div
+      className={clx(
+        "rounded-2xl border bg-white p-5 sm:p-7 shadow-xs transition-all",
+        isOpen ? "border-[#0F352E]/30 ring-1 ring-[#0F352E]/10" : "border-[#E7E5DF]"
+      )}
+    >
+      <div className="flex flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <span
+            className={clx(
+              "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+              !isOpen && paymentReady
+                ? "bg-[#0F352E] text-white"
+                : isOpen
+                  ? "bg-[#F36F21] text-white"
+                  : "bg-[#EFECE6] text-[#6B7280]"
+            )}
+          >
+            3
+          </span>
+          <Heading
+            level="h2"
+            className={clx(
+              "flex flex-row text-xl sm:text-2xl font-bold tracking-tight gap-x-2 items-center",
+              !isOpen && !paymentReady
+                ? "text-[#9CA3AF] pointer-events-none select-none"
+                : "text-[#0F352E]"
+            )}
+          >
+            <span>{t("checkout.payment")}</span>
+            {!isOpen && paymentReady && (
+              <CheckCircleSolid className="h-5 w-5 text-[#0F352E] shrink-0" />
+            )}
+          </Heading>
+        </div>
         {!isOpen && paymentReady && (
-          <Text>
+          <Text className="shrink-0">
             <button
+              type="button"
               onClick={handleEdit}
-              className="text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+              className="text-sm font-semibold text-[#F36F21] hover:text-[#D95D14] transition-colors"
               data-testid="edit-payment-button"
             >
-              {t("common.edit")}
+              {t("checkout.delivery.edit")}
             </button>
           </Text>
         )}
       </div>
       <div>
-        <div className={isOpen ? "block" : "hidden"}>
+        <div className={isOpen ? "block mt-6" : "hidden"}>
           {!paidByGiftcard && availablePaymentMethods?.length && (
             <>
               <RadioGroup
@@ -172,12 +192,12 @@ const Payment = ({
           )}
 
           {paidByGiftcard && (
-            <div className="flex flex-col w-1/3">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
+            <div className="flex flex-col">
+              <Text className="text-xs font-semibold uppercase tracking-wider text-[#6B7280] mb-1">
                 {t("checkout.payment.method")}
               </Text>
               <Text
-                className="txt-medium text-ui-fg-subtle"
+                className="text-sm text-[#4B5563]"
                 data-testid="payment-method-summary"
               >
                 {t("checkout.payment.methodGiftCard")}
@@ -192,7 +212,7 @@ const Payment = ({
 
           <Button
             size="large"
-            className="mt-6"
+            className="mt-6 h-11 rounded-xl !bg-[#0F352E] hover:!bg-[#164A40] px-6 font-semibold text-white shadow-xs"
             onClick={handleSubmit}
             isLoading={isLoading}
             disabled={
@@ -209,28 +229,28 @@ const Payment = ({
 
         <div className={isOpen ? "hidden" : "block"}>
           {cart && paymentReady && activeSession ? (
-            <div className="flex items-start gap-x-1 w-full">
-              <div className="flex flex-col w-1/3">
-                <Text className="txt-medium-plus text-ui-fg-base mb-1">
+            <div className="mt-5 pt-5 border-t border-[#EFECE6] grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
+              <div className="flex flex-col min-w-0">
+                <Text className="text-xs font-semibold uppercase tracking-wider text-[#6B7280] mb-1.5">
                   {t("checkout.payment.method")}
                 </Text>
                 <Text
-                  className="txt-medium text-ui-fg-subtle"
+                  className="text-sm font-medium text-[#111827] break-words"
                   data-testid="payment-method-summary"
                 >
                   {paymentInfoMap[activeSession?.provider_id]?.title ||
                     activeSession?.provider_id}
                 </Text>
               </div>
-              <div className="flex flex-col w-1/3">
-                <Text className="txt-medium-plus text-ui-fg-base mb-1">
+              <div className="flex flex-col min-w-0">
+                <Text className="text-xs font-semibold uppercase tracking-wider text-[#6B7280] mb-1.5">
                   {t("checkout.payment.details")}
                 </Text>
                 <div
-                  className="flex gap-2 txt-medium text-ui-fg-subtle items-center"
+                  className="flex gap-2 text-sm text-[#4B5563] items-center"
                   data-testid="payment-details-summary"
                 >
-                  <Container className="flex items-center h-7 w-fit p-2 bg-ui-button-neutral-hover">
+                  <Container className="flex items-center h-8 w-fit px-2.5 bg-[#FAF8F4] border border-[#E7E5DF] rounded-lg">
                     {paymentInfoMap[selectedPaymentMethod]?.icon || (
                       <CreditCard />
                     )}
@@ -240,12 +260,12 @@ const Payment = ({
               </div>
             </div>
           ) : paidByGiftcard ? (
-            <div className="flex flex-col w-1/3">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
+            <div className="mt-5 pt-5 border-t border-[#EFECE6] flex flex-col">
+              <Text className="text-xs font-semibold uppercase tracking-wider text-[#6B7280] mb-1.5">
                 {t("checkout.payment.method")}
               </Text>
               <Text
-                className="txt-medium text-ui-fg-subtle"
+                className="text-sm text-[#4B5563]"
                 data-testid="payment-method-summary"
               >
                 {t("checkout.payment.methodGiftCard")}
@@ -254,7 +274,6 @@ const Payment = ({
           ) : null}
         </div>
       </div>
-      <Divider className="mt-8" />
     </div>
   )
 }

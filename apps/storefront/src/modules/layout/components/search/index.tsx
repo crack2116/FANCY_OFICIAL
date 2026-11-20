@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { MagnifyingGlass } from "@medusajs/icons"
 import type { SearchClient } from "instantsearch.js"
@@ -23,14 +23,6 @@ import SearchDrawer from "./drawer"
 import SearchHit, { type ProductHit } from "./hit"
 
 const HITS_PER_PAGE = 8
-
-/**
- * Debounce for the typeahead.
- *
- * A request per keystroke would hit the search endpoint once per character and
- * spend most of its time discarding answers. 250ms is below the threshold where a
- * person notices lag while typing, and above the cost of a single request.
- */
 const DEBOUNCE_MS = 250
 
 const SearchInput = ({
@@ -49,9 +41,6 @@ const SearchInput = ({
       value={value}
       onChange={(event) => onChange(event.target.value)}
       onKeyDown={(event) => {
-        // Enter always lands on the results page. Without this, a query that
-        // matches no suggestion would be a dead end, because there is nothing
-        // left to click.
         if (event.key === "Enter") {
           event.preventDefault()
           onSubmit(value)
@@ -88,11 +77,6 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
-  /**
-   * The live search query, sanitised the same way the results page reads `?q=`.
-   * Below `MIN_SEARCH_LENGTH` this is "", which is what stops one letter from
-   * dumping the catalogue into the panel.
-   */
   const effectiveQuery = useMemo(() => normaliseQuery(query), [query])
   const isSearchable = effectiveQuery.length > 0
   const isPending = inputValue.trim() !== effectiveQuery
@@ -110,10 +94,6 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
         return
       }
 
-      // Too short to search: drop back to an empty query instead of sending one.
-      // The adapter treats an empty query as a placeholder search, so this costs
-      // at most one request when the shopper deletes back to a single character —
-      // far cheaper than a request per keystroke.
       refine("")
     },
     [refine]
@@ -158,8 +138,6 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
     }
 
     if (status === "error") {
-      // No error detail is rendered: the message can carry a Medusa payload or a
-      // stack trace, neither of which a shopper can act on.
       return (
         <Text
           className="px-4 py-6 text-center text-danger-700"
@@ -237,34 +215,30 @@ const Search = () => {
         type="button"
         onClick={open}
         aria-label={t("header.openSearch")}
-        className="-mr-2 flex h-11 w-11 items-center justify-center rounded-md text-fg-subtle transition-colors hover:bg-surface-subtle hover:text-fg-base small:hidden"
+        className="-mr-2 flex h-10 w-10 items-center justify-center rounded-full text-fg-subtle transition-colors hover:bg-slate-100 hover:text-fg-base small:hidden"
         data-testid="nav-search-button-mobile"
       >
         <MagnifyingGlass />
       </button>
 
-      {/* Desktop: prominent field that opens the same search panel.
-
-          42px and fully rounded are both measured from the live store, which
-          sets `--wd-form-height: 42px` and `--wd-form-brd-radius: 30px`. On a
-          42px-tall box a 30px radius IS a pill, so `rounded-full` is the same
-          shape expressed in the token this codebase already uses. `bg-surface`
-          is white, matching the field on the reference rather than the greyed
-          fill this used to carry — a grey field on a yellow band read as a
-          disabled control.
-
-          Width is NOT set here. The wrapper in `templates/nav` owns the
-          max-width, so the field grows into the space between the logo and the
-          action icons and stops at the measured ceiling. */}
+      {/* Desktop: wide rounded-full pill search bar with right solid orange circular button */}
       <button
         type="button"
         onClick={open}
         aria-label={t("header.openSearch")}
-        className="hidden h-11 w-full items-center gap-3 rounded-full border border-[var(--border-subtle)] bg-white px-5 text-left text-sm text-fg-muted shadow-[0_1px_0_rgba(61,46,28,0.04)] transition-all hover:border-brand-300 hover:bg-white hover:shadow-[0_6px_18px_-14px_rgba(61,46,28,0.35)] small:flex"
+        className="group hidden h-12 w-full items-center gap-3 rounded-full border border-slate-200/80 bg-[#F3F5F8] pl-5 pr-1.5 text-left text-sm text-slate-500 shadow-[inset_0_1px_2px_rgba(15,23,42,0.04)] transition-all hover:border-slate-300 hover:bg-[#EDF0F5] small:flex"
         data-testid="nav-search-button"
       >
-        <MagnifyingGlass />
-        <span className="flex-1">{t("header.searchPlaceholder")}</span>
+        <MagnifyingGlass className="h-4 w-4 shrink-0 text-slate-500" />
+        <span className="flex-1 truncate text-[13.5px] text-slate-500">
+          {t("header.searchPlaceholder")}
+        </span>
+        <span
+          aria-hidden="true"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F36F21] text-white shadow-sm transition-transform group-hover:scale-105 group-hover:bg-[#E05E10]"
+        >
+          <MagnifyingGlass className="h-4 w-4" />
+        </span>
       </button>
 
       <SearchDrawer isOpen={isOpen} close={close}>

@@ -1,5 +1,7 @@
 import { siteConfig } from "@lib/site-config"
 import { t } from "@lib/i18n/translations"
+import { LockClosedSolid } from "@medusajs/icons"
+import { FancyPetsLogo } from "@modules/common/components/fancy-pets-logo"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
 
@@ -9,32 +11,35 @@ export default function CheckoutLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="relative w-full bg-surface small:min-h-screen">
-      <div className="h-16 border-b border-[var(--border-subtle)] bg-surface">
-        <nav className="site-container flex h-full items-center justify-between">
+    <div className="relative w-full min-h-screen bg-[#FAF8F4]">
+      <div className="h-[72px] border-b border-[#E7E5DF] bg-white/95 backdrop-blur sticky top-0 z-30">
+        <nav className="site-container flex h-full items-center justify-between gap-3">
           <LocalizedClientLink
             href="/cart"
-            className="flex flex-1 basis-0 items-center gap-x-2 text-small-semi text-ui-fg-base"
+            className="flex flex-1 basis-0 items-center gap-x-1.5 text-sm font-medium text-[#0F352E] hover:text-[#F36F21] transition-colors"
             data-testid="back-to-cart-link"
           >
-            <ChevronDown className="rotate-90" size={16} />
-            <span className="txt-compact-plus mt-px hidden text-ui-fg-subtle hover:text-ui-fg-base small:block">
-              {t("checkout.backToCart")}
-            </span>
-            <span className="txt-compact-plus mt-px block text-ui-fg-subtle hover:text-ui-fg-base small:hidden">
-              {t("checkout.back")}
-            </span>
+            <ChevronDown className="rotate-90 shrink-0" size={16} />
+            <span className="hidden small:block">{t("checkout.backToCart")}</span>
+            <span className="block small:hidden">{t("checkout.back")}</span>
           </LocalizedClientLink>
 
           <LocalizedClientLink
             href="/"
-            className="text-lg font-bold tracking-tight text-fg-base transition-colors hover:text-brand-700"
+            className="flex shrink-0 items-center transition-opacity hover:opacity-90"
             data-testid="store-link"
+            aria-label={t("nav.home")}
           >
-            {siteConfig.name}
+            <span className="sr-only">{siteConfig.name}</span>
+            <FancyPetsLogo />
           </LocalizedClientLink>
 
-          <div className="flex-1 basis-0" />
+          <div className="flex flex-1 basis-0 items-center justify-end">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FAF8F4] border border-[#E7E5DF] px-3 py-1 text-xs font-medium text-[#0F352E]">
+              <LockClosedSolid className="h-3.5 w-3.5 text-[#0F352E] shrink-0" />
+              <span className="hidden xsmall:inline">{t("checkout.secureBadge")}</span>
+            </span>
+          </div>
         </nav>
       </div>
 

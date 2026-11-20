@@ -52,13 +52,13 @@ export default async function Profile(props: Props) {
 
   return (
     <div className="w-full" data-testid="profile-page-wrapper">
-      <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl font-semibold text-fg-base">{t("account.profile")}</h1>
-        <p className="text-base-regular text-fg-base">{t("account.profile.body")}</p>
+      <div className="mb-6 flex flex-col gap-y-1.5">
+        <h1 className="text-2xl font-bold text-[#0F352E]">{t("account.profile")}</h1>
+        <p className="text-sm text-slate-600">{t("account.profile.body")}</p>
       </div>
-      <div className="flex w-full flex-col gap-y-8">
+      <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-[0_8px_24px_rgba(15,53,46,0.04)] flex w-full flex-col gap-y-6">
         <ProfileDetails customer={customer} />
-        <div className="h-px w-full bg-[var(--border-subtle)]" />
+        <div className="h-px w-full bg-slate-100" />
         <ProfileEmail customer={customer} />
       </div>
     </div>

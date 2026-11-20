@@ -3,7 +3,11 @@ import { HttpTypes } from "@medusajs/types"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import { t } from "@lib/i18n/translations"
 import { getProductPrice } from "@lib/util/get-product-price"
-import { getAvailableOptionValues, isSimpleProduct } from "@lib/util/product"
+import { isSimpleProduct } from "@lib/util/product"
+import {
+  getAvailableOptionValues,
+  resolveOptionDisplayTitle,
+} from "@lib/util/product-options"
 import { Button, clx } from "@modules/common/components/ui"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import X from "@modules/common/icons/x"
@@ -59,11 +63,6 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   }, [price])
 
   const isSimple = isSimpleProduct(product)
-
-  const availableOptionValues = useMemo(
-    () => getAvailableOptionValues(product, options),
-    [product, options]
-  )
 
   return (
     <>
@@ -197,17 +196,28 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                     {(product.variants?.length ?? 0) > 1 ? (
                       <div className="flex flex-col gap-y-6">
                         {(product.options || []).map((option) => {
+                          const availableValues = getAvailableOptionValues(
+                            product,
+                            option
+                          )
+                          if (availableValues.length === 0) {
+                            return null
+                          }
+                          const resolvedTitle = resolveOptionDisplayTitle(
+                            product,
+                            option,
+                            availableValues
+                          )
+
                           return (
                             <div key={option.id}>
                               <OptionSelect
                                 option={option}
+                                values={availableValues}
                                 current={options[option.id]}
                                 updateOption={updateOptions}
-                                title={option.title ?? ""}
+                                title={resolvedTitle}
                                 disabled={optionsDisabled}
-                                availableValues={
-                                  availableOptionValues[option.id]
-                                }
                               />
                             </div>
                           )

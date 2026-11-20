@@ -328,4 +328,43 @@ services:
         limits: { cpus: "1.0", memory: 512M }
         reservations: { memory: 160M }
 
+  # ----------------------------------------------------------------------------
+  # FancyPets animated admin panel (same origin as the API)
+  #  - served at /panel
+  #  - /hero/* provides the images used by the login and carousel editor
+  #  - only /panel and /hero/* are routed here; /auth and /admin keep going
+  #    to fancyperu-backend
+  # ----------------------------------------------------------------------------
+  fancyperu-panel:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - /home/ivan/fancyperu-src/apps/backend/public/panel:/srv/panel:ro
+      - /home/ivan/fancyperu-src/apps/storefront/public/hero:/srv/hero:ro
+      - /home/ivan/fancyperu-src/deploy/dokploy/panel-nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - dokploy-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/panel"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: json-file
+      options: { max-size: "5m", max-file: "2" }
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLE:-true}"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.http.routers.fancyperu-panel.rule=Host(`${API_DOMAIN:?API_DOMAIN is required}`) && (Path(`/panel`) || PathPrefix(`/panel/`) || PathPrefix(`/hero/`))"
+      - "traefik.http.routers.fancyperu-panel.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.fancyperu-panel.tls=${TRAEFIK_TLS:-true}"
+      - "traefik.http.routers.fancyperu-panel.tls.certresolver=${TRAEFIK_CERTRESOLVER-letsencrypt}"
+      - "traefik.http.routers.fancyperu-panel.priority=1000"
+      - "traefik.http.services.fancyperu-panel.loadbalancer.server.port=80"
+    deploy:
+      resources:
+        limits: { cpus: "0.2", memory: 128M }
+        reservations: { memory: 32M }
+
 

@@ -1,9 +1,9 @@
 import { Listbox, Transition } from "@headlessui/react"
+import { t } from "@lib/i18n/translations"
 import { ChevronUpDown } from "@medusajs/icons"
 import { clx } from "@modules/common/components/ui"
 import { Fragment, useMemo } from "react"
 
-import { t } from "@lib/i18n/translations"
 import compareAddresses from "@lib/util/compare-addresses"
 import { HttpTypes } from "@medusajs/types"
 import Radio from "@modules/common/components/radio"

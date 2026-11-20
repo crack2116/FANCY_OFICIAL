@@ -1,5 +1,3 @@
-import type { ReactNode } from "react"
-
 import { t } from "@lib/i18n/translations"
 
 /**
@@ -68,7 +66,7 @@ type TrustItem = {
   title: string
   description: string
   /** Drawn inline so the strip needs no icon font or extra request. */
-  icon: ReactNode
+  icon: React.ReactNode
 }
 
 /*
@@ -123,60 +121,89 @@ const IconSecure = () => (
   </svg>
 )
 
-export default function TrustStrip() {
-  /*
-   * Four items, not five. The fifth was "Mi Cuenta", which the header already
-   * offers twice on mobile (the account icon and the side menu). Four is also the
-   * count that lets the row breathe on a 1280px page without wrapping a Spanish
-   * title onto three lines.
-   */
-  const items: TrustItem[] = [
-    {
-      id: "support",
-      title: t("home.trust.support.title"),
-      description: t("home.trust.support.description"),
-      icon: <IconSupport />,
-    },
-    {
-      id: "catalogue",
-      title: t("home.trust.catalogue.title"),
-      description: t("home.trust.catalogue.description"),
-      icon: <IconCare />,
-    },
-    {
-      id: "pickup",
-      title: t("home.trust.pickup.title"),
-      description: t("home.trust.pickup.description"),
-      icon: <IconPickup />,
-    },
-    {
-      id: "secure",
-      title: t("home.trust.secure.title"),
-      description: t("home.trust.secure.description"),
-      icon: <IconSecure />,
-    },
-  ]
+/**
+ * Receipt, standing in for "Mi Cuenta". It draws the ORDER, not the account:
+ * a person glyph would be the literal match for the title, but the nav already
+ * uses one for "Mi cuenta", and this strip exists to answer a different question
+ * than navigation does. The zigzag foot is what makes a rectangle read as a
+ * receipt rather than a card, and at 36px it is the only detail carrying that.
+ */
+const IconOrders = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M5.4 3.4h13.2v17.2l-2.2-1.4-2.2 1.4-2.2-1.4-2.2 1.4-2.2-1.4-2.2 1.4Z" />
+    <path d="M8.6 8.4h6.8M8.6 12.2h6.8" />
+  </svg>
+)
 
+const ITEMS: TrustItem[] = [
+  {
+    id: "support",
+    title: "Atención Personalizada",
+    description: "Te orientamos al elegir",
+    icon: <IconSupport />,
+  },
+  {
+    id: "catalogue",
+    title: "Alimento, Salud e Higiene",
+    description: "Todo el cuidado de tu mascota",
+    icon: <IconCare />,
+  },
+  {
+    id: "pickup",
+    title: "Recojo en Tienda",
+    description: "¡Gratis!",
+    icon: <IconPickup />,
+  },
+  {
+    id: "secure",
+    title: "Compra Segura",
+    description: "Pago verificado",
+    icon: <IconSecure />,
+  },
+  {
+    id: "account",
+    title: "Mi Cuenta",
+    description: "Crea tu cuenta y sigue tus pedidos",
+    icon: <IconOrders />,
+  },
+]
+
+export default function TrustStrip() {
   return (
-    <section aria-label={t("benefits.title")} className="bg-[var(--surface-warm)] py-7 medium:py-9">
-      <div className="site-container">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-5 rounded-[1.5rem] border border-[#eadfce] bg-white p-5 shadow-[var(--shadow-card)] medium:grid-cols-4 medium:gap-x-6 medium:p-6">
-          {items.map((item) => (
-            <div key={item.id} className="flex items-center gap-3.5">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700 [&_svg]:h-5 [&_svg]:w-5">
-                {item.icon}
-              </span>
-              <div className="flex min-w-0 flex-col gap-0.5">
-                <h3 className="text-[13px] font-semibold leading-tight text-fg-base">
-                  {item.title}
-                </h3>
-                <p className="text-[11px] leading-relaxed text-fg-muted">
-                  {item.description}
-                </p>
-              </div>
+    <section
+      aria-label={t("benefits.title")}
+      className="border-b border-[var(--border-subtle)] bg-white"
+    >
+      {/*
+       * Five columns from `medium`, not four. An odd count in a four-column grid
+       * drops the last item alone on a second row, which reads as a mistake
+       * rather than a decision. The gutter tightens to gap-x-5 because five long
+       * Spanish titles in the width four columns allowed would each wrap to three
+       * lines; at gap-x-5 they wrap to two and the row stays one tall.
+       */}
+      <div className="site-container grid grid-cols-2 gap-x-4 gap-y-7 py-8 medium:grid-cols-5 medium:gap-x-5">
+        {ITEMS.map((item) => (
+          <div key={item.id} className="flex items-center gap-4">
+            {/*
+             * 36px, and the box is centred against the two lines of copy rather
+             * than pinned to its top with an mt. At 28px the glyph sat above the
+             * title's optical centre; at 36px with items-center the icon and the
+             * text block share one middle, which is what makes the row read as
+             * five pairs instead of five glyphs floating over captions.
+             */}
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center text-fg-base">
+              {item.icon}
+            </span>
+            <div className="flex min-w-0 flex-col gap-1">
+              <h3 className="text-sm font-semibold leading-tight text-fg-base">
+                {item.title}
+              </h3>
+              <p className="text-xs leading-relaxed text-fg-muted">
+                {item.description}
+              </p>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </section>
   )

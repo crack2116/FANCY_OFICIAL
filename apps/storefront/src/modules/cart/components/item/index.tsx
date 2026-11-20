@@ -51,12 +51,12 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
   return (
     <Table.Row className="w-full" data-testid="product-row">
-      <Table.Cell className="!pl-0 p-4 w-24">
+      <Table.Cell className="!pl-0 py-3 !pr-1.5 small:!p-4 w-12 small:w-24">
         <LocalizedClientLink
           href={`/products/${item.product_handle}`}
           className={clx("flex", {
-            "w-16": type === "preview",
-            "small:w-24 w-12": type === "full",
+            "w-14 small:w-16": type === "preview",
+            "w-11 small:w-20": type === "full",
           })}
         >
           <Thumbnail
@@ -67,9 +67,9 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         </LocalizedClientLink>
       </Table.Cell>
 
-      <Table.Cell className="text-left">
+      <Table.Cell className="text-left py-3 !px-1.5 small:!p-4 min-w-0">
         <Text
-          className="txt-medium-plus text-ui-fg-base"
+          className="txt-medium-plus text-ui-fg-base leading-snug"
           data-testid="product-title"
         >
           {item.product_title}
@@ -78,13 +78,13 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       </Table.Cell>
 
       {type === "full" && (
-        <Table.Cell>
-          <div className="flex gap-2 items-center w-28">
+        <Table.Cell className="py-3 !px-1 small:!p-4">
+          <div className="flex gap-1 small:gap-2 items-center w-auto small:w-28">
             <DeleteButton id={item.id} data-testid="product-delete-button" />
             <CartItemSelect
               value={item.quantity}
               onChange={(value) => changeQuantity(parseInt(value.target.value))}
-              className="w-14 h-10 p-4"
+              className="w-11 small:w-14 h-9 small:h-10 !p-1.5 small:!p-3 text-xs small:text-sm"
               data-testid="product-select-button"
             >
               {/* TODO: Update this with the v2 way of managing inventory */}
@@ -119,9 +119,9 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         </Table.Cell>
       )}
 
-      <Table.Cell className="!pr-0">
+      <Table.Cell className="!pr-0 !pl-1.5 small:!pl-4 text-right whitespace-nowrap">
         <span
-          className={clx("!pr-0", {
+          className={clx("!pr-0 inline-block tabular-nums", {
             "flex flex-col items-end h-full justify-center": type === "preview",
           })}
         >

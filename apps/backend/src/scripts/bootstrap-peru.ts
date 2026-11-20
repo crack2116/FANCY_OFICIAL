@@ -395,6 +395,18 @@ export default async function bootstrapPeru({ container }: ExecArgs) {
               },
               price_type: "flat",
               prices: [{ amount: opt.amount, currency_code: CURRENCY_CODE }],
+              rules: [
+                {
+                  attribute: "enabled_in_store",
+                  value: "true",
+                  operator: "eq",
+                },
+                {
+                  attribute: "is_return",
+                  value: "false",
+                  operator: "eq",
+                },
+              ],
             },
           ],
         })

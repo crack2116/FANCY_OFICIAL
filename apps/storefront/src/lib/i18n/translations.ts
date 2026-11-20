@@ -14,7 +14,7 @@ export const esPE = {
   "announcement.label": "Aviso",
 
   // --- header -------------------------------------------------------------
-  "header.searchPlaceholder": "Buscar productos",
+  "header.searchPlaceholder": "Buscar productos...",
   "header.searchLabel": "Buscar",
   "header.openSearch": "Abrir búsqueda",
   "header.openMenu": "Abrir menú",
@@ -27,6 +27,7 @@ export const esPE = {
   // --- navigation ---------------------------------------------------------
   "nav.label": "Navegación principal",
   "nav.perros": "Perros",
+  "nav.gatos": "Gatos",
   "nav.alimentos": "Alimentos",
   "nav.salud": "Salud",
   "nav.farmacia": "Farmacia",
@@ -92,6 +93,14 @@ export const esPE = {
   "product.detailsNotReported": "No informado",
   "product.galleryImageAlt": "Imagen {number} de {title}",
   "product.galleryThumbnail": "Ver imagen {number} de {title}",
+  "product.zoom.hint": "Pasa el cursor o haz clic para hacer zoom",
+  "product.zoom.open": "Ampliar imagen",
+  "product.zoom.close": "Cerrar visor",
+  "product.zoom.in": "Acercar imagen",
+  "product.zoom.out": "Alejar imagen",
+  "product.zoom.reset": "Restablecer zoom",
+  "product.zoom.prev": "Imagen anterior",
+  "product.zoom.next": "Imagen siguiente",
   "product.breadcrumb.label": "Ruta de navegación",
   "product.breadcrumb.home": "Inicio",
   "product.breadcrumb.store": "Tienda",
@@ -118,6 +127,8 @@ export const esPE = {
   "cart.continueShopping": "Seguir comprando",
   "cart.quantityLabel": "Cantidad de {title}",
   "cart.item": "Producto",
+  "cart.itemCountSingle": "{count} producto",
+  "cart.itemCountPlural": "{count} productos",
   "cart.price": "Precio",
   "cart.meta.title": "Carrito",
   "cart.meta.description": "Revisa los productos de tu carrito.",
@@ -195,9 +206,15 @@ export const esPE = {
     "Al confirmar el pedido, confirmas que has leído y aceptas las condiciones de compra y la política de privacidad de la tienda.",
   "checkout.summary.title": "En tu carrito",
   "checkout.promo.add": "Agregar código de promoción",
+  "checkout.promo.placeholder": "Código de descuento",
   "checkout.promo.apply": "Aplicar",
   "checkout.promo.applied": "Promociones aplicadas:",
   "checkout.promo.remove": "Quitar código de promoción del pedido",
+  "checkout.secureBadge": "Compra segura",
+  "checkout.review.title": "Revisar y confirmar",
+  "checkout.delivery.empty":
+    "No hay métodos de envío disponibles para esta dirección todavía.",
+  "cart.trustLine": "Compra protegida · Cambios y devoluciones fáciles",
   "checkout.freeShipping.unlocked": "¡Envío gratis desbloqueado!",
   "checkout.freeShipping.unlock": "Desbloquea el envío gratis",
   "checkout.freeShipping.only": "Solo te faltan",
@@ -385,9 +402,9 @@ export const esPE = {
 
   // --- benefits -----------------------------------------------------------
   "benefits.title": "Por qué comprarnos",
-  "benefits.shipping.title": "Envíos a todo el Perú",
+  "benefits.shipping.title": "Envíos en Piura",
   "benefits.shipping.description":
-    "Recibe en Piura, Castilla y Veintiséis de Octubre, y en el resto del país.",
+    "Recibe rápido en Piura, Castilla y Veintiséis de Octubre.",
   "benefits.quality.title": "Productos originales",
   "benefits.quality.description":
     "Trabajamos con marcas y distribuidores autorizados.",
@@ -414,13 +431,13 @@ export const esPE = {
   "home.trust.secure.description": "Revisa tu pedido antes de pagar",
 
   // --- home: metadata -----------------------------------------------------
-  "home.meta.title": "Tienda de productos para perros en Perú",
+  "home.meta.title": "Tienda de productos para mascotas en Piura",
   "home.meta.description":
-    "Compra alimentos, salud, higiene, accesorios y juguetes para tu perro. Precios en soles y envíos a todo el Perú.",
+    "Compra alimentos, salud, higiene, accesorios y juguetes para tu mascota. Precios en soles y envíos rápidos en Piura.",
 
   // --- home: hero carousel ------------------------------------------------
   "home.hero.label": "Portada de la tienda",
-  "home.hero.eyebrow.store": "Tienda en Perú",
+  "home.hero.eyebrow.store": "Tienda en Piura",
   "home.hero.eyebrow.care": "Cuidado de tu mascota",
   "home.hero.slide1.title": "Todo para cuidar a tu mejor amigo",
   "home.hero.slide1.subtitle":
@@ -491,12 +508,20 @@ export const esPE = {
   "wishlist.remove": "Quitar {title} de favoritos",
 
   // --- home: secondary banner --------------------------------------------
-  "home.banner.title": "Cuidado diario para tu mascota",
+  "home.banner.eyebrow": "Para el día a día",
+  "home.banner.title": "Baño, cepillado y paseo",
   "home.banner.subtitle":
-    "Higiene, paseo y bienestar para acompañar su rutina.",
-  "home.banner.cta": "Descubrir productos",
+    "Shampoos, cepillos, collares y camas: lo que tu perro o gato usa cada semana, en un solo lugar.",
+  "home.banner.cta": "Ver productos",
+  "home.banner.secondaryCta": "Ir a higiene",
+  "home.banner.pillar.hygiene.title": "Higiene y baño",
+  "home.banner.pillar.hygiene.description": "Shampoos, limpieza y aseo",
+  "home.banner.pillar.health.title": "Salud y cepillado",
+  "home.banner.pillar.health.description": "Cuidado dental y del pelaje",
+  "home.banner.pillar.accessories.title": "Paseo y descanso",
+  "home.banner.pillar.accessories.description": "Collares, correas y camas",
   "home.banner.imageAlt":
-    "Ilustración de un kit de cuidado con champú, cepillo, toalla y comedero",
+    "Perro recién bañado secándose con una toalla en casa",
 
   // --- empty states -------------------------------------------------------
   "empty.state.title": "No hay productos para mostrar",
@@ -632,6 +657,17 @@ export const esPE = {
   "account.addresses.description": "Consulta y actualiza tus direcciones de envío.",
   "account.addresses.body":
     "Guarda las direcciones que quieras usar al recibir tus pedidos.",
+  "account.favorites": "Mis favoritos",
+  "account.favorites.description":
+    "Consulta los productos que guardaste en favoritos.",
+  "account.favorites.body":
+    "Aquí ves los productos que marcaste con corazón en este navegador.",
+  "account.favorites.empty.title": "Aún no tienes favoritos guardados.",
+  "account.favorites.empty.body":
+    "Toca el corazón en cualquier producto de la tienda para tenerlo siempre a mano.",
+  "account.favorites.empty.cta": "Explorar productos",
+  "account.favorites.count": "{count} favoritos",
+  "account.favorites.countOne": "1 favorito",
   "account.order.title": "Pedido n.º {id}",
   "account.order.description": "Detalle de uno de tus pedidos.",
 
@@ -643,8 +679,12 @@ export const esPE = {
   "account.nav.profile": "Mis datos",
   "account.nav.addresses": "Direcciones",
   "account.nav.orders": "Mis pedidos",
+  "account.nav.favorites": "Favoritos",
   "account.nav.logout": "Cerrar sesión",
   "account.nav.current": "Sección actual",
+  "account.menu.label": "Menú de mi cuenta",
+  "account.menu.overview": "Resumen de cuenta",
+  "account.menu.viewStore": "Seguir comprando",
 
   // --- account: dashboard --------------------------------------------------
   "account.dashboard.greeting": "Hola, {name}",
@@ -659,12 +699,17 @@ export const esPE = {
   "account.dashboard.card.profile.title": "Mis datos",
   "account.dashboard.card.profile.body":
     "Actualiza tu nombre, tus apellidos y tu teléfono.",
+  "account.dashboard.card.profile.emptyPhone": "Sin teléfono registrado",
   "account.dashboard.card.addresses.title": "Direcciones",
   "account.dashboard.card.addresses.body":
     "Guarda las direcciones con las que quieres recibir tus pedidos.",
   "account.dashboard.card.addresses.count": "{count} direcciones",
   "account.dashboard.card.addresses.countOne": "1 dirección",
   "account.dashboard.card.addresses.empty": "Todavía no guardas direcciones.",
+  "account.dashboard.card.favorites.title": "Favoritos",
+  "account.dashboard.card.favorites.body":
+    "Accede rápido a los productos que marcaste con corazón.",
+  "account.dashboard.card.favorites.empty": "Aún no guardas favoritos.",
   "account.dashboard.action": "Ver",
   "account.dashboard.lastOrder.title": "Último pedido",
   "account.dashboard.help.title": "¿Necesitas ayuda con un pedido?",

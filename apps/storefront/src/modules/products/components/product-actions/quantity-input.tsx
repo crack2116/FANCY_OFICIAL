@@ -54,11 +54,11 @@ export default function QuantityInput({
   }
 
   const buttonClass =
-    "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#e6d8c4] bg-white text-fg-base transition-colors hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-40"
+    "flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-[var(--border-subtle)] bg-surface text-fg-base transition-colors hover:bg-surface-subtle disabled:cursor-not-allowed disabled:opacity-40"
 
   return (
     <fieldset className={className} disabled={disabled}>
-      <legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-fg-muted">
+      <legend className="mb-2 text-xs font-semibold uppercase tracking-wider text-fg-muted">
         {t("product.quantity")}
       </legend>
 

@@ -24,10 +24,11 @@ const CartDropdown = ({
 }: {
   cart?: HttpTypes.StoreCart | null
 }) => {
-  const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
+  const [activeTimer, setActiveTimer] = useState<ReturnType<typeof setTimeout> | undefined>(
     undefined
   )
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
+  const hoverOpenedAtRef = useRef(0)
 
   const open = () => setCartDropdownOpen(true)
   const close = () => setCartDropdownOpen(false)
@@ -42,9 +43,7 @@ const CartDropdown = ({
 
   const timedOpen = () => {
     open()
-
     const timer = setTimeout(close, 5000)
-
     setActiveTimer(timer)
   }
 
@@ -52,11 +51,12 @@ const CartDropdown = ({
     if (activeTimer) {
       clearTimeout(activeTimer)
     }
-
+    if (!cartDropdownOpen) {
+      hoverOpenedAtRef.current = Date.now()
+    }
     open()
   }
 
-  // Clean up the timer when the component unmounts
   useEffect(() => {
     return () => {
       if (activeTimer) {
@@ -67,36 +67,50 @@ const CartDropdown = ({
 
   const pathname = usePathname()
 
-  // open cart dropdown when modifying the cart items, but only if we're not on the cart page
   useEffect(() => {
     if (itemRef.current !== totalItems && !pathname.includes("/cart")) {
       timedOpen()
     }
+    itemRef.current = totalItems
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalItems, itemRef.current])
+  }, [totalItems, pathname])
+
+  const sortedItems = cartState?.items
+    ? [...cartState.items].sort((a, b) =>
+        (a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1
+      )
+    : []
 
   return (
     <div
-      className="h-full z-50"
+      className="relative z-50 h-full"
       onMouseEnter={openAndCancel}
       onMouseLeave={close}
     >
       <Popover className="relative h-full">
         <PopoverButton
-          className="relative flex h-10 w-10 items-center justify-center rounded-full text-[var(--chrome-header-ink)] transition-colors hover:bg-[var(--chrome-header-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          type="button"
+          onClick={() => {
+            if (Date.now() - hoverOpenedAtRef.current < 450) {
+              open()
+              return
+            }
+            setCartDropdownOpen((prev) => !prev)
+          }}
+          className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#1A1A1A] transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
           aria-label={t("header.cartWithCount", { count: totalItems })}
+          aria-expanded={cartDropdownOpen}
           data-testid="nav-cart-button"
         >
           <Cart size="22" />
-          {totalItems > 0 ? (
-            <span
-              data-testid="cart-count-badge"
-              className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-700 px-1 text-[10px] font-bold leading-none text-white shadow-sm"
-            >
-              {totalItems}
-            </span>
-          ) : null}
+          <span
+            data-testid="cart-count-badge"
+            className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#F36F21] px-1 text-[10px] font-bold leading-none text-white shadow-sm"
+          >
+            {totalItems}
+          </span>
         </PopoverButton>
+
         <Transition
           show={cartDropdownOpen}
           as={Fragment}
@@ -109,90 +123,101 @@ const CartDropdown = ({
         >
           <PopoverPanel
             static
-            className="absolute right-0 top-[calc(100%+10px)] hidden w-[390px] overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-surface text-fg-base shadow-[var(--elevation-flyout)] small:block"
+            className="absolute right-0 top-[calc(100%+8px)] z-50 w-[420px] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-[#E7E5DF] bg-white text-fg-base shadow-[0_20px_48px_rgba(15,53,46,0.16)]"
             data-testid="nav-cart-dropdown"
           >
-            <div className="p-4 flex items-center justify-center">
-              <h3 className="text-base font-semibold text-fg-base">
+            <div className="flex items-center justify-between border-b border-[#EFECE6] bg-[#FCFBF8] px-5 py-3.5">
+              <h3 className="text-sm font-bold text-[#0F352E]">
                 {t("cart.title")}
               </h3>
+              <span className="rounded-full bg-[#FFF4EC] px-2.5 py-0.5 text-xs font-semibold text-[#C8530E]">
+                {t(
+                  totalItems === 1
+                    ? "cart.itemCountSingle"
+                    : "cart.itemCountPlural",
+                  { count: totalItems }
+                )}
+              </span>
             </div>
-            {cartState && cartState.items?.length ? (
+
+            {sortedItems.length > 0 && cartState ? (
               <>
-                <div className="overflow-y-scroll max-h-[402px] px-4 grid grid-cols-1 gap-y-8 no-scrollbar p-px">
-                  {cartState.items
-                    .sort((a, b) => {
-                      return (a.created_at ?? "") > (b.created_at ?? "")
-                        ? -1
-                        : 1
-                    })
-                    .map((item) => (
-                      <div
-                        className="grid grid-cols-[122px_1fr] gap-x-4"
-                        key={item.id}
-                        data-testid="cart-item"
+                <div className="max-h-[380px] divide-y divide-[#F2EFEA] overflow-y-auto px-5 no-scrollbar">
+                  {sortedItems.map((item) => (
+                    <div
+                      className="flex items-start gap-3.5 py-4"
+                      key={item.id}
+                      data-testid="cart-item"
+                    >
+                      <LocalizedClientLink
+                        href={`/products/${item.product_handle}`}
+                        onClick={close}
+                        className="w-20 shrink-0 overflow-hidden rounded-xl border border-[#EFECE6] bg-white p-1"
                       >
-                        <LocalizedClientLink
-                          href={`/products/${item.product_handle}`}
-                          className="w-24"
-                        >
-                          <Thumbnail
-                            thumbnail={item.thumbnail}
-                            images={item.variant?.product?.images}
-                            size="square"
-                          />
-                        </LocalizedClientLink>
-                        <div className="flex flex-col justify-between flex-1">
-                          <div className="flex flex-col flex-1">
-                            <div className="flex items-start justify-between">
-                              <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
-                                <h3 className="text-base-regular overflow-hidden text-ellipsis">
-                                  <LocalizedClientLink
-                                    href={`/products/${item.product_handle}`}
-                                    data-testid="product-link"
-                                  >
-                                    {item.title}
-                                  </LocalizedClientLink>
-                                </h3>
-                                <LineItemOptions
-                                  variant={item.variant}
-                                  data-testid="cart-item-variant"
-                                  data-value={item.variant}
-                                />
-                                <span
-                                  data-testid="cart-item-quantity"
-                                  data-value={item.quantity}
-                                >
-                                  {t("product.quantity")}: {item.quantity}
-                                </span>
-                              </div>
-                              <div className="flex justify-end">
-                                <LineItemPrice
-                                  item={item}
-                                  style="tight"
-                                  currencyCode={cartState.currency_code}
-                                />
-                              </div>
-                            </div>
+                        <Thumbnail
+                          thumbnail={item.thumbnail}
+                          images={item.variant?.product?.images}
+                          size="square"
+                        />
+                      </LocalizedClientLink>
+
+                      <div className="flex min-w-0 flex-1 flex-col gap-1">
+                        <div className="flex items-start justify-between gap-3">
+                          <h4 className="min-w-0 flex-1 text-sm font-semibold leading-snug text-[#0F352E] line-clamp-2">
+                            <LocalizedClientLink
+                              href={`/products/${item.product_handle}`}
+                              onClick={close}
+                              className="transition-colors hover:text-[#F36F21]"
+                              data-testid="product-link"
+                            >
+                              {item.title}
+                            </LocalizedClientLink>
+                          </h4>
+
+                          <div className="shrink-0 pl-1">
+                            <LineItemPrice
+                              item={item}
+                              style="tight"
+                              currencyCode={cartState.currency_code}
+                            />
                           </div>
+                        </div>
+
+                        <LineItemOptions
+                          variant={item.variant}
+                          data-testid="cart-item-variant"
+                          data-value={item.variant}
+                        />
+
+                        <div className="mt-1.5 flex items-center justify-between gap-2">
+                          <span
+                            className="inline-flex items-center rounded-md bg-[#F6F4EF] px-2 py-0.5 text-xs font-medium text-fg-base"
+                            data-testid="cart-item-quantity"
+                            data-value={item.quantity}
+                          >
+                            {t("product.quantity")}: {item.quantity}
+                          </span>
+
                           <DeleteButton
                             id={item.id}
-                            className="mt-1"
+                            className="text-xs text-fg-muted hover:text-danger-700"
                             data-testid="cart-item-remove-button"
                           >
                             {t("cart.remove")}
                           </DeleteButton>
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  ))}
                 </div>
-                <div className="p-4 flex flex-col gap-y-4 text-small-regular">
+
+                <div className="flex flex-col gap-3 border-t border-[#EFECE6] bg-[#FCFBF8] px-5 py-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-ui-fg-base font-semibold">
+                    <span className="text-sm font-medium text-fg-subtle">
                       {t("cart.subtotal")}
                     </span>
                     <span
-                      className="text-large-semi"
+                      className="text-lg font-bold tabular-nums text-[#0F352E]"
                       data-testid="cart-subtotal"
                       data-value={subtotal}
                     >
@@ -202,9 +227,10 @@ const CartDropdown = ({
                       })}
                     </span>
                   </div>
-                  <LocalizedClientLink href="/cart" passHref>
+
+                  <LocalizedClientLink href="/cart" onClick={close} passHref>
                     <Button
-                      className="w-full"
+                      className="h-11 w-full rounded-xl bg-[#0F352E] font-semibold text-white hover:bg-[#164A40]"
                       size="large"
                       data-testid="go-to-cart-button"
                     >
@@ -214,22 +240,18 @@ const CartDropdown = ({
                 </div>
               </>
             ) : (
-              <div>
-                <div className="flex flex-col items-center justify-center gap-y-4 py-16">
-                  <span className="text-sm text-fg-subtle">
-                    {t("cart.empty")}
-                  </span>
-                  <div>
-                    <LocalizedClientLink href="/store">
-                      <>
-                        <span className="sr-only">
-                          {t("cart.explore")}
-                        </span>
-                        <Button onClick={close}>{t("cart.explore")}</Button>
-                      </>
-                    </LocalizedClientLink>
-                  </div>
-                </div>
+              <div className="flex flex-col items-center justify-center gap-y-4 px-6 py-12 text-center">
+                <span className="text-sm text-fg-subtle">
+                  {t("cart.empty")}
+                </span>
+                <LocalizedClientLink href="/store" onClick={close}>
+                  <Button
+                    className="rounded-xl bg-[#0F352E] px-5 text-white hover:bg-[#164A40]"
+                    onClick={close}
+                  >
+                    {t("cart.explore")}
+                  </Button>
+                </LocalizedClientLink>
               </div>
             )}
           </PopoverPanel>

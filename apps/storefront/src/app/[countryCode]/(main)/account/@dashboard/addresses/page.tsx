@@ -53,11 +53,13 @@ export default async function Addresses(props: {
 
   return (
     <div className="w-full" data-testid="addresses-page-wrapper">
-      <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl font-semibold text-fg-base">{t("account.addresses")}</h1>
-        <p className="text-base-regular text-fg-base">{t("account.addresses.body")}</p>
+      <div className="mb-6 flex flex-col gap-y-1.5">
+        <h1 className="text-2xl font-bold text-[#0F352E]">{t("account.addresses")}</h1>
+        <p className="text-sm text-slate-600">{t("account.addresses.body")}</p>
       </div>
-      <AddressBook customer={customer} region={region} />
+      <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-[0_8px_24px_rgba(15,53,46,0.04)]">
+        <AddressBook customer={customer} region={region} />
+      </div>
     </div>
   )
 }

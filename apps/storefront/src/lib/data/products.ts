@@ -29,7 +29,7 @@ type ProductListQueryParams = (HttpTypes.FindParams &
  * the N+1 this field list exists to avoid.
  */
 const CARD_FIELDS =
-  "*variants.calculated_price,+variants.inventory_quantity,*variants.images,*variants.options,+metadata,+tags," +
+  "*variants.calculated_price,+variants.inventory_quantity,*variants.images,*variants.options,*categories,+metadata,+tags," +
   PET_PRODUCT_FIELDS
 
 export const listProducts = async ({
@@ -167,6 +167,49 @@ export const listProductsByIds = async ({
 
   return ids.flatMap((id) => {
     const product = byId.get(id)
+
+    return product ? [product] : []
+  })
+}
+
+export const listProductsByHandles = async ({
+  handles,
+  countryCode,
+  regionId,
+}: {
+  handles: string[]
+  countryCode?: string
+  regionId?: string
+}): Promise<HttpTypes.StoreProduct[]> => {
+  const uniqueHandles = Array.from(new Set(handles.filter(Boolean)))
+  if (!uniqueHandles.length) {
+    return []
+  }
+
+  const region = countryCode
+    ? await getRegion(countryCode)
+    : await retrieveRegion(regionId!)
+
+  if (!region) {
+    return []
+  }
+
+  const { products } = await sdk.client.fetch<ProductPage>("/store/products", {
+    method: "GET",
+    query: {
+      handle: uniqueHandles,
+      limit: uniqueHandles.length,
+      region_id: region.id,
+      fields: CARD_FIELDS,
+    },
+    headers: await getAuthHeaders(),
+    cache: CACHE_POLICY.searchResults,
+  })
+
+  const byHandle = new Map(products.map((product) => [product.handle, product]))
+
+  return uniqueHandles.flatMap((handle) => {
+    const product = byHandle.get(handle)
 
     return product ? [product] : []
   })

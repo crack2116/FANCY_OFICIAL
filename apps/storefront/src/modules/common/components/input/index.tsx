@@ -1,4 +1,3 @@
-import { t } from "@lib/i18n/translations"
 import { Label } from "@modules/common/components/ui"
 import React, { useEffect, useImperativeHandle, useState } from "react"
 
@@ -41,12 +40,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="flex relative z-0 w-full txt-compact-medium">
           <input
-            id={name}
             type={inputType}
             name={name}
             placeholder=" "
             required={required}
-            className="mt-0 block h-12 w-full appearance-none rounded-xl border border-[#e6d8c4] bg-white px-4 pb-1 pt-4 transition-colors hover:border-brand-300 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+            className="pt-4 pb-1 block w-full h-11 px-4 mt-0 bg-ui-bg-field border rounded-md appearance-none focus:outline-none focus:ring-0 focus:shadow-borders-interactive-with-active border-ui-border-base hover:bg-ui-bg-field-hover"
             {...props}
             ref={inputRef}
           />
@@ -61,12 +59,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {type === "password" && (
             <button
               type="button"
-              aria-label={
-                showPassword
-                  ? t("common.hidePassword")
-                  : t("common.showPassword")
-              }
-              aria-pressed={showPassword}
               onClick={() => setShowPassword(!showPassword)}
               className="text-ui-fg-subtle px-4 focus:outline-none transition-all duration-150 outline-none focus:text-ui-fg-base absolute right-0 top-3"
             >

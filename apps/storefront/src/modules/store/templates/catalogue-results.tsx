@@ -130,9 +130,9 @@ export default async function CatalogueResults({
       <div className="min-w-0 flex-1">
         {/* On mobile the trigger row above has already offered "Ordenar"; the
             heading here only labels the grid for screen readers. */}
-        <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-[#eadfce] bg-white/70 px-4 py-3 xsmall:flex-row xsmall:items-center xsmall:justify-between">
+        <div className="mb-6 flex flex-col gap-3 xsmall:flex-row xsmall:items-center xsmall:justify-between">
           <p
-            className="text-sm font-medium text-fg-subtle"
+            className="text-sm text-fg-subtle"
             aria-live="polite"
             data-testid="result-count"
           >

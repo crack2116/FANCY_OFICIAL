@@ -3,13 +3,16 @@
 import { addToCart } from "@lib/data/cart"
 import { t } from "@lib/i18n/translations"
 import { useIntersection } from "@lib/hooks/use-in-view"
-import { getAvailableOptionValues } from "@lib/util/product"
 import {
   LOW_STOCK_THRESHOLD,
   getVariantStockCap,
   isVariantPurchasable,
 } from "@lib/util/stock"
 import { HttpTypes } from "@medusajs/types"
+import {
+  getAvailableOptionValues,
+  resolveOptionDisplayTitle,
+} from "@lib/util/product-options"
 import { Button } from "@modules/common/components/ui"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
@@ -65,12 +68,25 @@ export default function ProductActions({
   const countryCode = useParams().countryCode as string
 
   // A product with exactly one variant has no decision to make, so its options
-  // are filled in automatically. Anything more than one stays unselected.
+  // are filled in automatically. When a product has multiple variants, also
+  // auto-select any option group that only has a single valid value.
   useEffect(() => {
     if (product.variants?.length === 1) {
       setOptions(optionsAsKeymap(product.variants[0].options) ?? {})
+      return
     }
-  }, [product.variants])
+
+    const singleValueDefaults: Record<string, string> = {}
+    for (const option of product.options ?? []) {
+      const available = getAvailableOptionValues(product, option)
+      if (available.length === 1) {
+        singleValueDefaults[option.id] = available[0]
+      }
+    }
+    if (Object.keys(singleValueDefaults).length > 0) {
+      setOptions((prev) => ({ ...singleValueDefaults, ...prev }))
+    }
+  }, [product])
 
   const selectedVariant = useMemo(() => {
     if (!product.variants || product.variants.length === 0) {
@@ -81,11 +97,6 @@ export default function ProductActions({
       isEqual(optionsAsKeymap(v.options), options)
     )
   }, [product.variants, options])
-
-  const availableOptionValues = useMemo(
-    () => getAvailableOptionValues(product, options),
-    [product, options]
-  )
 
   const setOptionValue = (optionId: string, value: string) => {
     setOptions((prev) => ({
@@ -194,24 +205,31 @@ export default function ProductActions({
 
   return (
     <>
-      <div
-        className="flex flex-col gap-y-4 rounded-2xl border border-[#eadfce] bg-white p-5 shadow-[var(--shadow-card)]"
-        ref={actionsRef}
-      >
+      <div className="flex flex-col gap-y-4" ref={actionsRef}>
         <div>
           {(product.variants?.length ?? 0) > 1 && (
             <div className="flex flex-col gap-y-4">
               {(product.options || []).map((option) => {
+                const availableValues = getAvailableOptionValues(product, option)
+                if (availableValues.length === 0) {
+                  return null
+                }
+                const resolvedTitle = resolveOptionDisplayTitle(
+                  product,
+                  option,
+                  availableValues
+                )
+
                 return (
                   <div key={option.id}>
                     <OptionSelect
                       option={option}
+                      values={availableValues}
                       current={options[option.id]}
                       updateOption={setOptionValue}
-                      title={option.title ?? ""}
+                      title={resolvedTitle}
                       data-testid="product-options"
                       disabled={!!disabled || isAdding}
-                      availableValues={availableOptionValues[option.id]}
                     />
                   </div>
                 )
@@ -225,21 +243,9 @@ export default function ProductActions({
 
         {inStock ? (
           <p
-            className={
-              isLowStock
-                ? "inline-flex w-fit items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700"
-                : "inline-flex w-fit items-center gap-2 rounded-full bg-success-50 px-3 py-1 text-xs font-semibold text-success-700"
-            }
+            className="text-sm text-fg-subtle"
             data-testid="product-stock-state"
           >
-            <span
-              aria-hidden="true"
-              className={
-                isLowStock
-                  ? "h-1.5 w-1.5 rounded-full bg-brand-500"
-                  : "h-1.5 w-1.5 rounded-full bg-success-500"
-              }
-            />
             {isLowStock ? t("product.lowStock") : t("product.inStock")}
           </p>
         ) : null}
@@ -263,7 +269,7 @@ export default function ProductActions({
             !isValidVariant
           }
           variant="primary"
-          className="h-12 w-full text-sm font-semibold"
+          className="h-11 w-full"
           isLoading={isAdding}
           data-testid="add-product-button"
         >

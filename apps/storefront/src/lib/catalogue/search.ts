@@ -501,16 +501,7 @@ function readPetFacets(
   // it with no matches, so the shopper can see — and un-tick — what they chose.
   // Without this, ticking "Senior" and reaching an empty grid makes the filter
   // panel forget the selection, and there is no way back short of the URL.
-  /*
-   * `all` is the sentinel a merchant stores on a product that suits every life
-   * stage, not a life stage of its own. The panel already renders a reset radio
-   * ("Todas las etapas") for "no life-stage refinement"; keeping the facet value
-   * as well produced two identically labelled radios with the same DOM id, and
-   * selecting the second one silently narrowed the grid to the products whose
-   * profile literally says `all` — the opposite of what its label promises.
-   */
   const lifeStages = readFacetValues(response, "life_stage")
-    .filter((entry) => entry.value !== "all")
     .map((entry) => ({
       value: entry.value,
       label: lifeStageLabel(entry.value) ?? entry.value,
