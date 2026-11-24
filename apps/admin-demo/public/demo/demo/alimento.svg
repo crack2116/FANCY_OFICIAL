@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="640" height="640" role="img" aria-label="Demo product image">
-  <rect width="64" height="64" fill="#E7F0F0"/>
-  <g fill="none" stroke="#15525A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14 32h36a18 18 0 0 1-36 0Z"/><path d="M10 32h44"/><path d="M26 20c0-4 3-4 3-8M38 20c0-4-3-4-3-8"/>
-  </g>
-</svg>
