@@ -1622,25 +1622,6 @@
                 </button>
               </div>
             </div>
-            <div class="pt-0.5">
-              <button type="button" onclick="toggleLoginServerConfig()"
-                      class="text-xs font-semibold text-slate-500 hover:text-[#F99C32] transition flex items-center gap-1">
-                <span>Configurar servidor API (opcional)</span>
-              </button>
-              <div id="loginServerConfig" class="hidden mt-2.5 space-y-2.5 rounded-xl border border-slate-200 bg-slate-50/80 p-3">
-                <div>
-                  <label for="loginApiBase" class="mb-1 block text-[11px] font-bold text-slate-700">URL de la API de Medusa</label>
-                  <input id="loginApiBase" type="url" placeholder="https://api.tudominio.com"
-                         class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 outline-none focus:border-[#F99C32] focus:ring-2 focus:ring-[#F99C32]/15">
-                  <p class="mt-1 text-[10px] text-slate-400">Dejalo vacío si abrís el panel desde el mismo servidor de Medusa.</p>
-                </div>
-                <div>
-                  <label for="loginShopBase" class="mb-1 block text-[11px] font-bold text-slate-700">URL de la tienda (Storefront)</label>
-                  <input id="loginShopBase" type="url" placeholder="https://shop.tudominio.com (opcional)"
-                         class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 outline-none focus:border-[#F99C32] focus:ring-2 focus:ring-[#F99C32]/15">
-                </div>
-              </div>
-            </div>
             <p id="loginError" class="hidden text-xs font-semibold text-red-600"></p>
             <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#F99C32] to-[#F24534] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition hover:brightness-105">
               Iniciar sesión <span aria-hidden="true">→</span>
@@ -1724,22 +1705,10 @@
     function syncConnectionInputs() {
       const apiBase = getApiBase();
       const shopBase = getShopBase();
-      const loginApi = document.getElementById('loginApiBase');
-      const loginShop = document.getElementById('loginShopBase');
       const setApi = document.getElementById('settingApiBase');
       const setShop = document.getElementById('settingShopBase');
-      if (loginApi && document.activeElement !== loginApi) loginApi.value = apiBase;
-      if (loginShop && document.activeElement !== loginShop) loginShop.value = shopBase;
       if (setApi && document.activeElement !== setApi) setApi.value = apiBase;
       if (setShop && document.activeElement !== setShop) setShop.value = shopBase;
-      const box = document.getElementById('loginServerConfig');
-      if (box && (Boolean(apiBase) || isHostedStandalone())) {
-        box.classList.remove('hidden');
-      }
-    }
-    function toggleLoginServerConfig() {
-      const box = document.getElementById('loginServerConfig');
-      if (box) box.classList.toggle('hidden');
     }
     async function saveConnectionSettings() {
       const apiRaw = document.getElementById('settingApiBase')?.value || '';
@@ -1982,36 +1951,8 @@
           event.preventDefault();
           const email = document.getElementById('loginEmail').value.trim();
           const password = document.getElementById('loginPassword').value;
-          const apiInput = document.getElementById('loginApiBase');
-          const shopInput = document.getElementById('loginShopBase');
           const error = document.getElementById('loginError');
           if (error) error.classList.add('hidden');
-
-          if (apiInput) {
-            const apiNorm = normalizeBaseOrigin(apiInput.value);
-            if (apiNorm === null) {
-              if (error) {
-                error.textContent = 'La URL de la API debe empezar con http:// o https://';
-                error.classList.remove('hidden');
-              }
-              return;
-            }
-            if (apiNorm) localStorage.setItem(API_BASE_KEY, apiNorm);
-            else localStorage.removeItem(API_BASE_KEY);
-          }
-          if (shopInput) {
-            const shopNorm = normalizeBaseOrigin(shopInput.value);
-            if (shopNorm === null) {
-              if (error) {
-                error.textContent = 'La URL de la tienda debe empezar con http:// o https://';
-                error.classList.remove('hidden');
-              }
-              return;
-            }
-            if (shopNorm) localStorage.setItem(SHOP_BASE_KEY, shopNorm);
-            else localStorage.removeItem(SHOP_BASE_KEY);
-          }
-          syncConnectionInputs();
 
           try {
             const response = await fetch(resolveApiUrl('/auth/user/emailpass'), {
@@ -2027,7 +1968,7 @@
               if (error) {
                 const looksNonApi = !contentType.includes('application/json') && (isHostedStandalone() || !getApiBase());
                 error.textContent = looksNonApi
-                  ? 'No se pudo conectar con la API de Medusa. Configurá la URL del servidor API (ej. https://api.tudominio.com) y verificá CORS en Medusa.'
+                  ? 'No se pudo conectar con el servidor de Medusa.'
                   : (data.message || 'Credenciales inválidas.');
                 error.classList.remove('hidden');
               }
@@ -2043,7 +1984,7 @@
             showView(hash);
           } catch (err) {
             if (error) {
-              error.textContent = 'No se pudo conectar con la API de Medusa. Configurá la URL del servidor API (ej. https://api.tudominio.com) y verificá CORS en Medusa.';
+              error.textContent = 'No se pudo conectar con el servidor de Medusa.';
               error.classList.remove('hidden');
             }
           }
