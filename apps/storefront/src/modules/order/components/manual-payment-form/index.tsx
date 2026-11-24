@@ -20,7 +20,7 @@ export default function ManualPaymentForm({
   initialStatus,
 }: ManualPaymentFormProps) {
   const [reference, setReference] = useState(initialReference || "")
-  const [method, setMethod] = useState("transferencia")
+  const [method, setMethod] = useState("yape")
   const [status, setStatus] = useState(initialStatus || "pending")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState<string | null>(null)

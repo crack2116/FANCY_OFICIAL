@@ -107,10 +107,16 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
     return null
   }
 
+  const activeSlideBg =
+    slides[index]?.bgColor && /^#[0-9a-fA-F]{6}$/.test(slides[index].bgColor!)
+      ? slides[index].bgColor!
+      : "#FCEBD7"
+
   return (
     <section
       aria-label={t("home.hero.label")}
-      className="w-full overflow-x-clip bg-[#FCEBD7]"
+      className="w-full overflow-x-clip transition-colors duration-300"
+      style={{ backgroundColor: activeSlideBg }}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
@@ -127,8 +133,8 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
         aria-roledescription="carousel"
         aria-label={t("home.hero.label")}
         tabIndex={0}
-        className="relative w-full overflow-hidden bg-[#FCEBD7] focus-visible:outline-none"
-        style={{ touchAction: "pan-y" }}
+        className="relative w-full overflow-hidden transition-colors duration-300 focus-visible:outline-none"
+        style={{ touchAction: "pan-y", backgroundColor: activeSlideBg }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={cancelSwipe}
@@ -196,6 +202,124 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                 slide.imageAlt ??
                 (slide.imageAltKey ? t(slide.imageAltKey) : rawTitle)
 
+              const slideBgColor =
+                slide.bgColor && /^#[0-9a-fA-F]{6}$/.test(slide.bgColor)
+                  ? slide.bgColor
+                  : "#FCEBD7"
+
+              const contentSide =
+                slide.contentSide === "right" ? "right" : "left"
+              const showPrimaryCta =
+                slide.ctaEnabled !== false && Boolean(ctaText.trim())
+              const showSecondaryCta =
+                slide.secondaryCtaEnabled !== false &&
+                Boolean(secondaryCtaText.trim())
+              const ctaOrder =
+                slide.ctaOrder === "secondary-first"
+                  ? "secondary-first"
+                  : "primary-first"
+              const ctaAlign = slide.ctaAlign ?? "left"
+              const ctaLayout = slide.ctaLayout === "column" ? "column" : "row"
+              const ctaShape = slide.ctaShape ?? "pill"
+              const ctaSize = slide.ctaSize ?? "md"
+              const offsetX =
+                typeof slide.ctaOffsetX === "number" ? slide.ctaOffsetX : 0
+              const offsetY =
+                typeof slide.ctaOffsetY === "number" ? slide.ctaOffsetY : 0
+
+              const shapeClass =
+                ctaShape === "sharp"
+                  ? "rounded-none"
+                  : ctaShape === "rounded"
+                    ? "rounded-xl"
+                    : "rounded-full"
+
+              const sizeClass =
+                ctaSize === "sm"
+                  ? "px-4 py-2 text-xs"
+                  : ctaSize === "lg"
+                    ? "px-8 py-3.5 text-base"
+                    : "px-6 py-3 text-sm"
+
+              const alignContainerClass =
+                ctaLayout === "column"
+                  ? clx(
+                      "flex-col",
+                      ctaAlign === "center"
+                        ? "items-center self-center"
+                        : ctaAlign === "right"
+                          ? "items-end self-end"
+                          : ctaAlign === "stretch"
+                            ? "items-stretch self-stretch w-full"
+                            : "items-start self-start"
+                    )
+                  : clx(
+                      "flex-row flex-wrap items-center",
+                      ctaAlign === "center"
+                        ? "justify-center self-center w-full"
+                        : ctaAlign === "right"
+                          ? "justify-end self-end w-full"
+                          : ctaAlign === "stretch"
+                            ? "justify-stretch self-stretch w-full [&>a]:flex-1"
+                            : "justify-start self-start"
+                    )
+
+              const primaryBtn = showPrimaryCta ? (
+                <LocalizedClientLink
+                  key="primary"
+                  href={slide.ctaHref}
+                  className={clx(
+                    "inline-flex items-center justify-center gap-2.5 bg-[var(--brand-500)] font-bold text-white shadow-[0_6px_18px_rgba(14,53,46,0.18)] transition-all hover:-translate-y-0.5 hover:bg-[var(--brand-600)]",
+                    shapeClass,
+                    sizeClass
+                  )}
+                >
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-4 w-4 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <circle cx="8" cy="16.5" r="1.2" fill="currentColor" />
+                    <circle cx="14.5" cy="16.5" r="1.2" fill="currentColor" />
+                    <path d="M2.5 3.5h2.2l1.9 9.2a1.2 1.2 0 0 0 1.2 1h7.3a1.2 1.2 0 0 0 1.2-.9l1.4-6.3H5.4" />
+                  </svg>
+                  <span>{ctaText}</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </LocalizedClientLink>
+              ) : null
+
+              const secondaryBtn = showSecondaryCta ? (
+                <LocalizedClientLink
+                  key="secondary"
+                  href={secondaryHref}
+                  className={clx(
+                    "inline-flex items-center justify-center gap-2 bg-white font-bold text-[var(--fg-base,#0E352E)] shadow-[0_4px_14px_rgba(14,53,46,0.08)] transition-colors hover:bg-[#FFF9F2]",
+                    shapeClass,
+                    sizeClass
+                  )}
+                >
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="h-4 w-4 shrink-0 text-[var(--accent-500,#15803D)]"
+                    aria-hidden="true"
+                  >
+                    <path d="M10 2.2 3.8 4.9v4.6c0 4.2 2.6 7.9 6.2 9.1 3.6-1.2 6.2-4.9 6.2-9.1V4.9L10 2.2Zm-1.1 10.6-2.4-2.4 1.1-1.1 1.3 1.3 3.2-3.2 1.1 1.1-4.3 4.3Z" />
+                  </svg>
+                  <span>{secondaryCtaText}</span>
+                </LocalizedClientLink>
+              ) : null
+
+              const orderedButtons =
+                ctaOrder === "secondary-first"
+                  ? [secondaryBtn, primaryBtn]
+                  : [primaryBtn, secondaryBtn]
+
               return (
                 <li
                   key={slide.id}
@@ -203,6 +327,7 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                   aria-hidden={isActive ? undefined : true}
                   inert={!isActive}
                   className="relative w-full shrink-0"
+                  style={{ backgroundColor: slideBgColor }}
                 >
                   <div
                     role="group"
@@ -213,31 +338,77 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                     })}
                     className="relative min-h-[23rem] small:min-h-[24.5rem] medium:min-h-[25.5rem] large:min-h-[27rem]"
                   >
-                    {/* Desktop & laptop full-bleed background artwork aligned to the right */}
+                    {/* Desktop & laptop full-bleed background artwork */}
                     <div className="pointer-events-none absolute inset-0 hidden overflow-hidden small:block">
-                      <div className="relative ml-auto h-full w-fit">
+                      <div
+                        className={clx(
+                          "relative h-full w-fit",
+                          contentSide === "right" ? "mr-auto" : "ml-auto"
+                        )}
+                      >
                         <img
                           src={slide.imageDesktop}
                           alt={altText}
-                          className="relative -top-[10%] h-[112%] w-auto max-w-none select-none object-contain object-right medium:-top-[19%] medium:h-[124%]"
+                          className={clx(
+                            "relative -top-[10%] h-[112%] w-auto max-w-none select-none object-contain medium:-top-[19%] medium:h-[124%]",
+                            contentSide === "right"
+                              ? "object-left"
+                              : "object-right"
+                          )}
                           loading={slideIndex === 0 ? "eager" : "lazy"}
                         />
-                        <div className="absolute inset-y-0 left-0 w-44 bg-gradient-to-r from-[#FCEBD7] via-[#FCEBD7]/90 to-transparent medium:w-48 medium:via-[#FCEBD7]/85" />
-                        <div className="absolute inset-x-0 top-0 h-5 bg-gradient-to-b from-[#FCEBD7] to-transparent" />
-                        <div className="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-[#FCEBD7] via-[#FCEBD7]/75 to-transparent" />
+                        {contentSide === "right" ? (
+                          <div
+                            className="absolute inset-y-0 right-0 w-44 medium:w-48"
+                            style={{
+                              background: `linear-gradient(to left, ${slideBgColor} 0%, ${slideBgColor}E6 45%, transparent 100%)`,
+                            }}
+                          />
+                        ) : (
+                          <div
+                            className="absolute inset-y-0 left-0 w-44 medium:w-48"
+                            style={{
+                              background: `linear-gradient(to right, ${slideBgColor} 0%, ${slideBgColor}E6 45%, transparent 100%)`,
+                            }}
+                          />
+                        )}
+                        <div
+                          className="absolute inset-x-0 top-0 h-5"
+                          style={{
+                            background: `linear-gradient(to bottom, ${slideBgColor} 0%, transparent 100%)`,
+                          }}
+                        />
+                        <div
+                          className="absolute inset-x-0 bottom-0 h-6"
+                          style={{
+                            background: `linear-gradient(to top, ${slideBgColor} 0%, ${slideBgColor}BF 55%, transparent 100%)`,
+                          }}
+                        />
                       </div>
                     </div>
 
                     {/* Content column */}
-                    <div className="site-container relative z-10 grid items-center gap-6 pb-2 pt-7 small:grid-cols-[1.06fr_0.94fr] small:pt-9 medium:pb-3 medium:pt-10">
-                      <div className="flex flex-col items-start gap-4">
+                    <div
+                      className={clx(
+                        "site-container relative z-10 grid items-center gap-6 pb-2 pt-7 small:pt-9 medium:pb-3 medium:pt-10",
+                        contentSide === "right"
+                          ? "small:grid-cols-[0.94fr_1.06fr]"
+                          : "small:grid-cols-[1.06fr_0.94fr]"
+                      )}
+                    >
+                      <div
+                        className={clx(
+                          "flex flex-col items-start gap-4",
+                          contentSide === "right" ? "small:col-start-2" : ""
+                        )}
+                      >
                         {eyebrowText ? (
                           <div className="inline-flex items-center gap-2 rounded-full bg-[#FFF8F0] px-4 py-1.5 text-xs font-bold text-[#D97706] shadow-xs">
                             {/* Orange paw icon */}
                             <svg
                               viewBox="0 0 20 20"
                               fill="currentColor"
-                              className="h-3.5 w-3.5 shrink-0 text-[#F36F21]"
+                              className="h-3.5 w-3.5 shrink-0 text-[var(--brand-500)]"
                               aria-hidden="true"
                             >
                               <ellipse cx="10" cy="13.2" rx="4.2" ry="3.3" />
@@ -250,14 +421,14 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                           </div>
                         ) : null}
 
-                        <h1 className="font-display text-[2.15rem] font-extrabold leading-[1.06] tracking-tight text-[#0E352E] xsmall:text-[2.65rem] medium:text-[3.2rem] large:text-[3.5rem]">
+                        <h1 className="font-display text-[2.15rem] font-extrabold leading-[1.06] tracking-tight text-[var(--fg-base,#0E352E)] xsmall:text-[2.65rem] medium:text-[3.2rem] large:text-[3.5rem]">
                           <span className="relative inline-block">
                             {rawTitle}
                             {/* 3 Orange Sparkle Rays at top-right of headline */}
                             <svg
                               viewBox="0 0 28 26"
                               fill="none"
-                              className="pointer-events-none absolute -right-6 -top-3.5 h-6 w-6 text-[#F36F21]"
+                              className="pointer-events-none absolute -right-6 -top-3.5 h-6 w-6 text-[var(--brand-500)]"
                               aria-hidden="true"
                             >
                               <path
@@ -271,7 +442,7 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                           {highlightText ? (
                             <>
                               <br />
-                              <span className="relative mt-0.5 inline-block text-[#F36F21]">
+                              <span className="relative mt-0.5 inline-block text-[var(--brand-500)]">
                                 {highlightText}
                                 {/* Curved golden-amber smile underline */}
                                 <svg
@@ -299,47 +470,20 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                           </p>
                         ) : null}
 
-                        <div className="mt-1 flex flex-wrap items-center gap-3.5">
-                          <LocalizedClientLink
-                            href={slide.ctaHref}
-                            className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#F36F21] px-6 py-3 text-sm font-bold text-white shadow-[0_6px_20px_rgba(243,111,33,0.35)] transition-all hover:-translate-y-0.5 hover:bg-[#E05E10]"
-                          >
-                            {/* Shopping cart icon */}
-                            <svg
-                              viewBox="0 0 20 20"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="1.8"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-4 w-4 shrink-0"
-                              aria-hidden="true"
-                            >
-                              <circle cx="8" cy="16.5" r="1.2" fill="currentColor" />
-                              <circle cx="14.5" cy="16.5" r="1.2" fill="currentColor" />
-                              <path d="M2.5 3.5h2.2l1.9 9.2a1.2 1.2 0 0 0 1.2 1h7.3a1.2 1.2 0 0 0 1.2-.9l1.4-6.3H5.4" />
-                            </svg>
-                            <span>{ctaText}</span>
-                            <span aria-hidden="true">&rarr;</span>
-                          </LocalizedClientLink>
-
-                          {secondaryCtaText ? (
-                            <LocalizedClientLink
-                              href={secondaryHref}
-                              className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-[#0E352E] shadow-[0_4px_14px_rgba(14,53,46,0.08)] transition-colors hover:bg-[#FFF9F2]"
-                            >
-                              {/* Green shield-check icon */}
-                              <svg
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                className="h-4 w-4 shrink-0 text-[#15803D]"
-                                aria-hidden="true"
-                              >
-                                <path d="M10 2.2 3.8 4.9v4.6c0 4.2 2.6 7.9 6.2 9.1 3.6-1.2 6.2-4.9 6.2-9.1V4.9L10 2.2Zm-1.1 10.6-2.4-2.4 1.1-1.1 1.3 1.3 3.2-3.2 1.1 1.1-4.3 4.3Z" />
-                              </svg>
-                              <span>{secondaryCtaText}</span>
-                            </LocalizedClientLink>
-                          ) : null}
+                        <div
+                          className={clx(
+                            "mt-1 flex gap-3.5 transition-transform duration-200",
+                            alignContainerClass
+                          )}
+                          style={
+                            offsetX || offsetY
+                              ? {
+                                  transform: `translate(${offsetX}px, ${offsetY}px)`,
+                                }
+                              : undefined
+                          }
+                        >
+                          {orderedButtons}
                         </div>
                       </div>
 
@@ -353,19 +497,31 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                         />
                         <div
                           aria-hidden="true"
-                          className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-[#FCEBD7] to-transparent"
+                          className="pointer-events-none absolute inset-x-0 top-0 h-6"
+                          style={{
+                            background: `linear-gradient(to bottom, ${slideBgColor} 0%, transparent 100%)`,
+                          }}
                         />
                         <div
                           aria-hidden="true"
-                          className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-[#FCEBD7] to-transparent"
+                          className="pointer-events-none absolute inset-x-0 bottom-0 h-6"
+                          style={{
+                            background: `linear-gradient(to top, ${slideBgColor} 0%, transparent 100%)`,
+                          }}
                         />
                         <div
                           aria-hidden="true"
-                          className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-[#FCEBD7] to-transparent"
+                          className="pointer-events-none absolute inset-y-0 left-0 w-10"
+                          style={{
+                            background: `linear-gradient(to right, ${slideBgColor} 0%, transparent 100%)`,
+                          }}
                         />
                         <div
                           aria-hidden="true"
-                          className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-[#FCEBD7] to-transparent"
+                          className="pointer-events-none absolute inset-y-0 right-0 w-6"
+                          style={{
+                            background: `linear-gradient(to left, ${slideBgColor} 0%, transparent 100%)`,
+                          }}
                         />
                       </div>
                     </div>
@@ -391,7 +547,7 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                       className={clx(
                         "block h-1.5 rounded-full transition-all duration-300",
                         isActive
-                          ? "w-4 bg-[#F36F21]"
+                          ? "w-4 bg-[var(--brand-500)]"
                           : "w-1.5 bg-[#D9B99B]/80"
                       )}
                     />
@@ -515,7 +671,7 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                     type="button"
                     onClick={showPrevious}
                     aria-label={t("home.hero.previous")}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-[#0E352E] shadow-2xs transition-colors hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-[#F36F21]"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-[#0E352E] shadow-2xs transition-colors hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-[var(--brand-500)]"
                   >
                     <svg
                       viewBox="0 0 16 16"
@@ -548,8 +704,8 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                             className={clx(
                               "block h-2 rounded-full transition-all duration-300",
                               isActive
-                                ? "w-5 bg-[#F36F21]"
-                                : "w-2 bg-[#D9B99B] hover:bg-[#F36F21]/60"
+                                ? "w-5 bg-[var(--brand-500)]"
+                                : "w-2 bg-[#D9B99B] hover:bg-[var(--brand-500)]"
                             )}
                           />
                         </button>
@@ -561,7 +717,7 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                     type="button"
                     onClick={showNext}
                     aria-label={t("home.hero.next")}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-[#0E352E] shadow-2xs transition-colors hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-[#F36F21]"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-[#0E352E] shadow-2xs transition-colors hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-[var(--brand-500)]"
                   >
                     <svg
                       viewBox="0 0 16 16"
@@ -584,7 +740,7 @@ export default function HeroCarousel({ slides }: { slides: HomeHeroSlide[] }) {
                       isPaused ? t("home.hero.play") : t("home.hero.pause")
                     }
                     aria-controls={viewportId}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-[#0E352E] shadow-2xs transition-colors hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-[#F36F21]"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-[#0E352E] shadow-2xs transition-colors hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-[var(--brand-500)]"
                     data-testid="hero-play-toggle"
                   >
                     {isPaused ? (

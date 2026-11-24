@@ -311,27 +311,87 @@ export const declineTransferRequest = async (id: string, token: string) => {
 }
 
 /**
+ * Fetch manual payment status and reference for an order (`GET /store/orders/:id/manual-payment`).
+ */
+export async function getManualPaymentStatus(
+  orderId: string,
+  token?: string
+): Promise<{
+  manual_payment_status?: string
+  manual_payment_reference?: string | null
+  manual_payment_method?: string | null
+} | null> {
+  const publishableKey =
+    process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ||
+    process.env.MEDUSA_PUBLISHABLE_KEY ||
+    ""
+  const headers: Record<string, string> = {
+    ...(await getAuthHeaders()),
+  }
+  if (publishableKey) {
+    headers["x-publishable-api-key"] = publishableKey
+  }
+  if (token) {
+    headers["x-order-token"] = token
+  }
+
+  const backendUrl =
+    process.env.MEDUSA_BACKEND_URL ||
+    process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ||
+    "http://localhost:9000"
+
+  try {
+    const res = await fetch(
+      `${backendUrl}/store/orders/${encodeURIComponent(orderId)}/manual-payment`,
+      {
+        method: "GET",
+        headers,
+        cache: "no-store",
+      }
+    )
+    if (!res.ok) {
+      return null
+    }
+    return await res.json()
+  } catch {
+    return null
+  }
+}
+
+/**
  * Submit customer transaction reference for manual payment (Yape / Plin / BCP).
  */
 export async function submitManualPaymentReference(
   orderId: string,
   reference: string,
-  paymentMethod: string = "transferencia",
+  paymentMethod: string = "yape",
   email?: string,
   token?: string
 ) {
+  const publishableKey =
+    process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ||
+    process.env.MEDUSA_PUBLISHABLE_KEY ||
+    ""
+
   const headers: Record<string, string> = {
     ...(await getAuthHeaders()),
     "Content-Type": "application/json",
+  }
+
+  if (publishableKey) {
+    headers["x-publishable-api-key"] = publishableKey
   }
 
   if (token) {
     headers["x-order-token"] = token
   }
 
-  const backendUrl = process.env.MEDUSA_BACKEND_URL || "http://localhost:9000"
+  const backendUrl =
+    process.env.MEDUSA_BACKEND_URL ||
+    process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ||
+    "http://localhost:9000"
   try {
-    const res = await fetch(`${backendUrl}/store/orders/${orderId}/manual-payment`, {
+    const res = await fetch(`${backendUrl}/store/orders/${encodeURIComponent(orderId)}/manual-payment`, {
       method: "POST",
       headers,
       body: JSON.stringify({ reference, payment_method: paymentMethod, email, token }),

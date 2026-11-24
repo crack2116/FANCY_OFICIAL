@@ -19,7 +19,12 @@ import { resolveFulfillmentStatus } from "@lib/order-status"
 import { Heading } from "@modules/common/components/ui"
 
 const OrderFulfillment = ({ order }: { order: HttpTypes.StoreOrder }) => {
-  const status = resolveFulfillmentStatus(order.fulfillment_status)
+  const isCompletedOrder = order.status === "completed"
+  const effectiveFulfillmentRaw =
+    order.fulfillment_status === "not_fulfilled" && isCompletedOrder
+      ? "delivered"
+      : order.fulfillment_status
+  const status = resolveFulfillmentStatus(effectiveFulfillmentRaw)
   const fulfillments = order.fulfillments ?? []
 
   return (
@@ -57,6 +62,10 @@ const OrderFulfillment = ({ order }: { order: HttpTypes.StoreOrder }) => {
               )
             })}
           </ul>
+        ) : isCompletedOrder ? (
+          <p className="txt-medium text-emerald-700 font-medium" data-testid="fulfillment-completed-note">
+            Tu pedido fue preparado y marcado como listo por la tienda.
+          </p>
         ) : (
           <p className="txt-medium text-ui-fg-subtle" data-testid="fulfillment-none">
             {t("account.order.fulfillment.none")}

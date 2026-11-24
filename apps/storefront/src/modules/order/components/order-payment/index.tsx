@@ -21,6 +21,7 @@
  */
 
 import { HttpTypes } from "@medusajs/types"
+import { getManualPaymentStatus } from "@lib/data/orders"
 import { t } from "@lib/i18n/translations"
 import { convertToLocale } from "@lib/util/money"
 import { resolvePaymentCollectionStatus } from "@lib/order-status"
@@ -28,13 +29,27 @@ import { Heading } from "@modules/common/components/ui"
 import ManualPaymentForm from "../manual-payment-form"
 import { generateOrderToken } from "@lib/util/order-token"
 
-const OrderPayment = ({ order }: { order: HttpTypes.StoreOrder }) => {
+const OrderPayment = async ({ order }: { order: HttpTypes.StoreOrder }) => {
   const collection = order.payment_collections?.[0]
   const collectionStatus = resolvePaymentCollectionStatus(collection?.status)
   const meta = (order.metadata as Record<string, unknown>) || {}
   const guestToken = order.email
     ? generateOrderToken(order.id, order.email, order.created_at)
     : undefined
+
+  const manualInfo = await getManualPaymentStatus(order.id, guestToken)
+  const isAlreadyCaptured =
+    order.payment_status === "captured" || collection?.status === "completed"
+
+  const resolvedReference =
+    (meta.manual_payment_reference as string | undefined) ||
+    (manualInfo?.manual_payment_reference ?? undefined)
+
+  const resolvedStatus = isAlreadyCaptured
+    ? "verified_and_captured"
+    : (meta.manual_payment_status as string | undefined) ||
+      manualInfo?.manual_payment_status ||
+      undefined
 
   return (
     <section aria-labelledby="order-payment-heading" data-testid="order-payment">
@@ -76,8 +91,8 @@ const OrderPayment = ({ order }: { order: HttpTypes.StoreOrder }) => {
             orderId={order.id}
             email={order.email ?? undefined}
             token={guestToken}
-            initialReference={meta.manual_payment_reference as string | undefined}
-            initialStatus={meta.manual_payment_status as string | undefined}
+            initialReference={resolvedReference}
+            initialStatus={resolvedStatus}
           />
         </div>
       ) : (

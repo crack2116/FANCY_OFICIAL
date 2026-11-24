@@ -1,26 +1,44 @@
 #!/bin/sh
+# Zero-sudo storefront rebuild & deploy for Dokploy on 192.168.1.38
 set -eu
 
-echo "== 1. Building fancyperu-storefront:dokploy =="
-sudo sh /home/ivan/fancyperu-src/deploy/dokploy/build-from-env.sh storefront
+export PATH="/home/ivan/.local/node22/bin:$PATH"
 
-echo "== 2. Triggering Dokploy redeploy =="
-TOKEN=$(tr -d '\r\n' < /home/ivan/fancyperu-dokploy-token)
-CID=$(tr -d '\r\n' < /home/ivan/fancyperu-dokploy-compose-id)
-curl -fsS -X POST -H 'Content-Type: application/json' -H "x-api-key: $TOKEN" \
-  -d "{\"composeId\":\"$CID\",\"title\":\"Deploy updated secondary banner on storefront\"}" \
-  "http://127.0.0.1:3000/api/compose.deploy"
-echo ""
+if [ -f /home/ivan/fancyperu-dokploy.env ]; then
+  set -a
+  . /home/ivan/fancyperu-dokploy.env
+  set +a
+fi
 
-echo "== 3. Waiting for deployment and checking http://shop.192.168.1.38.nip.io/pe =="
-i=0
-while [ "$i" -lt 24 ]; do
-  sleep 5
-  i=$((i + 1))
-  if curl -fsS -H 'Host: shop.192.168.1.38.nip.io' http://127.0.0.1/pe 2>/dev/null | grep -q "Baño, cepillado y paseo"; then
-    echo "OK: New banner is LIVE at http://shop.192.168.1.38.nip.io/pe"
-    exit 0
-  fi
-done
-echo "WARN: Timed out waiting for new banner text; check Dokploy logs."
-exit 1
+if [ -f /home/ivan/fancyperu-publishable-key ]; then
+  export NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY="$(tr -d '\r\n' < /home/ivan/fancyperu-publishable-key)"
+fi
+export MEDUSA_BACKEND_URL="${MEDUSA_BACKEND_URL:-http://medusa:9000}"
+
+echo "== 1. Building @dtc/storefront standalone (zero-sudo) =="
+cd /home/ivan/fancyperu-src
+pnpm --filter @dtc/storefront run build
+
+echo "== 2. Staging standalone output into /home/ivan/fancyperu-storefront-deploy =="
+mkdir -p /home/ivan/fancyperu-old-deploy-1
+if [ -d /home/ivan/fancyperu-storefront-deploy/apps/storefront/.next/cache ] && [ ! -L /home/ivan/fancyperu-storefront-deploy/apps/storefront/.next/cache ]; then
+  mv /home/ivan/fancyperu-storefront-deploy/apps/storefront/.next/cache "/home/ivan/fancyperu-old-deploy-1/cache-$(date +%s)" || true
+fi
+rm -rf /home/ivan/fancyperu-storefront-deploy
+mkdir -p /home/ivan/fancyperu-storefront-deploy/apps/storefront/.next
+cp -a /home/ivan/fancyperu-src/apps/storefront/.next/standalone/. /home/ivan/fancyperu-storefront-deploy/
+cp -a /home/ivan/fancyperu-src/apps/storefront/.next/static /home/ivan/fancyperu-storefront-deploy/apps/storefront/.next/static
+cp -a /home/ivan/fancyperu-src/apps/storefront/public /home/ivan/fancyperu-storefront-deploy/apps/storefront/public
+rm -rf /home/ivan/fancyperu-storefront-deploy/apps/storefront/.next/cache
+ln -snf /tmp /home/ivan/fancyperu-storefront-deploy/apps/storefront/.next/cache
+chmod -R a+rX /home/ivan/fancyperu-storefront-deploy
+
+echo "== 3. Triggering Dokploy compose.deploy =="
+TOKEN="$(tr -d '\r\n' < /home/ivan/fancyperu-dokploy-token)"
+COMPOSE_ID="$(tr -d '\r\n' < /home/ivan/fancyperu-dokploy-compose-id)"
+curl -fsS -X POST "http://127.0.0.1:3000/api/compose.deploy" \
+  -H "x-api-key: $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"composeId\":\"$COMPOSE_ID\"}" >/dev/null
+
+echo "== Deploy triggered successfully =="

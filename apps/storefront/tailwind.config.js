@@ -127,6 +127,13 @@ module.exports = {
           "Roboto",
           "sans-serif",
         ],
+        editorial: [
+          "var(--font-editorial)",
+          "Georgia",
+          "Cambria",
+          "Times New Roman",
+          "serif",
+        ],
       },
       keyframes: {
         ring: {

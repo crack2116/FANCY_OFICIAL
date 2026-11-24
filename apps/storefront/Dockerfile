@@ -65,7 +65,8 @@ RUN pnpm --filter @dtc/storefront run build
 # ------------------------------------------------------------------------------
 # Stage 3: Production Runner
 # ------------------------------------------------------------------------------
-FROM base AS runner
+FROM node:22-bookworm-slim AS runner
+RUN apt-get update && apt-get install -y --no-install-recommends wget ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # Create unprivileged user for security compliance

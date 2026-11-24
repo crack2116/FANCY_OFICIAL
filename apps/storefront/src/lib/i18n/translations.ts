@@ -508,20 +508,23 @@ export const esPE = {
   "wishlist.remove": "Quitar {title} de favoritos",
 
   // --- home: secondary banner --------------------------------------------
-  "home.banner.eyebrow": "Para el día a día",
-  "home.banner.title": "Baño, cepillado y paseo",
+  "home.banner.eyebrow": "Cuidado en casa",
+  "home.banner.title": "Baño, cepillado y paseo diario",
   "home.banner.subtitle":
-    "Shampoos, cepillos, collares y camas: lo que tu perro o gato usa cada semana, en un solo lugar.",
-  "home.banner.cta": "Ver productos",
-  "home.banner.secondaryCta": "Ir a higiene",
-  "home.banner.pillar.hygiene.title": "Higiene y baño",
-  "home.banner.pillar.hygiene.description": "Shampoos, limpieza y aseo",
-  "home.banner.pillar.health.title": "Salud y cepillado",
-  "home.banner.pillar.health.description": "Cuidado dental y del pelaje",
-  "home.banner.pillar.accessories.title": "Paseo y descanso",
-  "home.banner.pillar.accessories.description": "Collares, correas y camas",
+    "Lo básico de cada semana para mantener su pelaje limpio, su salud al día y sus paseos cómodos.",
+  "home.banner.cta": "Ver todo el catálogo",
+  "home.banner.secondaryCta": "Explorar higiene",
+  "home.banner.pillar.hygiene.title": "Todo para la hora del baño",
+  "home.banner.pillar.hygiene.description":
+    "Shampoos de uso frecuente, acondicionadores, toallas absorbentes y limpieza de oídos y patitas.",
+  "home.banner.pillar.health.title": "Cepillado y cuidado dental",
+  "home.banner.pillar.health.description":
+    "Cardas, cepillos quita-pelos, pastas dentales y suplementos para cuidar su piel y dientes.",
+  "home.banner.pillar.accessories.title": "Collares, correas y camas",
+  "home.banner.pillar.accessories.description":
+    "Arneses seguros para la calle y camas acolchadas lavables para que descanse en casa.",
   "home.banner.imageAlt":
-    "Perro recién bañado secándose con una toalla en casa",
+    "Perro limpio envuelto en una toalla de algodón beige en una sala luminosa",
 
   // --- empty states -------------------------------------------------------
   "empty.state.title": "No hay productos para mostrar",

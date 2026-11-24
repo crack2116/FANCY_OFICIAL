@@ -201,7 +201,7 @@ export default function CategoryShowcase({
   return (
     <section
       id="categorias"
-      className="relative overflow-hidden bg-[#FDF8F2] py-8 scroll-mt-44 small:py-11"
+      className="relative overflow-hidden bg-[var(--surface,#FDF8F2)] py-8 scroll-mt-44 small:py-11"
       aria-labelledby="category-showcase-heading"
     >
       {/* Decorative soft background paw watermarks matching reference */}

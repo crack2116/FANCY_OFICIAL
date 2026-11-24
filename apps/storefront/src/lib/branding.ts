@@ -62,8 +62,7 @@ export const getBranding = async (): Promise<StoreBranding> => {
       headers: {
         "x-publishable-api-key": PUBLISHABLE_API_KEY ?? "",
       },
-      next: { revalidate: BRANDING_REVALIDATE_SECONDS },
-      cache: "force-cache",
+      cache: "no-store",
     })
 
     if (!response.ok) {

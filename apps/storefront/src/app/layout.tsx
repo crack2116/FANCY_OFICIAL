@@ -2,7 +2,7 @@ import { getBaseURL } from "@lib/util/env"
 import { siteConfig } from "@lib/site-config"
 import { getBranding, brandingStyle } from "@lib/branding"
 import { t } from "@lib/i18n/translations"
-import { Plus_Jakarta_Sans } from "next/font/google"
+import { Fraunces, Plus_Jakarta_Sans } from "next/font/google"
 import { Metadata } from "next"
 import "styles/globals.css"
 
@@ -17,6 +17,14 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
   variable: "--font-sans",
   weight: ["400", "500", "600", "700", "800"],
+})
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-editorial",
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
 })
 
 export const metadata: Metadata = {
@@ -37,7 +45,7 @@ export default async function RootLayout(props: {
     <html
       lang={siteConfig.locale}
       data-mode="light"
-      className={plusJakartaSans.variable}
+      className={`${plusJakartaSans.variable} ${fraunces.variable}`}
     >
       <body className="font-sans antialiased" style={brandingStyle(branding)}>
         <a

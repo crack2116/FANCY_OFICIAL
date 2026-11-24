@@ -3,40 +3,60 @@ import type { HomeSecondaryBanner } from "@lib/home-config"
 import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
-type RoutineLink = {
+type DepartmentRow = {
   id: string
+  index: string
   href: string
   titleKey: TranslationKey
   descriptionKey: TranslationKey
 }
 
-const ROUTINE_LINKS: RoutineLink[] = [
+const DEPARTMENT_ROWS: DepartmentRow[] = [
   {
     id: "hygiene",
+    index: "01",
     href: "/categories/higiene",
     titleKey: "home.banner.pillar.hygiene.title",
     descriptionKey: "home.banner.pillar.hygiene.description",
   },
   {
     id: "health",
+    index: "02",
     href: "/categories/salud",
     titleKey: "home.banner.pillar.health.title",
     descriptionKey: "home.banner.pillar.health.description",
   },
   {
     id: "accessories",
+    index: "03",
     href: "/categories/accesorios",
     titleKey: "home.banner.pillar.accessories.title",
     descriptionKey: "home.banner.pillar.accessories.description",
   },
 ]
 
+function ArrowIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M4 10h12M11 5l5 5-5 5" />
+    </svg>
+  )
+}
+
 /**
- * Daily-care band between the product rails.
+ * Open, card-free editorial section between the product rails.
  *
- * Deliberately plain: one flat panel, a single-colour heading, a photo and a
- * short list of real category links. No decorative glows, badges or floating
- * cards, so it reads like the rest of the storefront instead of a template.
+ * Pairs a standalone photograph with Fraunces serif typography and a hairline-
+ * divided directory of daily-care departments directly on the page canvas.
  */
 export default function SecondaryBanner({
   banner,
@@ -45,79 +65,84 @@ export default function SecondaryBanner({
 }) {
   return (
     <section
-      className="bg-white py-10 small:py-14"
+      className="border-y border-[#EFE6D8] bg-[var(--surface,#FFFFFF)] py-14 small:py-20"
       aria-labelledby={`${banner.id}-heading`}
     >
       <div className="site-container">
-        <div className="grid grid-cols-1 overflow-hidden rounded-2xl bg-[#0E352E] small:grid-cols-12">
-          <div className="flex flex-col p-6 xsmall:p-8 small:col-span-7 medium:p-10 large:p-12">
+        <div className="grid grid-cols-1 items-center gap-10 small:grid-cols-12 small:gap-12 medium:gap-16">
+          {/* Standalone photograph on the open canvas (no card container) */}
+          <div className="small:col-span-5">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-[#F4EFE7] small:aspect-[4/5]">
+              <Image
+                src={banner.image}
+                alt={t(banner.imageAltKey)}
+                fill
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                className="object-cover object-center"
+              />
+            </div>
+          </div>
+
+          {/* Open typographic column + hairline-separated department list */}
+          <div className="small:col-span-7">
             {banner.eyebrowKey ? (
-              <p className="text-sm font-semibold text-[#F5A56D]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#C85A17]">
                 {t(banner.eyebrowKey)}
               </p>
             ) : null}
 
             <h2
               id={`${banner.id}-heading`}
-              className="mt-2 max-w-[22ch] font-display text-[1.85rem] font-bold leading-tight text-white xsmall:text-[2.1rem] medium:text-[2.4rem]"
+              className="mt-3 font-editorial text-[2rem] font-medium leading-[1.08] tracking-[-0.02em] text-[#0E352E] xsmall:text-[2.45rem] small:text-[2.75rem] medium:text-[3.05rem]"
             >
-              {t(banner.titleKey)}
+              Baño, cepillado y{" "}
+              <span className="italic text-[#C85A17]">paseo diario</span>
             </h2>
 
-            <p className="mt-3 max-w-[34rem] text-[15px] leading-relaxed text-[#C9DAD5]">
+            <p className="mt-4 max-w-[34rem] text-[15px] leading-relaxed text-[#4A5D58]">
               {t(banner.subtitleKey)}
             </p>
 
-            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <ul className="mt-8 divide-y divide-[#E6DDD0] border-y border-[#E6DDD0]">
+              {DEPARTMENT_ROWS.map((item) => (
+                <li key={item.id}>
+                  <LocalizedClientLink
+                    href={item.href}
+                    className="group flex items-center justify-between gap-6 py-5 outline-none focus-visible:ring-2 focus-visible:ring-[#C85A17]"
+                  >
+                    <div className="flex items-baseline gap-4 small:gap-5">
+                      <span
+                        aria-hidden="true"
+                        className="font-editorial text-sm italic text-[#B86835]"
+                      >
+                        {item.index}
+                      </span>
+
+                      <div>
+                        <span className="block font-editorial text-xl font-medium leading-snug text-[#0E352E] transition-colors group-hover:text-[#C85A17] small:text-[1.35rem]">
+                          {t(item.titleKey)}
+                        </span>
+                        <span className="mt-1 block max-w-[30rem] text-sm leading-relaxed text-[#526560]">
+                          {t(item.descriptionKey)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <ArrowIcon className="h-5 w-5 shrink-0 text-[#0E352E]/45 transition-all duration-200 group-hover:translate-x-1 group-hover:text-[#C85A17]" />
+                  </LocalizedClientLink>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-7">
               <LocalizedClientLink
                 href={banner.ctaHref}
-                className="inline-flex items-center justify-center rounded-full bg-[#F36F21] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#DF5E14]"
+                className="group inline-flex items-center gap-2 border-b border-[#0E352E] pb-1 text-sm font-semibold text-[#0E352E] transition-colors hover:border-[#C85A17] hover:text-[#C85A17]"
               >
-                {t(banner.ctaKey)}
+                <span>{t(banner.ctaKey)}</span>
+                <ArrowIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
               </LocalizedClientLink>
-
-              {banner.secondaryCtaKey && banner.secondaryCtaHref ? (
-                <LocalizedClientLink
-                  href={banner.secondaryCtaHref}
-                  className="text-sm font-semibold text-white underline decoration-white/40 underline-offset-4 transition-colors hover:decoration-white"
-                >
-                  {t(banner.secondaryCtaKey)}
-                </LocalizedClientLink>
-              ) : null}
             </div>
-
-            <div className="mt-auto pt-8">
-              <ul className="grid grid-cols-1 border-t border-white/15 pt-2 xsmall:grid-cols-3 xsmall:gap-6 xsmall:pt-6">
-                {ROUTINE_LINKS.map((item) => (
-                  <li
-                    key={item.id}
-                    className="border-b border-white/10 last:border-b-0 xsmall:border-b-0"
-                  >
-                    <LocalizedClientLink
-                      href={item.href}
-                      className="group block py-3 xsmall:py-0"
-                    >
-                      <span className="block text-[15px] font-semibold text-white group-hover:underline group-hover:underline-offset-4">
-                        {t(item.titleKey)}
-                      </span>
-                      <span className="mt-1 block text-[13px] leading-snug text-[#A9C2BC]">
-                        {t(item.descriptionKey)}
-                      </span>
-                    </LocalizedClientLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="relative aspect-[4/3] w-full bg-[#E8E1D4] small:col-span-5 small:aspect-auto small:min-h-[22rem]">
-            <Image
-              src={banner.image}
-              alt={t(banner.imageAltKey)}
-              fill
-              sizes="(min-width: 1024px) 40vw, 100vw"
-              className="object-cover object-center"
-            />
           </div>
         </div>
       </div>

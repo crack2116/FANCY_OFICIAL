@@ -51,7 +51,11 @@ const OrderDetailsTemplate = ({ order }: OrderDetailsTemplateProps) => {
 
   const orderStatus = resolveOrderStatus(order.status)
   const paymentStatus = resolvePaymentStatus(order.payment_status)
-  const fulfillmentStatus = resolveFulfillmentStatus(order.fulfillment_status)
+  const effectiveFulfillmentRaw =
+    order.fulfillment_status === "not_fulfilled" && order.status === "completed"
+      ? "delivered"
+      : order.fulfillment_status
+  const fulfillmentStatus = resolveFulfillmentStatus(effectiveFulfillmentRaw)
 
   return (
     <div className="flex flex-col justify-center gap-y-4" data-testid="order-details-container">

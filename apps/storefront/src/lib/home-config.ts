@@ -41,6 +41,18 @@ export type HomeHeroSlide = {
   imageMobile: string | null
   active: boolean
   order: number
+  /** Custom hero background & button positioning/styling from Landing editor */
+  bgColor?: string
+  contentSide?: "left" | "right"
+  ctaEnabled?: boolean
+  secondaryCtaEnabled?: boolean
+  ctaOrder?: "primary-first" | "secondary-first"
+  ctaAlign?: "left" | "center" | "right" | "stretch"
+  ctaLayout?: "row" | "column"
+  ctaShape?: "pill" | "rounded" | "sharp"
+  ctaSize?: "sm" | "md" | "lg"
+  ctaOffsetX?: number
+  ctaOffsetY?: number
 }
 
 export const heroSlides: HomeHeroSlide[] = [

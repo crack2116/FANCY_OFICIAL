@@ -51,7 +51,7 @@ async function getAdminManagedSlides(): Promise<HomeHeroSlide[] | null> {
             (item): item is Record<string, unknown> =>
               Boolean(item) && typeof item === "object"
           )
-          .map((item, idx) => ({
+          .map((item, idx): HomeHeroSlide => ({
             id:
               typeof item.id === "string" && item.id.trim()
                 ? item.id.trim()
@@ -104,6 +104,43 @@ async function getAdminManagedSlides(): Promise<HomeHeroSlide[] | null> {
               typeof item.order === "number" && Number.isFinite(item.order)
                 ? item.order
                 : (idx + 1) * 10,
+            bgColor:
+              typeof item.bgColor === "string" &&
+              /^#[0-9a-fA-F]{6}$/.test(item.bgColor.trim())
+                ? item.bgColor.trim()
+                : undefined,
+            contentSide: item.contentSide === "right" ? "right" : "left",
+            ctaEnabled: item.ctaEnabled !== false,
+            secondaryCtaEnabled: item.secondaryCtaEnabled !== false,
+            ctaOrder:
+              item.ctaOrder === "secondary-first"
+                ? "secondary-first"
+                : "primary-first",
+            ctaAlign:
+              item.ctaAlign === "center" ||
+              item.ctaAlign === "right" ||
+              item.ctaAlign === "stretch"
+                ? item.ctaAlign
+                : "left",
+            ctaLayout: item.ctaLayout === "column" ? "column" : "row",
+            ctaShape:
+              item.ctaShape === "rounded" || item.ctaShape === "sharp"
+                ? item.ctaShape
+                : "pill",
+            ctaSize:
+              item.ctaSize === "sm" || item.ctaSize === "lg"
+                ? item.ctaSize
+                : "md",
+            ctaOffsetX:
+              typeof item.ctaOffsetX === "number" &&
+              Number.isFinite(item.ctaOffsetX)
+                ? Math.max(-80, Math.min(80, item.ctaOffsetX))
+                : 0,
+            ctaOffsetY:
+              typeof item.ctaOffsetY === "number" &&
+              Number.isFinite(item.ctaOffsetY)
+                ? Math.max(-60, Math.min(60, item.ctaOffsetY))
+                : 0,
           }))
           .filter((slide) => slide.active)
           .sort((a, b) => a.order - b.order)

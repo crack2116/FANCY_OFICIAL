@@ -48,6 +48,7 @@ export default async function Nav() {
                 currentLocale={currentLocale}
                 categories={productCategories ?? []}
                 collections={collections.collections ?? []}
+                customer={customer}
               />
             </div>
 

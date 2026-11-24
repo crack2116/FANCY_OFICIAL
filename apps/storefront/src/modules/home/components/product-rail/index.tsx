@@ -75,7 +75,7 @@ export default function ProductRail({
   return (
     <section
       id={id}
-      className="relative overflow-hidden bg-[#FAF6EF] py-9 scroll-mt-44 small:py-12"
+      className="relative overflow-hidden bg-[var(--surface,#FAF6EF)] py-9 scroll-mt-44 small:py-12"
       aria-labelledby={headingId}
     >
       {/* Decorative soft background paw watermarks matching reference */}
@@ -178,7 +178,7 @@ export default function ProductRail({
         ) : null}
 
         <div className="relative mt-6">
-          {!sparse ? <RailArrows listId={listId} /> : null}
+          <RailArrows listId={listId} hideOnDesktop={sparse} />
           <ul
             id={listId}
             className={
@@ -230,7 +230,7 @@ export default function ProductRail({
           </ul>
         </div>
 
-        {!sparse ? <RailDots listId={listId} label={title} /> : null}
+        <RailDots listId={listId} label={title} />
       </div>
     </section>
   )
