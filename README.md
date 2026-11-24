@@ -1,27 +1,27 @@
 # Fancy Pets
 
-E-commerce storefront and admin for Fancy Pets, a pet store in Peru. The customer-facing shop runs on Next.js and talks to a Medusa backend; the manager runs everything else from the Medusa admin dashboard, including how the shop looks.
+Tienda online y panel de administración de Fancy Pets, una tienda de mascotas en Perú. La tienda para clientes funciona con Next.js y se comunica con un backend Medusa. El equipo administra todo lo demás desde el panel de Medusa, incluido el aspecto visual de la tienda.
 
-This repository is a Medusa DTC starter that has been reshaped into the Fancy Pets product. The upstream starter is still reachable as the `upstream` remote.
+Este repositorio comenzó como un starter DTC de Medusa y fue adaptado al producto Fancy Pets. El starter original sigue disponible en el remoto `upstream`.
 
 ## Stack
 
 | | |
 |---|---|
-| Monorepo | Turborepo + pnpm workspaces |
+| Monorepo | Turborepo + espacios de trabajo pnpm |
 | Backend | Medusa v2 (2.21.2), Node 22+, PostgreSQL 15+ |
 | Storefront | Next.js 15 (App Router, Turbopack) |
-| Package manager | pnpm 10.11.1 |
+| Gestor de paquetes | pnpm 10.11.1 |
 
-## Requirements
+## Requisitos
 
 - **Node.js >= 22.22.0**
-- **pnpm 10.11.1** — use the version in the root `package.json`, never introduce a second lockfile
-- **PostgreSQL 15+** running and reachable at the `DATABASE_URL` you configure
+- **pnpm 10.11.1**: usá la versión del `package.json` raíz y no introduzcas un segundo lockfile.
+- **PostgreSQL 15+** en ejecución y accesible desde el `DATABASE_URL` que configures.
 
-> On a WSL development machine, note that PostgreSQL runs *inside* WSL and Windows reaches it through the WSL2 localhost relay on `127.0.0.1:5432`. That relay is unreliable right after WSL boots: a Windows-side check for a PostgreSQL service always finds nothing, which looks like a missing database when it is really a cold relay. If the backend dies with `ECONNREFUSED 127.0.0.1:5432`, start WSL and confirm the port answers several times in a row before touching anything else.
+> En una máquina de desarrollo con WSL, tené en cuenta que PostgreSQL corre *dentro* de WSL y Windows lo alcanza a través del relay de localhost de WSL2 en `127.0.0.1:5432`. Ese relay no es confiable justo después de arrancar WSL: una comprobación del servicio de PostgreSQL desde Windows siempre no encuentra nada, lo que parece una base de datos faltante cuando en realidad es un relay frío. Si el backend muere con `ECONNREFUSED 127.0.0.1:5432`, arrancá WSL y confirmá que el puerto responde varias veces seguidas antes de tocar cualquier otra cosa.
 
-## Setup
+## Instalación
 
 ```bash
 pnpm install
@@ -30,19 +30,19 @@ cp apps/backend/.env.template    apps/backend/.env
 cp apps/storefront/.env.template apps/storefront/.env.local
 ```
 
-Then fill in at least:
+Luego completá al menos:
 
-| Variable | Where | Notes |
+| Variable | Dónde | Notas |
 |---|---|---|
-| `DATABASE_URL` | backend | Your PostgreSQL connection string |
-| `JWT_SECRET`, `COOKIE_SECRET` | backend | Any non-trivial random strings |
-| `MEDUSA_BACKEND_URL` | backend | **See the warning below** |
-| `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | storefront | Without it every store request returns 400 |
-| `NEXT_PUBLIC_MEDUSA_BACKEND_URL` | storefront | `http://localhost:9000` for local work |
+| `DATABASE_URL` | backend | Tu cadena de conexión a PostgreSQL |
+| `JWT_SECRET`, `COOKIE_SECRET` | backend | Cualquier cadena aleatoria no trivial |
+| `MEDUSA_BACKEND_URL` | backend | **Ver la advertencia de abajo** |
+| `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | storefront | Sin esta clave, todas las peticiones de la tienda devuelven 400 |
+| `NEXT_PUBLIC_MEDUSA_BACKEND_URL` | storefront | `http://localhost:9000` para desarrollo local |
 
-> **`MEDUSA_BACKEND_URL` is load-bearing.** The file module builds every uploaded asset URL from it, and those URLs are then persisted into `store.metadata.branding`. A wrong value does not fail loudly at upload time — it bakes unreachable links into saved data. Include the `/static` path, not just the origin: `@medusajs/file-local` replaces the pathname of this value with the file key, while the framework mounts uploads at `/static`.
+> **`MEDUSA_BACKEND_URL` es crítica.** El módulo de archivos construye cada URL de los assets subidos a partir de este valor, y esas URLs después se guardan en `store.metadata.branding`. Un valor incorrecto no falla de forma visible al subir: deja enlaces inaccesibles grabados en los datos guardados. Incluí la ruta `/static`, no solo el origen: `@medusajs/file-local` reemplaza el pathname de este valor con la clave del archivo, mientras que el framework monta las subidas en `/static`.
 
-Then create the database schema and an admin user:
+Luego creá el esquema de la base de datos y un usuario administrador:
 
 ```bash
 cd apps/backend
@@ -50,19 +50,19 @@ pnpm exec medusa db:migrate
 pnpm exec medusa user -e admin@fancyperu.com -p supersecret
 ```
 
-## Running
+## Ejecución
 
 ```bash
-pnpm run dev              # both apps
-pnpm run backend:dev      # http://localhost:9000, admin at /app
+pnpm run dev              # ambas apps
+pnpm run backend:dev      # http://localhost:9000, admin en /app
 pnpm run storefront:dev   # http://localhost:8000/pe
 ```
 
-Start the backend only after PostgreSQL is actually reachable, otherwise it exits after a few retries.
+Arrancá el backend solo después de que PostgreSQL esté realmente accesible. De lo contrario, se cierra después de unos reintentos.
 
-## Seeding data
+## Carga de datos
 
-There is no working `pnpm run backend:seed`. The `seed` task exists in `turbo.json` but the backend package defines no `seed` script, so turbo resolves it to `<NONEXISTENT>` and the command does nothing. Run the scripts directly instead:
+No existe un `pnpm run backend:seed` funcional. La tarea `seed` existe en `turbo.json`, pero el paquete del backend no define un script `seed`, así que turbo la resuelve como `<NONEXISTENT>` y el comando no hace nada. Ejecutá los scripts directamente:
 
 ```bash
 cd apps/backend
@@ -74,39 +74,39 @@ pnpm exec medusa exec ./src/scripts/seed-demo-products.ts
 pnpm exec medusa exec ./src/scripts/seed-staff-accounts.ts
 ```
 
-All of them are idempotent by design: running one twice converges instead of duplicating.
+Todos son idempotentes por diseño: ejecutar uno dos veces converge en lugar de duplicar.
 
-`bootstrap-peru.ts` is the one that matters for a working store — it creates the Peru region, zones, shipping options and PEN prices, and it deliberately leaves the upstream demo Europe region alone.
+`bootstrap-peru.ts` es el que importa para tener una tienda funcional: crea la región de Perú, las zonas, las opciones de envío y los precios en PEN, y deja deliberadamente intacta la región demo de Europa del upstream.
 
-`seed-staff-accounts.ts` reads its credentials from the environment and never from the repository:
+`seed-staff-accounts.ts` lee sus credenciales desde el entorno y nunca desde el repositorio:
 
 ```bash
 FANCYPETS_MANAGER_EMAIL=...    FANCYPETS_MANAGER_PASSWORD=...
 FANCYPETS_DEVELOPER_EMAIL=...  FANCYPETS_DEVELOPER_PASSWORD=...
 ```
 
-A password is required only for an account that does not exist yet. An account that already exists is reconciled — its role is updated and its password is never read, so re-running never rotates a live credential.
+Una contraseña es obligatoria solo para una cuenta que todavía no existe. Una cuenta existente se reconcilia: se actualiza su rol y su contraseña nunca se lee, así que volver a ejecutar nunca rota una credencial en producción.
 
-## What this fork adds over the starter
+## Qué agrega este fork sobre el starter
 
-**A manager-owned look, with no code changes.** `Marca`, in the main navigation, is a single screen that owns the colours, the logo, the announcement strip, the six category images and the two hero banners. Everything persists in `store.metadata.branding` rather than in code, and the storefront prefers the saved values over its shipped fallbacks, degrading per entry so one missing upload never blanks a slot.
+**Un aspecto administrado por el equipo, sin cambios de código.** `Marca`, en la navegación principal, es una sola pantalla que administra los colores, el logo, la franja de anuncios, las seis imágenes de categorías y los dos banners del hero. Todo se guarda en `store.metadata.branding` en lugar de estar en el código, y la tienda prefiere los valores guardados por encima de los fallbacks incluidos, degradando entrada por entrada para que una subida faltante nunca deje un espacio en blanco.
 
-Uploads go through Medusa's own file module with image-type and size validation, and the workflow deletes the file when the metadata write fails, so a failed save cannot leave an orphan behind.
+Las subidas pasan por el módulo de archivos de Medusa con validación de tipo de imagen y tamaño, y el workflow elimina el archivo cuando falla la escritura de metadata, así que un guardado fallido no puede dejar un archivo huérfano.
 
-**Staff accounts with a role.** Accounts carry `metadata.role`, and the settings sidebar hides the `Desarrollador` group for `manager`. This is **presentation only**: `metadata.role` is not authorization, and with `MEDUSA_FF_RBAC` off the routes behind that group stay reachable by direct URL. Turning RBAC on loads the RBAC module, at which point admin accounts need a real RBAC role and not just `metadata.role`.
+**Cuentas de personal con rol.** Las cuentas llevan `metadata.role`, y la barra lateral de configuración oculta el grupo `Desarrollador` para `manager`. Esto es **solo presentación**: `metadata.role` no es autorización, y con `MEDUSA_FF_RBAC` desactivado las rutas detrás de ese grupo siguen siendo accesibles por URL directa. Al activar RBAC se carga el módulo RBAC, y en ese momento las cuentas de administración necesitan un rol RBAC real y no solo `metadata.role`.
 
-**A storefront that matches the reference design.** Header, hero and catalogue work was measured against the live store rather than eyeballed, and the hero carousel autoplays with a play/pause control, pauses on hover and focus, and never autoplays under `prefers-reduced-motion`.
+**Una tienda que coincide con el diseño de referencia.** El trabajo de header, hero y catálogo se midió contra la tienda en vivo en lugar de estimarse a ojo, y el carrusel del hero se reproduce automáticamente con un control de play/pausa, se pausa al pasar el mouse o al enfocar, y nunca se reproduce automáticamente con `prefers-reduced-motion`.
 
-## Project layout
+## Estructura del proyecto
 
 ```text
 apps/
-  backend/     Medusa app: admin customizations, API routes, modules, workflows, scripts
-  storefront/  Next.js app: home, catalogue, cart, checkout, account
-odd/tasks/     Feature documents written while building the above
+  backend/     App Medusa: personalizaciones del admin, rutas de API, módulos, workflows, scripts
+  storefront/  App Next.js: home, catálogo, carrito, checkout, cuenta
+odd/tasks/     Documentos de funcionalidades escritos durante el desarrollo
 ```
 
-## Checks
+## Verificaciones
 
 ```bash
 pnpm run lint
@@ -116,17 +116,17 @@ cd apps/storefront && pnpm exec tsc --noEmit -p tsconfig.json
 cd apps/backend    && pnpm exec tsc --noEmit -p tsconfig.json
 ```
 
-`tsc` in `apps/backend` reports one pre-existing error, `TS1470` at `src/admin/widgets/login-branding-widget.tsx:4`. Treat it as baseline noise, not a regression.
+`tsc` en `apps/backend` reporta un error preexistente, `TS1470` en `src/admin/widgets/login-branding-widget.tsx:4`. Tratalo como ruido de base, no como una regresión.
 
-Integration suites need a reachable PostgreSQL.
+Las suites de integración necesitan una PostgreSQL accesible.
 
-### A note on the header's hidden focus guards
+### Una nota sobre los guards de foco ocultos del header
 
-The SSR HTML for the storefront header contains two `<span hidden>` focus guards emitted by `@headlessui/react`'s `Popover` — one per Popover, in `SideMenu` and in the cart button. They are absent from the DOM after hydration, and that is correct: Headless UI renders them for the initial paint and removes them once mounted. They are **not** the cause of the hydration mismatch described above.
+El HTML SSR del header de la tienda contiene dos `<span hidden>` de guardas de foco emitidos por `Popover` de `@headlessui/react`: uno por cada Popover, en `SideMenu` y en el botón del carrito. Desaparecen del DOM después de la hidratación, y eso es correcto: Headless UI los renderiza para el primer pintado y los elimina una vez montado. **No** son la causa del desajuste de hidratación descrito arriba.
 
-If you ever see a hydration mismatch in development, suspect the dev server before the code: a bundle compiled against one state of the tree while the server renders another reproduces it reliably, and it disappears once the dev server settles.
+Si alguna vez ves un desajuste de hidratación en desarrollo, sospechá primero del servidor de desarrollo antes que del código: un bundle compilado contra un estado del árbol mientras el servidor renderiza otro lo reproduce de forma confiable, y desaparece cuando el servidor de desarrollo se estabiliza.
 
-## Known issues
+## Problemas conocidos
 
-- **Hydration mismatch on `/pe` — open, unexplained.** React pairs the client's `<header className="w-full bg-surface">` against the server's `<div className="bg-[var(--chrome-header)]>` in `modules/layout/templates/nav/index.tsx`, and regenerates the header on the client. It survives a hard reload. It could not be reproduced in 36 controlled loads (fresh cache-disabled loads, clean browser profiles, a production build, an HMR update to a live page, throttled network, and seven routes), so it depends on something in a real browser that a headless run does not reach. First thing to check is a browser extension mutating the DOM before React hydrates; the second is to replicate the exact browser and window size. Do not "fix" it by changing `@headlessui/react` versions — the hidden focus guards in the header are that library's intended SSR lifecycle, not this bug.
-- **`next/image` quality warnings.** Product thumbnails pass `quality={50}`, which Next.js 16 will require to be declared in `images.qualities`.
+- **Desajuste de hidratación en `/pe`: abierto, sin explicación.** React empareja el `<header className="w-full bg-surface">` del cliente contra el `<div className="bg-[var(--chrome-header)]">` del servidor en `modules/layout/templates/nav/index.tsx`, y regenera el header en el cliente. Sobrevive a una recarga forzada. No se pudo reproducir en 36 cargas controladas (cargas nuevas con caché desactivada, perfiles de navegador limpios, una build de producción, una actualización HMR a una página viva, red limitada y siete rutas), así que depende de algo de un navegador real que una ejecución headless no alcanza. Lo primero que hay que revisar es una extensión del navegador que mute el DOM antes de que React hidrate; lo segundo es replicar el navegador y el tamaño de ventana exactos. No lo "arregles" cambiando versiones de `@headlessui/react`: los guards de foco ocultos del header son el ciclo de vida SSR previsto por esa librería, no este bug.
+- **Advertencias de calidad de `next/image`.** Las miniaturas de productos pasan `quality={50}`, que Next.js 16 exigirá declarar en `images.qualities`.
